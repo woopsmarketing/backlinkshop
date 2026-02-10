@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GoogleTag } from './components/GoogleTag';
 
 export const metadata: Metadata = {
   title: "백링크샵 - 국내 최대 PBN으로 진짜 SEO 효과를 만듭니다",
@@ -53,7 +54,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <GoogleTag />
+        {children}
+      </body>
     </html>
   );
 }
