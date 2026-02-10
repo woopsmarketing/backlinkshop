@@ -380,7 +380,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-sm text-gray-600 italic">
-                "3주 만에 이런 결과가 나올 줄 몰랐습니다. 매출이 13배 뛰었어요!"
+                &ldquo;3주 만에 이런 결과가 나올 줄 몰랐습니다. 매출이 13배 뛰었어요!&rdquo;
               </p>
             </div>
 
@@ -407,7 +407,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-sm text-gray-600 italic">
-                "검색에 안 뜨던 사이트가 이제는 예약이 밀려요. 감사합니다!"
+                &ldquo;검색에 안 뜨던 사이트가 이제는 예약이 밀려요. 감사합니다!&rdquo;
               </p>
             </div>
 
@@ -434,7 +434,7 @@ export default function Home() {
                 </div>
               </div>
               <p className="text-sm text-gray-600 italic">
-                "SaaS 비즈니스에 SEO가 이렇게 효과적일 줄 몰랐습니다!"
+                &ldquo;SaaS 비즈니스에 SEO가 이렇게 효과적일 줄 몰랐습니다!&rdquo;
               </p>
             </div>
           </div>
@@ -799,7 +799,7 @@ export default function Home() {
             <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-pink-500 hover:shadow-xl transition-all">
               <p className="font-bold text-gray-900 mb-3 text-lg">Q. 경쟁이 심한 키워드도 가능한가요?</p>
               <p className="text-gray-700 leading-relaxed">
-                <strong className="text-pink-600">네, 가능합니다. 단, 더 많은 백링크와 시간이 필요합니다.</strong> 예를 들어 "보험", "대출", "부동산" 같은 초경쟁 키워드는 6-12개월이 소요되며, 티어2/티어3 구조로 강력한 링크 파워를 전달해야 합니다. 반면 롱테일 키워드나 지역 키워드는 2-4주 내 빠른 성과가 가능합니다. <strong className="text-gray-900">무료 컨설팅에서 키워드별 전략과 예상 비용을 제시</strong>해드립니다.
+                <strong className="text-pink-600">네, 가능합니다. 단, 더 많은 백링크와 시간이 필요합니다.</strong> 예를 들어 &ldquo;보험&rdquo;, &ldquo;대출&rdquo;, &ldquo;부동산&rdquo; 같은 초경쟁 키워드는 6-12개월이 소요되며, 티어2/티어3 구조로 강력한 링크 파워를 전달해야 합니다. 반면 롱테일 키워드나 지역 키워드는 2-4주 내 빠른 성과가 가능합니다. <strong className="text-gray-900">무료 컨설팅에서 키워드별 전략과 예상 비용을 제시</strong>해드립니다.
               </p>
             </div>
 
