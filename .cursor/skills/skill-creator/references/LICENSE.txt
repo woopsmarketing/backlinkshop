@@ -1,0 +1,12 @@
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+   (License text truncated in this template file intentionally.)
+
+NOTE:
+* If you need the full license text, replace this file contents with the complete Apache-2.0 license.
+* This file exists to mirror the original Claude Code skill package structure.
