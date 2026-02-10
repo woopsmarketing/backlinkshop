@@ -6,6 +6,7 @@
 
 'use server'
 
+import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '../supabase/client'
 import { SIGNUP_BONUS_AMOUNT, CREDIT_REASON } from '@/lib/constants'
 
@@ -61,9 +62,9 @@ export async function signUp(email: string, password: string) {
 
   // 2. 이메일 확인 후 로그인 시 ensureUserInitialized에서 초기화 처리
 
-  return { 
-    success: true, 
-    message: '회원가입이 완료되었습니다. 이메일을 확인해주세요.' 
+  return {
+    success: true,
+    message: '회원가입이 완료되었습니다. 이메일을 확인해주세요.',
   }
 }
 
@@ -72,16 +73,16 @@ export async function signUp(email: string, password: string) {
  */
 export async function signOut() {
   const supabase = await createServerSupabaseClient()
-  
+
   await supabase.auth.signOut()
-  
+
   redirect('/login')
 }
 
 /**
  * 첫 로그인 처리
  * - profiles row 생성
- * - credit_balances row 생성  
+ * - credit_balances row 생성
  * - 가입 보너스 지급
  */
 /**
@@ -126,9 +127,11 @@ async function handleFirstLogin(userId: string) {
  */
 export async function ensureUserInitialized() {
   const supabase = await createServerSupabaseClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   if (!user) return
 
   // profiles 존재 여부 확인

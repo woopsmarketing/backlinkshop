@@ -83,9 +83,7 @@ export default function AdminOrdersTable({ orders }: Props) {
       )}
 
       {orders.length === 0 ? (
-        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-          주문이 없습니다
-        </div>
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">주문이 없습니다</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -121,13 +119,13 @@ export default function AdminOrdersTable({ orders }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {orders.map((order) => (
+              {orders.map(order => (
                 <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                     {order.id.slice(0, 8)}...
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                    {order.products?.name || '알 수 없는 상품'}
+                    {order.products?.[0]?.name || '알 수 없는 상품'}
                   </td>
                   <td className="py-3 px-4 text-center text-sm text-gray-700 dark:text-gray-300">
                     {order.quantity}
@@ -141,10 +139,10 @@ export default function AdminOrdersTable({ orders }: Props) {
                         order.status === 'completed'
                           ? 'bg-green-100 text-green-700'
                           : order.status === 'processing'
-                          ? 'bg-blue-100 text-blue-700'
-                          : order.status === 'failed'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-blue-100 text-blue-700'
+                            : order.status === 'failed'
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-yellow-100 text-yellow-700'
                       }`}
                     >
                       {statusLabel[order.status] || order.status}
@@ -218,12 +216,10 @@ export default function AdminOrdersTable({ orders }: Props) {
         >
           <div
             className="w-full max-w-lg rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                요청 메모
-              </h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">요청 메모</h3>
               <button
                 onClick={closeNoteModal}
                 className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -240,4 +236,3 @@ export default function AdminOrdersTable({ orders }: Props) {
     </div>
   )
 }
-

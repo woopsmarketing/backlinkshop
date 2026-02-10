@@ -18,7 +18,7 @@ export type AdminOrderRow = {
   report_filename?: string | null
   report_uploaded_at?: string | null
   created_at: string
-  products?: { name: string } | null
+  products: { name: string }[] | null
 }
 
 /**
@@ -31,7 +31,9 @@ export async function getAdminOrders(status?: string) {
 
     let query = adminClient
       .from('orders')
-      .select('id, user_id, product_id, quantity, total_price, status, note, report_path, report_filename, report_uploaded_at, created_at, products(name)')
+      .select(
+        'id, user_id, product_id, quantity, total_price, status, note, report_path, report_filename, report_uploaded_at, created_at, products(name)'
+      )
       .order('created_at', { ascending: false })
 
     if (status) {
@@ -51,4 +53,3 @@ export async function getAdminOrders(status?: string) {
     return []
   }
 }
-
