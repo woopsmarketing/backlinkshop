@@ -13,10 +13,12 @@ import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import TopNav from '@/app/components/TopNav'
 
 type Props = {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
-export default async function ProductDetailPage({ params }: Props) {
+export default async function ProductDetailPage(props: Props) {
+  // Next.js 15: params는 Promise
+  const params = await props.params
   const product = await getProductById(params.id)
   const user = await getCurrentUser()
   const admin = await isAdmin()
@@ -43,17 +45,13 @@ export default async function ProductDetailPage({ params }: Props) {
         <div className="grid gap-8 lg:grid-cols-2">
           {/* 왼쪽: 상품 정보 */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              상품 설명
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">상품 설명</h2>
             <p className="text-gray-600 dark:text-gray-400 whitespace-pre-wrap mb-6">
               {product.description}
             </p>
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                가격
-              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">가격</p>
               <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">
                 {formatCredits(Number(product.price))} 크레딧
               </p>
@@ -62,9 +60,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
           {/* 오른쪽: 구매 폼 */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              구매하기
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">구매하기</h2>
             <ProductPurchaseForm
               productId={product.id}
               productName={product.name}
@@ -76,4 +72,3 @@ export default async function ProductDetailPage({ params }: Props) {
     </div>
   )
 }
-

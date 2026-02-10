@@ -12,10 +12,10 @@ import AdminNav from '@/app/admin/components/AdminNav'
 import AdminOrdersTable from './components/AdminOrdersTable'
 
 type Props = {
-  searchParams?: { status?: string }
+  searchParams: Promise<{ status?: string }>
 }
 
-export default async function AdminOrdersPage({ searchParams }: Props) {
+export default async function AdminOrdersPage(props: Props) {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -27,6 +27,8 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
     redirect('/dashboard')
   }
 
+  // Next.js 15: searchParams는 Promise
+  const searchParams = await props.searchParams
   const status = searchParams?.status
   const orders = await getAdminOrders(status)
 
@@ -98,4 +100,3 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
     </div>
   )
 }
-

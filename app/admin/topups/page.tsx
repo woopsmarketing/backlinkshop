@@ -12,10 +12,10 @@ import TopupTable from './components/TopupTable'
 import AdminNav from '@/app/admin/components/AdminNav'
 
 type Props = {
-  searchParams?: { status?: string }
+  searchParams: Promise<{ status?: string }>
 }
 
-export default async function AdminTopupsPage({ searchParams }: Props) {
+export default async function AdminTopupsPage(props: Props) {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -27,6 +27,8 @@ export default async function AdminTopupsPage({ searchParams }: Props) {
     redirect('/dashboard')
   }
 
+  // Next.js 15: searchParams는 Promise
+  const searchParams = await props.searchParams
   const status = searchParams?.status
   const requests = await getTopupRequests(status)
 
@@ -88,4 +90,3 @@ export default async function AdminTopupsPage({ searchParams }: Props) {
     </div>
   )
 }
-

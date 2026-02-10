@@ -11,10 +11,12 @@ import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import TopNav from '@/app/components/TopNav'
 
 type Props = {
-  searchParams?: { category?: string }
+  searchParams: Promise<{ category?: string }>
 }
 
-export default async function ProductsPage({ searchParams }: Props) {
+export default async function ProductsPage(props: Props) {
+  // Next.js 15: searchParams는 Promise
+  const searchParams = await props.searchParams
   const category = searchParams?.category
   const products = await getActiveProducts(category)
   const user = await getCurrentUser()
@@ -78,7 +80,7 @@ export default async function ProductsPage({ searchParams }: Props) {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
+            {products.map(product => (
               <div
                 key={product.id}
                 className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col"
@@ -110,4 +112,3 @@ export default async function ProductsPage({ searchParams }: Props) {
     </div>
   )
 }
-
