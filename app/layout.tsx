@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     "네이버 SEO",
     "백링크 전략",
     "SEO 컨설팅",
+    "PBN백링크"
   ],
   openGraph: {
     title: "백링크샵 - 국내 최대 PBN으로 진짜 SEO 효과를 만듭니다",
