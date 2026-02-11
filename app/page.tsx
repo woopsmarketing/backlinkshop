@@ -92,13 +92,13 @@ export default function Home() {
               <p className="flex items-center justify-center gap-3">
                 <span className="text-yellow-300 text-xl">✓</span>
                 <span>
-                  <strong>10가지 이상 백링크 유형</strong> (WEB2.0, EDU, GOV, Wiki 등)
+                  <strong>도메인 · 웹사이트 · 호스팅 · 백링크</strong>까지 올인원 제공
                 </span>
               </p>
               <p className="flex items-center justify-center gap-3">
                 <span className="text-yellow-300 text-xl">✓</span>
                 <span>
-                  <strong>직접 구축한 PBN 네트워크</strong>
+                  <strong>0부터 100까지 구축·운영·최적화</strong> 가능한 전문 업체
                 </span>
               </p>
               <p className="flex items-center justify-center gap-3">
@@ -936,9 +936,9 @@ export default function Home() {
                   저품질은 스팸 사이트에서 자동 생성되는 링크, 고품질은 관련성 있는 사이트에서
                   자연스럽게 생성되는 링크입니다.
                 </strong>{' '}
-                저품질 링크는 효과가 없거나 오히려 순위를 떨어뜨리지만, 고품질 링크는 도메인 권위,
-                관련성, 앵커 텍스트 다양성을 갖추고 있습니다. 백링크샵은 DA 30 이상 사이트, 관련
-                콘텐츠, 자연스러운 앵커 텍스트를 보장하며,{' '}
+                저품질 링크는 효과가 없거나 오히려 순위를 떨어뜨리지만, 고품질 링크는 도메인 신뢰도,
+                관련성, 앵커 텍스트 다양성을 갖추고 있습니다. 백링크샵은 고품질 사이트, 관련 콘텐츠,
+                자연스러운 앵커 텍스트를 보장하며,{' '}
                 <strong className="text-gray-900">효과 없으면 전액 환불</strong>합니다.
               </p>
             </div>
@@ -1064,7 +1064,7 @@ export default function Home() {
                 진행됩니다. 대시보드에서 실시간 진행 상황을 확인할 수 있으며, 작업 완료 시 이메일
                 알림과 함께{' '}
                 <strong className="text-gray-900">
-                  상세 엑셀 리포트(URL, DA, 앵커 텍스트 등)를 제공
+                  상세 엑셀 리포트(URL, 앵커 텍스트 등)를 제공
                 </strong>
                 합니다.
               </p>
@@ -1076,7 +1076,7 @@ export default function Home() {
                 <strong className="text-fuchsia-600">
                   작업 완료 후 상세 엑셀 리포트를 제공합니다.
                 </strong>{' '}
-                리포트에는 백링크 URL, 도메인 권위(DA), 앵커 텍스트, 백링크 유형, 작업 일자가
+                리포트에는 백링크 URL, 도메인 신뢰도, 앵커 텍스트, 백링크 유형, 작업 일자가
                 포함됩니다. 또한 구글 서치 콘솔 데이터와 연동하여 백링크 인덱싱 상태를 추적하고,{' '}
                 <strong className="text-gray-900">매주 순위 변화 리포트</strong>를 이메일로
                 발송합니다. 투명한 프로세스로 신뢰를 드립니다.

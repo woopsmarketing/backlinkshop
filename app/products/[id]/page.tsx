@@ -96,13 +96,8 @@ export default async function ProductDetailPage(props: Props) {
             </p>
 
             {/* 메타 정보 */}
-            {(metadata?.da_range || metadata?.turnaround) && (
+            {metadata?.turnaround && (
               <div className="mb-6 flex flex-wrap gap-2">
-                {metadata?.da_range && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                    DA {metadata.da_range}
-                  </span>
-                )}
                 {metadata?.turnaround && (
                   <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">
                     {metadata.turnaround} 내 완료

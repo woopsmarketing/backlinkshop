@@ -117,13 +117,8 @@ export default async function ProductCategoryPage(props: Props) {
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                       {getHighlight(product.name)}
                     </p>
-                    {(metadata?.da_range || metadata?.turnaround) && (
+                    {metadata?.turnaround && (
                       <div className="mt-3 flex flex-wrap gap-2">
-                        {metadata?.da_range && (
-                          <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                            DA {metadata.da_range}
-                          </span>
-                        )}
                         {metadata?.turnaround && (
                           <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">
                             {metadata.turnaround} 내 완료
