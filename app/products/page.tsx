@@ -40,6 +40,16 @@ export default async function ProductsPage(props: Props) {
     return '기타'
   }
 
+  // 상품 카드용 설명 보강 텍스트
+  const getHighlight = (name: string) => {
+    if (name.includes('로직 업그레이드')) return '고유 도메인 + 콘텐츠 업데이트'
+    if (name.includes('PBN')) return '직접 운영 PBN 네트워크'
+    if (name.includes('플랜')) return '다양한 유형 백링크 조합'
+    if (name.includes('온페이지')) return '기술 SEO 점검 리포트'
+    if (name.includes('콘텐츠')) return '키워드 기반 최적화'
+    return '맞춤형 SEO 솔루션'
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
@@ -122,6 +132,9 @@ export default async function ProductsPage(props: Props) {
                     </h3>
                     <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
                       {product.description}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      {getHighlight(product.name)}
                     </p>
                     {(metadata?.da_range || metadata?.turnaround) && (
                       <div className="mt-3 flex flex-wrap gap-2">
