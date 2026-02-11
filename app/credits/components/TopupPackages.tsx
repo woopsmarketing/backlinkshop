@@ -1,49 +1,40 @@
+// v2.0 - 직접 입력 충전 + 보너스 로직 적용 (2026-02-11)
 /**
- * 충전 패키지 컴포넌트
- * Client Component
+ * 크레딧 충전 컴포넌트
+ * - 사용 예시: <TopupPackages />
  */
 
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { createTopupRequestAction } from '@/server/actions/credits'
-import { CREDIT_PRICES, TOPUP_PACKAGES } from '@/lib/constants'
+import { calculateTopupBonus, TOPUP_BONUS_TIERS } from '@/lib/topup'
 import { formatCredits, formatPrice } from '@/lib/utils'
 
 export default function TopupPackages() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [amount, setAmount] = useState(100000)
 
-  const packages = [
-    {
-      id: TOPUP_PACKAGES.STARTER_300,
-      name: '스타터',
-      amount: CREDIT_PRICES.STARTER.amount,
-      price: CREDIT_PRICES.STARTER.price,
-      popular: false,
-    },
-    {
-      id: TOPUP_PACKAGES.PRO_1000,
-      name: '프로',
-      amount: CREDIT_PRICES.PRO.amount,
-      price: CREDIT_PRICES.PRO.price,
-      popular: true,
-    },
-    {
-      id: TOPUP_PACKAGES.ENTERPRISE_5000,
-      name: '엔터프라이즈',
-      amount: CREDIT_PRICES.ENTERPRISE.amount,
-      price: CREDIT_PRICES.ENTERPRISE.price,
-      popular: false,
-    },
-  ]
+  // 보너스 계산 (1크레딧=1원 기준)
+  const bonusInfo = useMemo(() => calculateTopupBonus(amount), [amount])
 
-  const handleRequest = async (packageId: string, amount: number) => {
+  const handleRequest = async () => {
     setLoading(true)
     setMessage(null)
 
     try {
-      const result = await createTopupRequestAction(packageId, amount)
+      if (!amount || amount < 1000) {
+        setMessage({ type: 'error', text: '최소 1,000 크레딧부터 충전 가능합니다' })
+        return
+      }
+
+      // 요청 메모에 보너스 정보 포함
+      const note = `충전 ${formatCredits(amount)} 크레딧, 보너스 ${formatCredits(
+        bonusInfo.bonus
+      )} 크레딧 (${Math.round(bonusInfo.rate * 100)}%)`
+
+      const result = await createTopupRequestAction('custom', amount, note)
 
       if (result.success) {
         setMessage({
@@ -78,50 +69,79 @@ export default function TopupPackages() {
         </div>
       )}
 
-      {/* 패키지 카드 */}
-      <div className="space-y-3">
-        {packages.map((pkg) => (
-          <div
-            key={pkg.id}
-            className={`border rounded-lg p-4 ${
-              pkg.popular
-                ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                : 'border-gray-200 dark:border-gray-700'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {pkg.name}
-                  </h3>
-                  {pkg.popular && (
-                    <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                      인기
-                    </span>
-                  )}
-                </div>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
-                  {formatCredits(pkg.amount)}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500 dark:text-gray-400">가격</p>
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {formatPrice(pkg.price)}
-                </p>
-              </div>
-            </div>
+      {/* 직접 입력 충전 */}
+      <div className="space-y-4">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            충전할 크레딧 입력 (1크레딧 = 1원)
+          </label>
+          <input
+            type="number"
+            min={1000}
+            step={1000}
+            value={amount}
+            onChange={e => setAmount(Number(e.target.value))}
+            className="w-full px-3 py-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
+            placeholder="예: 100000"
+          />
 
-            <button
-              onClick={() => handleRequest(pkg.id, pkg.amount)}
-              disabled={loading}
-              className="w-full mt-3 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-lg transition-colors"
-            >
-              {loading ? '처리 중...' : '충전 요청'}
-            </button>
+          {/* 추천 버튼 */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[100000, 500000, 1000000].map(preset => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setAmount(preset)}
+                className="px-3 py-1 text-xs rounded-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                {formatCredits(preset)}
+              </button>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* 계산 결과 */}
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400">결제 금액</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+              {formatPrice(amount)}
+            </p>
+          </div>
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3">
+            <p className="text-xs text-blue-600 dark:text-blue-300">보너스</p>
+            <p className="text-sm font-semibold text-blue-700 dark:text-blue-200">
+              +{formatCredits(bonusInfo.bonus)}
+            </p>
+          </div>
+          <div className="rounded-lg bg-green-50 dark:bg-green-900/20 p-3">
+            <p className="text-xs text-green-600 dark:text-green-300">총 지급</p>
+            <p className="text-sm font-semibold text-green-700 dark:text-green-200">
+              {formatCredits(bonusInfo.total)}
+            </p>
+          </div>
+        </div>
+
+        {/* 보너스 안내 */}
+        <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-3 text-xs text-gray-600 dark:text-gray-300">
+          <p className="mb-2 font-semibold">보너스 구간</p>
+          <ul className="space-y-1">
+            <li>• 10만 크레딧 정확히 충전 시 100% 보너스</li>
+            {TOPUP_BONUS_TIERS.map(tier => (
+              <li key={tier.minCredits}>
+                • {formatCredits(tier.minCredits)} 크레딧 이상: {Math.round(tier.bonusRate * 100)}%
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <button
+          onClick={handleRequest}
+          disabled={loading}
+          className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          {loading ? '처리 중...' : '충전 요청'}
+        </button>
       </div>
 
       {/* 안내 */}

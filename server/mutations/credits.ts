@@ -1,3 +1,4 @@
+// v1.1 - 충전 금액 서버 검증 추가 (2026-02-11)
 /**
  * 크레딧 관련 Mutation 함수
  * 쿠폰 사용, 충전 요청 등
@@ -105,6 +106,11 @@ export async function createTopupRequest(
   note?: string
 ) {
   const supabase = await createServerSupabaseClient()
+
+  // 금액 검증 (서버 기준)
+  if (!Number.isFinite(amount) || amount < 1000) {
+    return { success: false, error: '최소 1,000 크레딧부터 충전 가능합니다' }
+  }
 
   const { data, error } = await supabase
     .from('topup_requests')

@@ -1,4 +1,4 @@
-// v1.0 - 충전 요청 테이블 컴포넌트 추가 (2026-02-05)
+// v1.1 - 보너스 크레딧 표시 (2026-02-11)
 /**
  * 충전 요청 테이블
  * 승인/거절 버튼 포함
@@ -8,6 +8,7 @@
 
 import { useState } from 'react'
 import { approveTopupRequestAction, rejectTopupRequestAction } from '@/server/actions/admin-topups'
+import { calculateTopupBonus } from '@/lib/topup'
 import { formatCredits, formatDate } from '@/lib/utils'
 import type { TopupRequestRow } from '@/server/queries/admin-topups'
 
@@ -98,7 +99,7 @@ export default function TopupTable({ requests }: Props) {
                   패키지
                 </th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  금액
+                  충전/보너스
                 </th>
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
                   상태
@@ -112,7 +113,7 @@ export default function TopupTable({ requests }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {requests.map((item) => (
+              {requests.map(item => (
                 <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                     {item.user_id.slice(0, 8)}...
@@ -121,7 +122,20 @@ export default function TopupTable({ requests }: Props) {
                     {item.package_id}
                   </td>
                   <td className="py-3 px-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    {formatCredits(Number(item.amount))} 크레딧
+                    {(() => {
+                      const bonusInfo = calculateTopupBonus(Number(item.amount))
+                      return (
+                        <div className="flex flex-col items-end gap-1">
+                          <span>{formatCredits(Number(item.amount))} 크레딧</span>
+                          <span className="text-xs text-blue-600 dark:text-blue-300">
+                            +{formatCredits(bonusInfo.bonus)} 보너스
+                          </span>
+                          <span className="text-xs text-green-600 dark:text-green-300">
+                            총 {formatCredits(bonusInfo.total)} 크레딧
+                          </span>
+                        </div>
+                      )
+                    })()}
                   </td>
                   <td className="py-3 px-4 text-center">
                     <span
@@ -129,8 +143,8 @@ export default function TopupTable({ requests }: Props) {
                         item.status === 'approved'
                           ? 'bg-green-100 text-green-700'
                           : item.status === 'rejected'
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-yellow-100 text-yellow-700'
                       }`}
                     >
                       {statusLabel[item.status] || item.status}
@@ -170,4 +184,3 @@ export default function TopupTable({ requests }: Props) {
     </div>
   )
 }
-

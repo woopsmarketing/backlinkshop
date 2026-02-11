@@ -1,4 +1,4 @@
-// v1.0 - 관리자 충전 승인/거절 액션 추가 (2026-02-05)
+// v1.1 - 보너스 크레딧 반영 (2026-02-11)
 /**
  * 관리자 충전 승인/거절 Server Actions
  * 관리자 권한 검증 후 처리
@@ -10,6 +10,7 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { CREDIT_REASON } from '@/lib/constants'
+import { calculateTopupBonus } from '@/lib/topup'
 
 /**
  * 충전 요청 승인
@@ -41,10 +42,19 @@ export async function approveTopupRequestAction(requestId: string) {
       return { success: false, error: '이미 처리된 요청입니다' }
     }
 
-    // 2. 크레딧 지급
+    // 금액 검증 (부정 요청 방지)
+    const requestAmount = Number(request.amount)
+    if (!Number.isFinite(requestAmount) || requestAmount <= 0) {
+      return { success: false, error: '유효하지 않은 충전 금액입니다' }
+    }
+
+    // 2. 보너스 계산 후 크레딧 지급
+    const bonusInfo = calculateTopupBonus(requestAmount)
+    const totalCredits = requestAmount + bonusInfo.bonus
+
     const { error: creditError } = await adminClient.rpc('apply_credit_delta', {
       p_user_id: request.user_id,
-      p_amount: request.amount,
+      p_amount: totalCredits,
       p_reason: CREDIT_REASON.MANUAL_TOPUP,
       p_ref_type: 'topup_request',
       p_ref_id: request.id,
@@ -134,4 +144,3 @@ export async function rejectTopupRequestAction(requestId: string) {
     return { success: false, error: '충전 거절 중 오류가 발생했습니다' }
   }
 }
-
