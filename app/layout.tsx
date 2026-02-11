@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'google-site-verification-code', // 실제 구글 서치 콘솔 코드로 교체 필요
+    google: 'j32wzFaswXxA6-7Fh5R-J8V2o7xQ4b-eb0-u37ywSYg',
   },
 }
 
