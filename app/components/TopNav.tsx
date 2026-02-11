@@ -33,13 +33,9 @@ export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
           <Link href="/dashboard" className="text-xl font-bold text-gray-900 dark:text-white">
             백링크샵
           </Link>
-          {title && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {title}
-            </span>
-          )}
+          {title && <span className="text-sm text-gray-500 dark:text-gray-400">{title}</span>}
           <nav className="hidden md:flex items-center gap-4">
-            {links.map((link) => (
+            {links.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -53,6 +49,15 @@ export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
 
         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
           <span>{userEmail}</span>
+          {/* 문의하기 버튼 */}
+          <a
+            href="https://t.me/@goat82"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            문의하기
+          </a>
           <form action={signOut}>
             <button
               type="submit"
@@ -67,7 +72,7 @@ export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
       {/* 모바일 메뉴 */}
       <div className="md:hidden border-t border-gray-200 dark:border-gray-700">
         <nav className="flex items-center gap-4 px-4 py-2 overflow-x-auto">
-          {links.map((link) => (
+          {links.map(link => (
             <Link
               key={link.href}
               href={link.href}
@@ -77,7 +82,15 @@ export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
             </Link>
           ))}
         </nav>
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3 flex flex-col gap-2">
+          <a
+            href="https://t.me/@goat82"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-center"
+          >
+            문의하기
+          </a>
           <form action={signOut}>
             <button
               type="submit"
@@ -91,4 +104,3 @@ export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
     </header>
   )
 }
-
