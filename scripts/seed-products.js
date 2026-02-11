@@ -16,7 +16,9 @@ function validateEnv() {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !serviceKey) {
-    throw new Error('환경변수가 누락되었습니다: NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY')
+    throw new Error(
+      '환경변수가 누락되었습니다: NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY'
+    )
   }
 
   return { url, serviceKey }
@@ -30,16 +32,24 @@ function getSeedProducts() {
   return [
     {
       name: 'PBN 백링크 50',
-      description: 'DA 높은 PBN 네트워크 50개 배치',
-      price: 500,
+      description: '고품질 PBN 네트워크 50개 배치 (도메인 직접 운영)',
+      price: 300000,
       category: 'backlink',
       status: 'active',
       metadata: { da_range: '40-60', turnaround: '7일' },
     },
     {
+      name: 'PBN 백링크 100',
+      description: '고품질 PBN 네트워크 100개 배치 (강력한 순위 상승)',
+      price: 570000,
+      category: 'backlink',
+      status: 'active',
+      metadata: { da_range: '40-70', turnaround: '10일' },
+    },
+    {
       name: '플랜 백링크 20',
-      description: '외부 사이트 20개에 백링크 구축',
-      price: 200,
+      description: '플랜 C 패키지 (20만 원) - 어드벤처 킷에 적합',
+      price: 200000,
       category: 'backlink',
       status: 'active',
       metadata: { da_range: '20-40', turnaround: '5일' },
@@ -47,7 +57,7 @@ function getSeedProducts() {
     {
       name: '온페이지 SEO 점검',
       description: '메타태그/구조/콘텐츠 점검 리포트 제공',
-      price: 300,
+      price: 200000,
       category: 'seo',
       status: 'active',
       metadata: { turnaround: '3일' },
@@ -55,7 +65,7 @@ function getSeedProducts() {
     {
       name: '콘텐츠 최적화 패키지',
       description: '키워드 기반 콘텐츠 수정 및 최적화',
-      price: 400,
+      price: 300000,
       category: 'content',
       status: 'active',
       metadata: { turnaround: '4일' },
@@ -75,7 +85,7 @@ async function seedProducts() {
   })
 
   const products = getSeedProducts()
-  const names = products.map((item) => item.name)
+  const names = products.map(item => item.name)
 
   // 기존 상품 확인 (이름 기준)
   const { data: existing, error: existError } = await supabase
@@ -87,8 +97,8 @@ async function seedProducts() {
     throw new Error(`기존 상품 조회 실패: ${existError.message}`)
   }
 
-  const existingNames = new Set((existing || []).map((item) => item.name))
-  const newProducts = products.filter((item) => !existingNames.has(item.name))
+  const existingNames = new Set((existing || []).map(item => item.name))
+  const newProducts = products.filter(item => !existingNames.has(item.name))
 
   if (newProducts.length === 0) {
     console.log('이미 모든 상품이 존재합니다. 추가 삽입 없음.')
@@ -121,4 +131,3 @@ async function main() {
 if (require.main === module) {
   main()
 }
-

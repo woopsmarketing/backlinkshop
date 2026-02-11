@@ -774,7 +774,7 @@ export default function Home() {
                 <li>✓ 티어2, 티어3 구조 지원</li>
                 <li>✓ 다양한 조합 제공</li>
               </ul>
-              <p className="text-2xl font-bold text-gray-900 mb-4">500 크레딧~</p>
+              <p className="text-2xl font-bold text-gray-900 mb-4">200,000 크레딧~</p>
               <Link
                 href="/products"
                 className="block text-center py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
@@ -798,7 +798,7 @@ export default function Home() {
                 <li>✓ 고품질 보장</li>
                 <li>✓ 티어 구조 지원</li>
               </ul>
-              <p className="text-2xl font-bold text-gray-900 mb-4">1,000 크레딧~</p>
+              <p className="text-2xl font-bold text-gray-900 mb-4">300,000 크레딧~</p>
               <Link
                 href="/products"
                 className="block text-center py-3 px-6 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
@@ -817,7 +817,7 @@ export default function Home() {
                 <li>✓ 온페이지 최적화</li>
                 <li>✓ 빠른 속도 개선</li>
               </ul>
-              <p className="text-2xl font-bold text-gray-900 mb-4">800 크레딧~</p>
+              <p className="text-2xl font-bold text-gray-900 mb-4">200,000 크레딧~</p>
               <Link
                 href="/products"
                 className="block text-center py-3 px-6 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all"

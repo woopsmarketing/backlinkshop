@@ -22,6 +22,24 @@ export default async function ProductsPage(props: Props) {
   const user = await getCurrentUser()
   const admin = await isAdmin()
 
+  // 상품 카드용 아이콘/배지 매핑
+  const getProductIcon = (name: string, categoryValue?: string) => {
+    if (name.includes('PBN')) return '🏆'
+    if (name.includes('플랜')) return '📦'
+    if (name.includes('온페이지')) return '🧭'
+    if (name.includes('콘텐츠')) return '✍️'
+    if (categoryValue === 'seo') return '⚙️'
+    if (categoryValue === 'content') return '📝'
+    return '🔗'
+  }
+
+  const getCategoryLabel = (categoryValue?: string) => {
+    if (categoryValue === 'backlink') return '백링크'
+    if (categoryValue === 'seo') return 'SEO'
+    if (categoryValue === 'content') return '콘텐츠'
+    return '기타'
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
@@ -80,32 +98,60 @@ export default async function ProductsPage(props: Props) {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {products.map(product => (
-              <div
-                key={product.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col"
-              >
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                    {product.description}
-                  </p>
+            {products.map(product => {
+              const icon = getProductIcon(product.name, product.category)
+              const categoryLabel = getCategoryLabel(product.category)
+              const metadata = product.metadata as { da_range?: string; turnaround?: string } | null
+
+              return (
+                <div
+                  key={product.id}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 flex flex-col"
+                >
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">{icon}</span>
+                        <span className="text-xs px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                          {categoryLabel}
+                        </span>
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {product.description}
+                    </p>
+                    {(metadata?.da_range || metadata?.turnaround) && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {metadata?.da_range && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            DA {metadata.da_range}
+                          </span>
+                        )}
+                        {metadata?.turnaround && (
+                          <span className="text-xs px-2 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                            {metadata.turnaround} 내 완료
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-auto">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">
+                      {formatCredits(Number(product.price))} 크레딧
+                    </p>
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                    >
+                      상품 보기
+                    </Link>
+                  </div>
                 </div>
-                <div className="mt-auto">
-                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-4">
-                    {formatCredits(Number(product.price))} 크레딧
-                  </p>
-                  <Link
-                    href={`/products/${product.id}`}
-                    className="block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    상품 보기
-                  </Link>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </main>

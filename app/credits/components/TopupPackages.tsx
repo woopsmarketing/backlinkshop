@@ -87,7 +87,7 @@ export default function TopupPackages() {
 
           {/* 추천 버튼 */}
           <div className="mt-3 flex flex-wrap gap-2">
-            {[100000, 500000, 1000000].map(preset => (
+            {[100000, 500000, 1000000, 2000000].map(preset => (
               <button
                 key={preset}
                 type="button"
@@ -126,7 +126,6 @@ export default function TopupPackages() {
         <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-3 text-xs text-gray-600 dark:text-gray-300">
           <p className="mb-2 font-semibold">보너스 구간</p>
           <ul className="space-y-1">
-            <li>• 10만 크레딧 정확히 충전 시 100% 보너스</li>
             {TOPUP_BONUS_TIERS.map(tier => (
               <li key={tier.minCredits}>
                 • {formatCredits(tier.minCredits)} 크레딧 이상: {Math.round(tier.bonusRate * 100)}%
