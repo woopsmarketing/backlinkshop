@@ -37,6 +37,11 @@ export default function TopupPackages() {
       const result = await createTopupRequestAction('custom', amount, note)
 
       if (result.success) {
+        // GA4 구매(충전 요청) 추적
+        if (typeof window !== 'undefined' && (window as any).trackPurchase) {
+          ;(window as any).trackPurchase(amount)
+        }
+
         setMessage({
           type: 'success',
           text: result.message || '충전 요청이 완료되었습니다',

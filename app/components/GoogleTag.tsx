@@ -12,12 +12,12 @@ import Script from 'next/script'
 export function GoogleTag() {
   // 환경 변수에서 GA Tracking ID 가져오기
   const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID
-  
+
   // Tracking ID가 없으면 아무것도 렌더링하지 않음 (개발 환경)
   if (!GA_TRACKING_ID) {
     return null
   }
-  
+
   return (
     <>
       {/* Google Tag Manager 스크립트 */}
@@ -25,7 +25,7 @@ export function GoogleTag() {
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
         strategy="afterInteractive"
       />
-      
+
       {/* Google Analytics 초기화 */}
       <Script id="google-analytics" strategy="afterInteractive">
         {`
@@ -34,19 +34,18 @@ export function GoogleTag() {
           gtag('js', new Date());
           gtag('config', '${GA_TRACKING_ID}');
           
-          // Google Ads 전환 추적 (회원가입)
+          // GA4 표준 이벤트 추적 (회원가입)
           window.trackSignup = function() {
-            gtag('event', 'conversion', {
-              'send_to': '${GA_TRACKING_ID}/signup',
-              'value': 300,
-              'currency': 'KRW'
+            console.log('Track Signup');
+            gtag('event', 'sign_up', {
+              'method': 'email'
             });
           };
           
-          // Google Ads 전환 추적 (구매)
+          // GA4 표준 이벤트 추적 (구매)
           window.trackPurchase = function(amount) {
-            gtag('event', 'conversion', {
-              'send_to': '${GA_TRACKING_ID}/purchase',
+            console.log('Track Purchase', amount);
+            gtag('event', 'purchase', {
               'value': amount,
               'currency': 'KRW'
             });

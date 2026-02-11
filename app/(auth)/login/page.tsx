@@ -44,6 +44,11 @@ export default function LoginPage() {
         if (result.success) {
           setMessage(result.message || '회원가입이 완료되었습니다')
           // 이메일 확인 필요한 경우 메시지 표시
+
+          // GA4 회원가입 추적
+          if (typeof window !== 'undefined' && (window as any).trackSignup) {
+            ;(window as any).trackSignup()
+          }
         } else {
           setError(result.error || '회원가입에 실패했습니다')
         }
@@ -62,9 +67,7 @@ export default function LoginPage() {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
           {/* 헤더 */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              백링크샵
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">백링크샵</h1>
             <p className="text-gray-600 dark:text-gray-400">
               {mode === 'login' ? '로그인하여 시작하세요' : '새 계정 만들기'}
             </p>
@@ -85,8 +88,8 @@ export default function LoginPage() {
           {/* 로그인 폼 */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label 
-                htmlFor="email" 
+              <label
+                htmlFor="email"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 이메일
@@ -95,7 +98,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="your@email.com"
@@ -103,8 +106,8 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label 
-                htmlFor="password" 
+              <label
+                htmlFor="password"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
                 비밀번호
@@ -113,15 +116,13 @@ export default function LoginPage() {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 required
                 minLength={6}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="••••••••"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                최소 6자 이상
-              </p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">최소 6자 이상</p>
             </div>
 
             <button
