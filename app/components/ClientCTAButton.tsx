@@ -45,10 +45,10 @@ export function ClientCTAButton({
 
   // 로딩 중에는 기본 텍스트 표시 (깜빡임 최소화)
   const buttonText = isLoading
-    ? '무료 300 크레딧 받기 →'
+    ? '무료 30만 크레딧 받기 →'
     : isLoggedIn
       ? '마이페이지'
-      : '무료 300 크레딧 받기 →'
+      : '무료 30만 크레딧 받기 →'
 
   const href = isLoggedIn ? '/dashboard' : '/login'
 

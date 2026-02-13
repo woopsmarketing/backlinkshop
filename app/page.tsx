@@ -135,7 +135,7 @@ export default function Home() {
             </div>
 
             <p className="text-white/80 text-sm">
-              5분 내 시작 가능 · 카드 등록 불필요 · 가입 보너스 300 크레딧 제공
+              5분 내 시작 가능 · 카드 등록 불필요 · 가입 보너스 30만 크레딧 제공
             </p>
           </div>
         </div>
@@ -751,7 +751,7 @@ export default function Home() {
               예산은 고객이 정하되, 최적의 전략은 우리가 제안합니다
             </h3>
             <p className="text-lg text-white/90 mb-6">
-              무료 300 크레딧으로 진단 + 전략 제안을 먼저 받아보세요
+              무료 30만 크레딧으로 진단 + 전략 제안을 먼저 받아보세요
               <br />
               <strong className="text-yellow-300">만족하시면 그때 결제하시면 됩니다</strong>
             </p>
@@ -1008,11 +1008,11 @@ export default function Home() {
               </p>
               <p className="text-gray-700 leading-relaxed">
                 <strong className="text-orange-600">
-                  네, 가입 시 무료 300 크레딧을 제공합니다.
+                  네, 가입 시 무료 30만 크레딧을 제공합니다.
                 </strong>{' '}
-                300 크레딧으로 플랜 백링크 1개 또는 사이트 진단 + 맞춤 전략 제안을 받을 수 있습니다.
-                리스크 없이 우리의 품질을 먼저 경험해보세요. 만족하시면 그때 결제하시면 되며,{' '}
-                <strong className="text-gray-900">98%의 고객이 재구매</strong>합니다.
+                30만 크레딧으로 플랜 백링크 1개 또는 사이트 진단 + 맞춤 전략 제안을 받을 수
+                있습니다. 리스크 없이 우리의 품질을 먼저 경험해보세요. 만족하시면 그때 결제하시면
+                되며, <strong className="text-gray-900">98%의 고객이 재구매</strong>합니다.
               </p>
             </div>
 
@@ -1033,7 +1033,7 @@ export default function Home() {
 
             <div className="bg-white rounded-xl p-6 shadow-lg border-l-4 border-amber-500 hover:shadow-xl transition-all">
               <p className="font-bold text-gray-900 mb-3 text-lg">
-                Q. 무료 300 크레딧으로 무엇을 할 수 있나요?
+                Q. 무료 30만 크레딧으로 무엇을 할 수 있나요?
               </p>
               <p className="text-gray-700 leading-relaxed">
                 <strong className="text-amber-600">
@@ -1236,7 +1236,7 @@ export default function Home() {
                     name: '소량으로 테스트할 수 있나요?',
                     acceptedAnswer: {
                       '@type': 'Answer',
-                      text: '네, 가입 시 무료 300 크레딧을 제공합니다. 300 크레딧으로 플랜 백링크 1개 또는 사이트 진단 + 맞춤 전략 제안을 받을 수 있습니다. 리스크 없이 우리의 품질을 먼저 경험해보세요. 만족하시면 그때 결제하시면 되며, 98%의 고객이 재구매합니다.',
+                      text: '네, 가입 시 무료 30만 크레딧을 제공합니다. 30만 크레딧으로 플랜 백링크 1개 또는 사이트 진단 + 맞춤 전략 제안을 받을 수 있습니다. 리스크 없이 우리의 품질을 먼저 경험해보세요. 만족하시면 그때 결제하시면 되며, 98%의 고객이 재구매합니다.',
                     },
                   },
                   {
@@ -1273,7 +1273,7 @@ export default function Home() {
               지금 시작하지 않으면 경쟁사에게 밀립니다
             </h2>
             <p className="text-xl text-white/90 mb-8">
-              <strong className="text-yellow-300">무료 300 크레딧</strong>으로 먼저 테스트하고
+              <strong className="text-yellow-300">무료 30만 크레딧</strong>으로 먼저 테스트하고
               결정하세요
             </p>
             <ClientCTAButton variant="white" size="lg" className="!text-2xl !px-12 !py-6" />

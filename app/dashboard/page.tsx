@@ -17,7 +17,7 @@ import ReportDownloadButton from '@/app/components/ReportDownloadButton'
 export default async function DashboardPage() {
   // 유저 확인
   const user = await getCurrentUser()
-  
+
   if (!user) {
     redirect('/login')
   }
@@ -69,21 +69,15 @@ export default async function DashboardPage() {
           {/* 주문 통계 카드 */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">
-                총 주문
-              </h3>
+              <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">총 주문</h3>
               <span className="text-2xl">📦</span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {orderCount || 0}개
-            </p>
+            <p className="text-3xl font-bold text-gray-900 dark:text-white">{orderCount || 0}개</p>
           </div>
 
           {/* 빠른 액션 카드 */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-4">
-              빠른 액션
-            </h3>
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-4">빠른 액션</h3>
             <div className="space-y-2">
               <Link
                 href="/products"
@@ -100,34 +94,32 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-        {/* 최근 보고서 카드 */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
-          <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-4">
-            보고서 다운로드
-          </h3>
-          {recentReports.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              아직 보고서가 없습니다
-            </p>
-          ) : (
-            <div className="space-y-2">
-              {recentReports.map((report: any) => (
-                <div key={report.id} className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700 dark:text-gray-200 truncate">
-                    {report.products?.name || '보고서'}
-                  </span>
-                  <ReportDownloadButton orderId={report.id} label="다운로드" />
-                </div>
-              ))}
-            </div>
-          )}
-          <Link
-            href="/orders"
-            className="inline-block mt-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm font-medium"
-          >
-            주문 내역 보기 →
-          </Link>
-        </div>
+          {/* 최근 보고서 카드 */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+            <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-4">
+              보고서 다운로드
+            </h3>
+            {recentReports.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400">아직 보고서가 없습니다</p>
+            ) : (
+              <div className="space-y-2">
+                {recentReports.map((report: any) => (
+                  <div key={report.id} className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700 dark:text-gray-200 truncate">
+                      {report.products?.name || '보고서'}
+                    </span>
+                    <ReportDownloadButton orderId={report.id} label="다운로드" />
+                  </div>
+                ))}
+              </div>
+            )}
+            <Link
+              href="/orders"
+              className="inline-block mt-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 text-sm font-medium"
+            >
+              주문 내역 보기 →
+            </Link>
+          </div>
         </div>
 
         {/* 환영 메시지 (가입 보너스 안내) */}
@@ -140,7 +132,7 @@ export default async function DashboardPage() {
                   환영합니다!
                 </h3>
                 <p className="text-green-700 dark:text-green-300 text-sm">
-                  가입 보너스 300 크레딧이 지급되었습니다. 마음껏 사용해보세요!
+                  가입 보너스 30만 크레딧이 지급되었습니다. 마음껏 사용해보세요!
                 </p>
               </div>
             </div>
