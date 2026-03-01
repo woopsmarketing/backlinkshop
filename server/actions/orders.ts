@@ -85,37 +85,39 @@ export async function createOrderAction(productId: string, quantity: number, not
     }
 
     // 5. 이메일 발송 (고객)
-    await sendEmail(
-      user.email,
-      '주문이 접수되었습니다 - 백링크샵',
-      createElement(OrderCreatedCustomerEmail, {
-        customerEmail: user.email,
-        orderId: order.id,
-        productName: product.name,
-        quantity,
-        totalPrice,
-        note: note || undefined,
+    if (user.email) {
+      await sendEmail(
+        user.email,
+        '주문이 접수되었습니다 - 백링크샵',
+        createElement(OrderCreatedCustomerEmail, {
+          customerEmail: user.email,
+          orderId: order.id,
+          productName: product.name,
+          quantity,
+          totalPrice,
+          note: note || undefined,
+        })
+      ).catch(err => {
+        console.error('고객 이메일 발송 실패:', err)
+        // 이메일 실패해도 주문은 성공으로 처리
       })
-    ).catch(err => {
-      console.error('고객 이메일 발송 실패:', err)
-      // 이메일 실패해도 주문은 성공으로 처리
-    })
 
-    // 6. 이메일 발송 (관리자)
-    await sendEmailToAdmin(
-      `[신규 주문] ${product.name} - ${user.email}`,
-      createElement(OrderCreatedAdminEmail, {
-        customerEmail: user.email,
-        orderId: order.id,
-        productName: product.name,
-        quantity,
-        totalPrice,
-        note: note || undefined,
+      // 6. 이메일 발송 (관리자)
+      await sendEmailToAdmin(
+        `[신규 주문] ${product.name} - ${user.email}`,
+        createElement(OrderCreatedAdminEmail, {
+          customerEmail: user.email,
+          orderId: order.id,
+          productName: product.name,
+          quantity,
+          totalPrice,
+          note: note || undefined,
+        })
+      ).catch(err => {
+        console.error('관리자 이메일 발송 실패:', err)
+        // 이메일 실패해도 주문은 성공으로 처리
       })
-    ).catch(err => {
-      console.error('관리자 이메일 발송 실패:', err)
-      // 이메일 실패해도 주문은 성공으로 처리
-    })
+    }
 
     // 7. 캐시 갱신
     revalidatePath('/orders')
