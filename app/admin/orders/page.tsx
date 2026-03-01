@@ -7,6 +7,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import { getAdminOrders } from '@/server/queries/admin-orders'
+import { getAdminStats } from '@/server/queries/admin-stats'
 import TopNav from '@/app/components/TopNav'
 import AdminNav from '@/app/admin/components/AdminNav'
 import AdminOrdersTable from './components/AdminOrdersTable'
@@ -30,7 +31,9 @@ export default async function AdminOrdersPage(props: Props) {
   // Next.js 15: searchParams는 Promise
   const searchParams = await props.searchParams
   const status = searchParams?.status
-  const orders = await getAdminOrders(status)
+
+  // 데이터 병렬 조회
+  const [orders, stats] = await Promise.all([getAdminOrders(status), getAdminStats()])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -38,8 +41,8 @@ export default async function AdminOrdersPage(props: Props) {
       <TopNav userEmail={user.email} isAdmin={admin} title="주문 관리" />
 
       <main className="container mx-auto px-4 py-8">
-        {/* 관리자 탭 */}
-        <AdminNav current="orders" />
+        {/* 관리자 탭 (미처리 알림 배지 포함) */}
+        <AdminNav current="orders" stats={stats} />
 
         {/* 상태 필터 */}
         <div className="flex gap-2 mb-6">

@@ -1,7 +1,7 @@
-// v1.1 - 보너스 크레딧 반영 (2026-02-11)
+// v1.2 - 충전 승인 시 이메일 알림 추가 (2026-03-01)
 /**
  * 관리자 충전 승인/거절 Server Actions
- * 관리자 권한 검증 후 처리
+ * 관리자 권한 검증 후 처리 및 이메일 알림 발송
  */
 
 'use server'
@@ -11,6 +11,8 @@ import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { CREDIT_REASON } from '@/lib/constants'
 import { calculateTopupBonus } from '@/lib/topup'
+import { sendEmail } from '@/lib/email/send-email'
+import TopupApprovedEmail from '@/lib/email/templates/topup-approved'
 
 /**
  * 충전 요청 승인
@@ -27,10 +29,10 @@ export async function approveTopupRequestAction(requestId: string) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 요청 조회 및 상태 확인
+    // 1. 요청 조회 및 상태 확인 (유저 이메일 포함)
     const { data: request, error: requestError } = await adminClient
       .from('topup_requests')
-      .select('*')
+      .select('*, profiles(email)')
       .eq('id', requestId)
       .single()
 
@@ -78,6 +80,33 @@ export async function approveTopupRequestAction(requestId: string) {
     if (updateError) {
       console.error('요청 상태 업데이트 실패:', updateError)
       return { success: false, error: '요청 상태 업데이트 실패' }
+    }
+
+    // 4. 현재 잔액 조회 (이메일에 표시용)
+    const { data: profile } = await adminClient
+      .from('profiles')
+      .select('credit_balance')
+      .eq('id', request.user_id)
+      .single()
+
+    const newBalance = profile?.credit_balance || totalCredits
+
+    // 5. 이메일 발송 (고객에게 충전 승인 알림)
+    const userEmail = (request as any).profiles?.email
+
+    if (userEmail) {
+      await sendEmail(
+        userEmail,
+        '크레딧 충전이 완료되었습니다 - 백링크샵',
+        TopupApprovedEmail({
+          customerEmail: userEmail,
+          amount: totalCredits,
+          newBalance,
+        })
+      ).catch(err => {
+        console.error('충전 승인 이메일 발송 실패:', err)
+        // 이메일 실패해도 승인은 성공으로 처리
+      })
     }
 
     revalidatePath('/admin/topups')

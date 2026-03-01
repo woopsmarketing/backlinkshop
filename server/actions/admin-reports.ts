@@ -1,7 +1,7 @@
-// v1.1 - 대용량 업로드 대응 (Signed Upload URL) (2026-02-11)
+// v1.2 - 보고서 업로드 시 이메일 알림 추가 (2026-03-01)
 /**
  * 관리자 주문 보고서 업로드 Server Actions
- * 주문에 엑셀/CSV 파일을 첨부
+ * 주문에 엑셀/CSV 파일을 첨부하고 고객에게 이메일 알림 발송
  */
 
 'use server'
@@ -9,6 +9,8 @@
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
+import { sendEmail } from '@/lib/email/send-email'
+import ReportUploadedEmail from '@/lib/email/templates/report-uploaded'
 
 /**
  * 보고서 업로드용 Signed URL 발급
@@ -78,7 +80,18 @@ export async function saveOrderReportMetaAction(
 
     const adminClient = createAdminSupabaseClient()
 
-    // 주문 테이블에 메타데이터 저장
+    // 1. 주문 정보 조회 (유저 이메일, 상품명 포함)
+    const { data: order, error: orderError } = await adminClient
+      .from('orders')
+      .select('id, user_id, products(name), profiles(email)')
+      .eq('id', orderId)
+      .single()
+
+    if (orderError || !order) {
+      return { success: false, error: '주문을 찾을 수 없습니다' }
+    }
+
+    // 2. 주문 테이블에 메타데이터 저장
     const { error: updateError } = await adminClient
       .from('orders')
       .update({
@@ -93,6 +106,26 @@ export async function saveOrderReportMetaAction(
     if (updateError) {
       console.error('보고서 메타데이터 업데이트 실패:', updateError)
       return { success: false, error: '보고서 정보 저장에 실패했습니다' }
+    }
+
+    // 3. 이메일 발송 (고객에게 보고서 업로드 알림)
+    const userEmail = (order as any).profiles?.email
+    const productName = (order as any).products?.name || '알 수 없는 상품'
+
+    if (userEmail) {
+      await sendEmail(
+        userEmail,
+        '보고서가 업로드되었습니다 - 백링크샵',
+        ReportUploadedEmail({
+          customerEmail: userEmail,
+          orderId: order.id,
+          productName,
+          reportFilename: fileName,
+        })
+      ).catch(err => {
+        console.error('보고서 업로드 이메일 발송 실패:', err)
+        // 이메일 실패해도 업로드는 성공으로 처리
+      })
     }
 
     revalidatePath('/admin/orders')

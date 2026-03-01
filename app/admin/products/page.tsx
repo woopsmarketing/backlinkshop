@@ -7,6 +7,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import { getAdminProducts } from '@/server/queries/admin-products'
+import { getAdminStats } from '@/server/queries/admin-stats'
 import TopNav from '@/app/components/TopNav'
 import AdminNav from '@/app/admin/components/AdminNav'
 import AdminProductForm from './components/AdminProductForm'
@@ -24,7 +25,8 @@ export default async function AdminProductsPage() {
     redirect('/dashboard')
   }
 
-  const products = await getAdminProducts()
+  // 데이터 병렬 조회
+  const [products, stats] = await Promise.all([getAdminProducts(), getAdminStats()])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -32,14 +34,12 @@ export default async function AdminProductsPage() {
       <TopNav userEmail={user.email} isAdmin={admin} title="상품 관리" />
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        {/* 관리자 탭 */}
-        <AdminNav current="products" />
+        {/* 관리자 탭 (미처리 알림 배지 포함) */}
+        <AdminNav current="products" stats={stats} />
 
         {/* 상품 생성 폼 */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            상품 생성
-          </h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">상품 생성</h2>
           <AdminProductForm />
         </div>
 
@@ -49,4 +49,3 @@ export default async function AdminProductsPage() {
     </div>
   )
 }
-

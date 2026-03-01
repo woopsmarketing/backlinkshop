@@ -1,7 +1,7 @@
-// v1.0 - 주문 생성 Server Action 추가 (2026-02-05)
+// v1.1 - 주문 생성 시 이메일 알림 추가 (2026-03-01)
 /**
  * 주문 관련 Server Actions
- * 상품 구매(주문 생성)
+ * 상품 구매(주문 생성) 및 이메일 알림
  */
 
 'use server'
@@ -11,6 +11,9 @@ import { requireAuth } from '../auth/session'
 import { createServerSupabaseClient } from '../supabase/client'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { CREDIT_REASON } from '@/lib/constants'
+import { sendEmail, sendEmailToAdmin } from '@/lib/email/send-email'
+import OrderCreatedCustomerEmail from '@/lib/email/templates/order-created-customer'
+import OrderCreatedAdminEmail from '@/lib/email/templates/order-created-admin'
 
 /**
  * 상품 구매 (주문 생성)
@@ -18,11 +21,7 @@ import { CREDIT_REASON } from '@/lib/constants'
  * @param quantity 수량
  * @param note 요청사항
  */
-export async function createOrderAction(
-  productId: string,
-  quantity: number,
-  note?: string
-) {
+export async function createOrderAction(productId: string, quantity: number, note?: string) {
   try {
     const user = await requireAuth()
     const supabase = await createServerSupabaseClient()
@@ -84,7 +83,40 @@ export async function createOrderAction(
       return { success: false, error: '크레딧이 부족합니다' }
     }
 
-    // 5. 캐시 갱신
+    // 5. 이메일 발송 (고객)
+    await sendEmail(
+      user.email,
+      '주문이 접수되었습니다 - 백링크샵',
+      OrderCreatedCustomerEmail({
+        customerEmail: user.email,
+        orderId: order.id,
+        productName: product.name,
+        quantity,
+        totalPrice,
+        note: note || undefined,
+      })
+    ).catch(err => {
+      console.error('고객 이메일 발송 실패:', err)
+      // 이메일 실패해도 주문은 성공으로 처리
+    })
+
+    // 6. 이메일 발송 (관리자)
+    await sendEmailToAdmin(
+      `[신규 주문] ${product.name} - ${user.email}`,
+      OrderCreatedAdminEmail({
+        customerEmail: user.email,
+        orderId: order.id,
+        productName: product.name,
+        quantity,
+        totalPrice,
+        note: note || undefined,
+      })
+    ).catch(err => {
+      console.error('관리자 이메일 발송 실패:', err)
+      // 이메일 실패해도 주문은 성공으로 처리
+    })
+
+    // 7. 캐시 갱신
     revalidatePath('/orders')
     revalidatePath('/dashboard')
     revalidatePath('/credits')
@@ -94,4 +126,3 @@ export async function createOrderAction(
     return { success: false, error: '주문 처리 중 오류가 발생했습니다' }
   }
 }
-

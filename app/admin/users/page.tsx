@@ -7,6 +7,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import { getAdminUsers } from '@/server/queries/admin-users'
+import { getAdminStats } from '@/server/queries/admin-stats'
 import TopNav from '@/app/components/TopNav'
 import AdminNav from '@/app/admin/components/AdminNav'
 import AdminUsersTable from './components/AdminUsersTable'
@@ -24,8 +25,8 @@ export default async function AdminUsersPage() {
     redirect('/dashboard')
   }
 
-  // 3. 회원 목록 조회
-  const users = await getAdminUsers()
+  // 3. 데이터 병렬 조회
+  const [users, stats] = await Promise.all([getAdminUsers(), getAdminStats()])
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -33,8 +34,8 @@ export default async function AdminUsersPage() {
       <TopNav userEmail={user.email} isAdmin={admin} title="회원 관리" />
 
       <main className="container mx-auto px-4 py-8">
-        {/* 관리자 탭 */}
-        <AdminNav current="users" />
+        {/* 관리자 탭 (미처리 알림 배지 포함) */}
+        <AdminNav current="users" stats={stats} />
 
         {/* 회원 테이블 */}
         <AdminUsersTable users={users} />

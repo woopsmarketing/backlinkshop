@@ -1,7 +1,8 @@
-// v1.1 - 실패 처리 시 환불 로직 추가 (2026-02-05)
+// v1.2 - 주문 상태 변경 시 이메일 알림 추가 (2026-03-01)
 /**
  * 관리자 주문 상태 변경 Server Actions
  * 상태: pending → processing → completed / failed
+ * 상태 변경 시 고객에게 이메일 알림 발송
  */
 
 'use server'
@@ -9,6 +10,8 @@
 import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
+import { sendEmail } from '@/lib/email/send-email'
+import OrderStatusChangedEmail from '@/lib/email/templates/order-status-changed'
 
 const allowedStatuses = ['pending', 'processing', 'completed', 'failed'] as const
 
@@ -32,10 +35,10 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 주문 확인
+    // 1. 주문 확인 (상품명, 유저 이메일 포함)
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('id, status, total_price, user_id')
+      .select('id, status, total_price, user_id, products(name), profiles(email)')
       .eq('id', orderId)
       .single()
 
@@ -109,6 +112,27 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
       return { success: false, error: '주문 상태 업데이트 실패' }
     }
 
+    // 4. 이메일 발송 (고객에게 상태 변경 알림)
+    const userEmail = (order as any).profiles?.email
+    const productName = (order as any).products?.name || '알 수 없는 상품'
+
+    if (userEmail) {
+      await sendEmail(
+        userEmail,
+        `주문 상태가 변경되었습니다 - 백링크샵`,
+        OrderStatusChangedEmail({
+          customerEmail: userEmail,
+          orderId: order.id,
+          productName,
+          oldStatus: order.status,
+          newStatus: status,
+        })
+      ).catch(err => {
+        console.error('상태 변경 이메일 발송 실패:', err)
+        // 이메일 실패해도 상태 변경은 성공으로 처리
+      })
+    }
+
     revalidatePath('/admin/orders')
     revalidatePath('/orders')
     revalidatePath('/credits')
@@ -120,4 +144,3 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
     return { success: false, error: '주문 상태 변경 중 오류가 발생했습니다' }
   }
 }
-
