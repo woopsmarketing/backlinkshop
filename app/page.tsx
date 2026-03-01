@@ -127,7 +127,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
               <ClientCTAButton variant="white" size="lg" />
               <a
-                href="https://t.me/@goat82"
+                href="https://t.me/goat82"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center px-10 py-5 bg-white/10 backdrop-blur-md border-2 border-white/30 text-white text-xl font-bold rounded-xl hover:bg-white/20 transition-all"
