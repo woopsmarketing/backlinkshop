@@ -18,7 +18,7 @@ export type AdminOrderRow = {
   report_filename?: string | null
   report_uploaded_at?: string | null
   created_at: string
-  products: { name: string }[] | null
+  products: { name: string } | null
 }
 
 /**

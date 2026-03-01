@@ -125,7 +125,7 @@ export default function AdminOrdersTable({ orders }: Props) {
                     {order.id.slice(0, 8)}...
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                    {order.products?.[0]?.name || '알 수 없는 상품'}
+                    {order.products?.name || '알 수 없는 상품'}
                   </td>
                   <td className="py-3 px-4 text-center text-sm text-gray-700 dark:text-gray-300">
                     {order.quantity}
