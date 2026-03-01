@@ -157,7 +157,7 @@ export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps>
           <p style={{ margin: 0, fontSize: '14px' }}>
             <strong>💡 다음 단계</strong>
             <br />
-            1. 작업이 시작되면 상태가 "처리중"으로 변경됩니다
+            1. 작업이 시작되면 상태가 &quot;처리중&quot;으로 변경됩니다
             <br />
             2. 작업 완료 시 보고서가 업로드되며 이메일로 알림을 받으실 수 있습니다
             <br />

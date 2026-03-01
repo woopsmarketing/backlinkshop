@@ -161,11 +161,11 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
             <br />
             1. 관리자 페이지에서 주문 상세 확인
             <br />
-            2. "처리중" 상태로 변경 후 작업 시작
+            2. &quot;처리중&quot; 상태로 변경 후 작업 시작
             <br />
             3. 작업 완료 후 보고서 업로드
             <br />
-            4. "완료" 상태로 변경
+            4. &quot;완료&quot; 상태로 변경
           </p>
         </div>
       </div>
