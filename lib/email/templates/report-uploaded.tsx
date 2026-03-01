@@ -160,5 +160,3 @@ export const ReportUploadedEmail: React.FC<ReportUploadedEmailProps> = ({
     </body>
   </html>
 )
-
-export default ReportUploadedEmail

@@ -6,7 +6,7 @@
 'use server'
 
 import { resend, FROM_EMAIL, ADMIN_EMAIL } from './resend'
-import { ReactElement } from 'react'
+import { ReactElement, JSXElementConstructor } from 'react'
 
 /**
  * 이메일 발송 결과 타입
@@ -26,7 +26,7 @@ export type SendEmailResult = {
 export async function sendEmail(
   to: string,
   subject: string,
-  react: ReactElement
+  react: ReactElement<any, string | JSXElementConstructor<any>>
 ): Promise<SendEmailResult> {
   try {
     // Resend API 키 확인
@@ -63,7 +63,7 @@ export async function sendEmail(
  */
 export async function sendEmailToAdmin(
   subject: string,
-  react: ReactElement
+  react: ReactElement<any, string | JSXElementConstructor<any>>
 ): Promise<SendEmailResult> {
   return sendEmail(ADMIN_EMAIL, subject, react)
 }
@@ -77,7 +77,7 @@ export async function sendEmailToAdmin(
 export async function sendBulkEmail(
   recipients: string[],
   subject: string,
-  react: ReactElement
+  react: ReactElement<any, string | JSXElementConstructor<any>>
 ): Promise<SendEmailResult[]> {
   const results = await Promise.all(recipients.map(to => sendEmail(to, subject, react)))
   return results

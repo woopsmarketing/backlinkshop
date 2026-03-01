@@ -11,7 +11,8 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { sendEmail } from '@/lib/email/send-email'
-import OrderStatusChangedEmail from '@/lib/email/templates/order-status-changed'
+import { OrderStatusChangedEmail } from '@/lib/email/templates/order-status-changed'
+import { createElement } from 'react'
 
 const allowedStatuses = ['pending', 'processing', 'completed', 'failed'] as const
 
@@ -120,7 +121,7 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
       await sendEmail(
         userEmail,
         `주문 상태가 변경되었습니다 - 백링크샵`,
-        OrderStatusChangedEmail({
+        createElement(OrderStatusChangedEmail, {
           customerEmail: userEmail,
           orderId: order.id,
           productName,

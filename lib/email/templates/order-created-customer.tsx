@@ -175,5 +175,3 @@ export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps>
     </body>
   </html>
 )
-
-export default OrderCreatedCustomerEmail

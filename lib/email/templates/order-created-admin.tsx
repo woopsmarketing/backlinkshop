@@ -172,5 +172,3 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
     </body>
   </html>
 )
-
-export default OrderCreatedAdminEmail

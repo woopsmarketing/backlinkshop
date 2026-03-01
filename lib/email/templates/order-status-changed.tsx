@@ -230,5 +230,3 @@ export const OrderStatusChangedEmail: React.FC<OrderStatusChangedEmailProps> = (
     </html>
   )
 }
-
-export default OrderStatusChangedEmail

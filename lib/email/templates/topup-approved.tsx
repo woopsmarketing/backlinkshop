@@ -142,5 +142,3 @@ export const TopupApprovedEmail: React.FC<TopupApprovedEmailProps> = ({
     </body>
   </html>
 )
-
-export default TopupApprovedEmail

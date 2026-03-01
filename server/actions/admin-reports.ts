@@ -10,7 +10,8 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { sendEmail } from '@/lib/email/send-email'
-import ReportUploadedEmail from '@/lib/email/templates/report-uploaded'
+import { ReportUploadedEmail } from '@/lib/email/templates/report-uploaded'
+import { createElement } from 'react'
 
 /**
  * 보고서 업로드용 Signed URL 발급
@@ -116,7 +117,7 @@ export async function saveOrderReportMetaAction(
       await sendEmail(
         userEmail,
         '보고서가 업로드되었습니다 - 백링크샵',
-        ReportUploadedEmail({
+        createElement(ReportUploadedEmail, {
           customerEmail: userEmail,
           orderId: order.id,
           productName,
