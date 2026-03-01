@@ -17,7 +17,12 @@ type AdminNavProps = {
 }
 
 export default function AdminNav({ current, stats }: AdminNavProps) {
-  const items = [
+  const items: Array<{
+    key: string
+    label: string
+    href: string
+    badge?: number
+  }> = [
     { key: 'users', label: '회원 관리', href: '/admin/users' },
     {
       key: 'topups',
@@ -33,7 +38,7 @@ export default function AdminNav({ current, stats }: AdminNavProps) {
     },
     { key: 'products', label: '상품 관리', href: '/admin/products' },
     { key: 'coupons', label: '쿠폰 관리', href: '/admin/coupons' },
-  ] as const
+  ]
 
   return (
     <div className="flex gap-2 mb-6">
