@@ -18,7 +18,7 @@ export type AdminOrderRow = {
   report_filename?: string | null
   report_uploaded_at?: string | null
   created_at: string
-  products: { name: string } | null
+  products: { name: string } | { name: string }[] | null
 }
 
 /**
@@ -47,7 +47,13 @@ export async function getAdminOrders(status?: string) {
       return []
     }
 
-    return (data || []) as AdminOrderRow[]
+    // Supabase JOIN 결과를 안전하게 변환
+    const orders = (data || []).map(order => ({
+      ...order,
+      products: Array.isArray(order.products) ? order.products[0] || null : order.products,
+    }))
+
+    return orders as AdminOrderRow[]
   } catch (error) {
     console.error('관리자 주문 조회 오류:', error)
     return []
