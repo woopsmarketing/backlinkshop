@@ -30,14 +30,15 @@ export async function approveTopupRequestAction(requestId: string) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 요청 조회 및 상태 확인 (유저 이메일 포함)
+    // 1. 요청 조회 및 상태 확인
     const { data: request, error: requestError } = await adminClient
       .from('topup_requests')
-      .select('*, profiles(email)')
+      .select('*')
       .eq('id', requestId)
       .single()
 
     if (requestError || !request) {
+      console.error('충전 요청 조회 실패:', requestError)
       return { success: false, error: '충전 요청을 찾을 수 없습니다' }
     }
 
@@ -83,18 +84,17 @@ export async function approveTopupRequestAction(requestId: string) {
       return { success: false, error: '요청 상태 업데이트 실패' }
     }
 
-    // 4. 현재 잔액 조회 (이메일에 표시용)
+    // 4. 유저 이메일 및 현재 잔액 조회 (이메일 발송용)
     const { data: profile } = await adminClient
       .from('profiles')
-      .select('credit_balance')
+      .select('email, credit_balance')
       .eq('id', request.user_id)
       .single()
 
+    const userEmail = profile?.email
     const newBalance = profile?.credit_balance || totalCredits
 
     // 5. 이메일 발송 (고객에게 충전 승인 알림)
-    const userEmail = (request as any).profiles?.email
-
     if (userEmail) {
       await sendEmail(
         userEmail,

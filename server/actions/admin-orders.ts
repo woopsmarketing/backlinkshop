@@ -36,14 +36,15 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 주문 확인 (상품명, 유저 이메일 포함)
+    // 1. 주문 확인
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('id, status, total_price, user_id, products(name), profiles(email)')
+      .select('id, status, total_price, user_id, product_id')
       .eq('id', orderId)
       .single()
 
     if (orderError || !order) {
+      console.error('주문 조회 실패:', orderError)
       return { success: false, error: '주문을 찾을 수 없습니다' }
     }
 
@@ -113,10 +114,23 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
       return { success: false, error: '주문 상태 업데이트 실패' }
     }
 
-    // 4. 이메일 발송 (고객에게 상태 변경 알림)
-    const userEmail = (order as any).profiles?.email
-    const productName = (order as any).products?.name || '알 수 없는 상품'
+    // 4. 유저 이메일 및 상품명 조회 (이메일 발송용)
+    const { data: userProfile } = await adminClient
+      .from('profiles')
+      .select('email')
+      .eq('id', order.user_id)
+      .single()
 
+    const { data: product } = await adminClient
+      .from('products')
+      .select('name')
+      .eq('id', order.product_id)
+      .single()
+
+    const userEmail = userProfile?.email
+    const productName = product?.name || '알 수 없는 상품'
+
+    // 5. 이메일 발송 (고객에게 상태 변경 알림)
     if (userEmail) {
       await sendEmail(
         userEmail,

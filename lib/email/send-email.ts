@@ -31,9 +31,17 @@ export async function sendEmail(
   try {
     // Resend API 키 확인
     if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY가 설정되지 않았습니다')
+      console.error('❌ [이메일 발송 실패] RESEND_API_KEY가 설정되지 않았습니다')
+      console.error('   Vercel 환경변수에 RESEND_API_KEY를 추가해주세요')
       return { success: false, error: 'Email service not configured' }
     }
+
+    console.log('📧 [이메일 발송 시도]', {
+      to,
+      subject,
+      from: FROM_EMAIL,
+      hasApiKey: !!process.env.RESEND_API_KEY,
+    })
 
     // 이메일 발송
     const { data, error } = await resend.emails.send({
@@ -44,14 +52,28 @@ export async function sendEmail(
     })
 
     if (error) {
-      console.error('이메일 발송 실패:', error)
+      console.error('❌ [이메일 발송 실패]', {
+        to,
+        subject,
+        error: error.message,
+        errorDetails: error,
+      })
       return { success: false, error: error.message }
     }
 
-    console.log('이메일 발송 성공:', { to, subject, messageId: data?.id })
+    console.log('✅ [이메일 발송 성공]', {
+      to,
+      subject,
+      messageId: data?.id,
+    })
     return { success: true, messageId: data?.id }
   } catch (error) {
-    console.error('이메일 발송 오류:', error)
+    console.error('❌ [이메일 발송 오류]', {
+      to,
+      subject,
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
     return { success: false, error: 'Failed to send email' }
   }
 }

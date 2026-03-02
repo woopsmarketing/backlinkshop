@@ -81,14 +81,15 @@ export async function saveOrderReportMetaAction(
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 주문 정보 조회 (유저 이메일, 상품명 포함)
+    // 1. 주문 정보 조회
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('id, user_id, products(name), profiles(email)')
+      .select('id, user_id, product_id')
       .eq('id', orderId)
       .single()
 
     if (orderError || !order) {
+      console.error('주문 조회 실패:', orderError)
       return { success: false, error: '주문을 찾을 수 없습니다' }
     }
 
@@ -109,10 +110,23 @@ export async function saveOrderReportMetaAction(
       return { success: false, error: '보고서 정보 저장에 실패했습니다' }
     }
 
-    // 3. 이메일 발송 (고객에게 보고서 업로드 알림)
-    const userEmail = (order as any).profiles?.email
-    const productName = (order as any).products?.name || '알 수 없는 상품'
+    // 3. 유저 이메일 및 상품명 조회 (이메일 발송용)
+    const { data: userProfile } = await adminClient
+      .from('profiles')
+      .select('email')
+      .eq('id', order.user_id)
+      .single()
 
+    const { data: product } = await adminClient
+      .from('products')
+      .select('name')
+      .eq('id', order.product_id)
+      .single()
+
+    const userEmail = userProfile?.email
+    const productName = product?.name || '알 수 없는 상품'
+
+    // 4. 이메일 발송 (고객에게 보고서 업로드 알림)
     if (userEmail) {
       await sendEmail(
         userEmail,
