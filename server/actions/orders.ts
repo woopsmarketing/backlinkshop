@@ -14,7 +14,6 @@ import { CREDIT_REASON } from '@/lib/constants'
 import { sendEmail, sendEmailToAdmin } from '@/lib/email/send-email'
 import { OrderCreatedCustomerEmail } from '@/lib/email/templates/order-created-customer'
 import { OrderCreatedAdminEmail } from '@/lib/email/templates/order-created-admin'
-import { createElement } from 'react'
 
 /**
  * 상품 구매 (주문 생성)
@@ -89,7 +88,7 @@ export async function createOrderAction(productId: string, quantity: number, not
       await sendEmail(
         user.email,
         '주문이 접수되었습니다 - 백링크샵',
-        createElement(OrderCreatedCustomerEmail, {
+        OrderCreatedCustomerEmail({
           customerEmail: user.email,
           orderId: order.id,
           productName: product.name,
@@ -105,7 +104,7 @@ export async function createOrderAction(productId: string, quantity: number, not
       // 6. 이메일 발송 (관리자)
       await sendEmailToAdmin(
         `[신규 주문] ${product.name} - ${user.email}`,
-        createElement(OrderCreatedAdminEmail, {
+        OrderCreatedAdminEmail({
           customerEmail: user.email,
           orderId: order.id,
           productName: product.name,

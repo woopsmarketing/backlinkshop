@@ -13,7 +13,6 @@ import { CREDIT_REASON } from '@/lib/constants'
 import { calculateTopupBonus } from '@/lib/topup'
 import { sendEmail } from '@/lib/email/send-email'
 import { TopupApprovedEmail } from '@/lib/email/templates/topup-approved'
-import { createElement } from 'react'
 
 /**
  * 충전 요청 승인
@@ -99,7 +98,7 @@ export async function approveTopupRequestAction(requestId: string) {
       await sendEmail(
         userEmail,
         '크레딧 충전이 완료되었습니다 - 백링크샵',
-        createElement(TopupApprovedEmail, {
+        TopupApprovedEmail({
           customerEmail: userEmail,
           amount: totalCredits,
           newBalance,
