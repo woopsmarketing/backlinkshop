@@ -6,7 +6,7 @@
 'use server'
 
 import { resend, FROM_EMAIL, ADMIN_EMAIL } from './resend'
-import { ReactElement, JSXElementConstructor } from 'react'
+import { ReactElement, JSXElementConstructor, ReactNode } from 'react'
 
 /**
  * 이메일 발송 결과 타입
@@ -21,12 +21,12 @@ export type SendEmailResult = {
  * 이메일 발송 함수
  * @param to 수신자 이메일
  * @param subject 제목
- * @param react React 이메일 템플릿
+ * @param react React 이메일 템플릿 (컴포넌트 또는 ReactElement)
  */
 export async function sendEmail(
   to: string,
   subject: string,
-  react: ReactElement<any, string | JSXElementConstructor<any>>
+  react: ReactNode
 ): Promise<SendEmailResult> {
   try {
     // Resend API 키 확인
@@ -81,11 +81,11 @@ export async function sendEmail(
 /**
  * 관리자에게 이메일 발송
  * @param subject 제목
- * @param react React 이메일 템플릿
+ * @param react React 이메일 템플릿 (컴포넌트 또는 ReactElement)
  */
 export async function sendEmailToAdmin(
   subject: string,
-  react: ReactElement<any, string | JSXElementConstructor<any>>
+  react: ReactNode
 ): Promise<SendEmailResult> {
   return sendEmail(ADMIN_EMAIL, subject, react)
 }
@@ -94,12 +94,12 @@ export async function sendEmailToAdmin(
  * 여러 수신자에게 동일한 이메일 발송
  * @param recipients 수신자 이메일 배열
  * @param subject 제목
- * @param react React 이메일 템플릿
+ * @param react React 이메일 템플릿 (컴포넌트 또는 ReactElement)
  */
 export async function sendBulkEmail(
   recipients: string[],
   subject: string,
-  react: ReactElement<any, string | JSXElementConstructor<any>>
+  react: ReactNode
 ): Promise<SendEmailResult[]> {
   const results = await Promise.all(recipients.map(to => sendEmail(to, subject, react)))
   return results
