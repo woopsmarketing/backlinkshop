@@ -102,6 +102,36 @@ export async function sendBulkEmail(
   subject: string,
   react: ReactNode
 ): Promise<SendEmailResult[]> {
-  const results = await Promise.all(recipients.map(to => sendEmail(to, subject, react)))
+  console.log(`📧 [일괄 이메일 발송] 총 ${recipients.length}명에게 발송 시작`)
+
+  // 각 이메일 발송 (순차 처리로 변경하여 로그 확인 용이)
+  const results: SendEmailResult[] = []
+  let successCount = 0
+  let failCount = 0
+
+  for (let i = 0; i < recipients.length; i++) {
+    const to = recipients[i]
+    const result = await sendEmail(to, subject, react)
+    results.push(result)
+
+    if (result.success) {
+      successCount++
+    } else {
+      failCount++
+      console.error(`❌ [${i + 1}/${recipients.length}] 발송 실패: ${to} - ${result.error}`)
+    }
+
+    // 진행률 로그 (10명마다)
+    if ((i + 1) % 10 === 0 || i + 1 === recipients.length) {
+      console.log(
+        `📊 [진행률] ${i + 1}/${recipients.length} (성공: ${successCount}, 실패: ${failCount})`
+      )
+    }
+  }
+
+  console.log(
+    `✅ [일괄 이메일 발송 완료] 총 ${recipients.length}명 중 성공: ${successCount}, 실패: ${failCount}`
+  )
+
   return results
 }

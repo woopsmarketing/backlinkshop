@@ -24,31 +24,32 @@ export async function sendAnnouncementToAllUsersAction() {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 2. 모든 회원 이메일 조회
-    const { data: profiles, error: profilesError } = await adminClient
-      .from('profiles')
-      .select('email')
-      .not('email', 'is', null)
+    // 2. auth.users에서 모든 회원 이메일 조회 (profiles.email은 null일 수 있음)
+    const { data: usersData, error: usersError } = await adminClient.auth.admin.listUsers()
 
-    if (profilesError) {
-      console.error('회원 조회 실패:', profilesError)
+    if (usersError) {
+      console.error('❌ [회원 조회 실패]', usersError)
       return { success: false, error: '회원 목록을 가져오는데 실패했습니다' }
     }
 
-    if (!profiles || profiles.length === 0) {
+    if (!usersData || !usersData.users || usersData.users.length === 0) {
       return { success: false, error: '발송할 회원이 없습니다' }
     }
 
-    // 3. 이메일 주소 추출
-    const emails = profiles.map(p => p.email).filter((email): email is string => email !== null)
+    // 3. 이메일 주소 추출 (이메일이 있고, 이메일 인증된 사용자만)
+    const emails = usersData.users
+      .filter(u => u.email && u.email_confirmed_at) // 이메일 인증된 사용자만
+      .map(u => u.email!)
 
     if (emails.length === 0) {
       return { success: false, error: '유효한 이메일 주소가 없습니다' }
     }
 
-    console.log(`📧 [일괄 이메일 발송 시작] 총 ${emails.length}명`)
+    console.log(
+      `📧 [일괄 이메일 발송 시작] 총 ${emails.length}명 (전체 회원: ${usersData.users.length}명)`
+    )
 
-    // 4. 일괄 이메일 발송
+    // 4. 일괄 이메일 발송 (renderAnnouncementEmail 사용)
     const results = await sendBulkEmail(
       emails,
       '[백링크샵] 중요 공지사항 - 주문 정보 확인 요청',
@@ -58,6 +59,12 @@ export async function sendAnnouncementToAllUsersAction() {
     // 5. 결과 집계
     const successCount = results.filter(r => r.success).length
     const failCount = results.filter(r => !r.success).length
+
+    // 실패한 이메일 목록 로깅
+    if (failCount > 0) {
+      const failedEmails = emails.filter((_, idx) => !results[idx].success)
+      console.error(`❌ [실패한 이메일 목록] ${failCount}건:`, failedEmails)
+    }
 
     console.log(`✅ [일괄 이메일 발송 완료] 성공: ${successCount}, 실패: ${failCount}`)
 
