@@ -13,6 +13,9 @@ interface OrderCreatedCustomerEmailProps {
   note?: string
   siteUrl?: string
   keywords?: string
+  useSubKeywords?: boolean
+  mainKeywordRatio?: number
+  subKeywordRatio?: number
 }
 
 export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps> = ({
@@ -24,6 +27,9 @@ export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps>
   note,
   siteUrl,
   keywords,
+  useSubKeywords,
+  mainKeywordRatio,
+  subKeywordRatio,
 }) => (
   <html>
     <head>
@@ -142,9 +148,28 @@ export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps>
 
           {keywords && (
             <div className="info-row">
-              <span className="label">키워드</span>
+              <span className="label">메인 키워드</span>
               <span className="value">{keywords}</span>
             </div>
+          )}
+
+          {useSubKeywords && (
+            <>
+              <div className="info-row">
+                <span className="label">서브키워드 추가</span>
+                <span className="value" style={{ color: '#10b981', fontWeight: 'bold' }}>
+                  ✓ 사용 (약 100개 자동 생성)
+                </span>
+              </div>
+              {mainKeywordRatio !== undefined && subKeywordRatio !== undefined && (
+                <div className="info-row">
+                  <span className="label">키워드 비율</span>
+                  <span className="value">
+                    메인 {mainKeywordRatio}% / 서브 {subKeywordRatio}%
+                  </span>
+                </div>
+              )}
+            </>
           )}
 
           <div className="info-row">

@@ -16,6 +16,9 @@ export type AdminOrderRow = {
   note: string | null
   site_url?: string | null
   keywords?: string | null
+  use_sub_keywords?: boolean | null
+  main_keyword_ratio?: number | null
+  sub_keyword_ratio?: number | null
   report_path?: string | null
   report_filename?: string | null
   report_uploaded_at?: string | null
@@ -34,7 +37,7 @@ export async function getAdminOrders(status?: string) {
     let query = adminClient
       .from('orders')
       .select(
-        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, report_path, report_filename, report_uploaded_at, created_at, products(name)'
+        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, use_sub_keywords, main_keyword_ratio, sub_keyword_ratio, report_path, report_filename, report_uploaded_at, created_at, products(name)'
       )
       .order('created_at', { ascending: false })
 

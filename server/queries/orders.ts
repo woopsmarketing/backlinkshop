@@ -17,7 +17,7 @@ export async function getMyOrders(userId: string, limit = 50) {
   const { data, error } = await supabase
     .from('orders')
     .select(
-      'id, quantity, total_price, status, note, site_url, keywords, created_at, report_path, report_filename, products(name, price)'
+      'id, quantity, total_price, status, note, site_url, keywords, use_sub_keywords, main_keyword_ratio, sub_keyword_ratio, created_at, report_path, report_filename, products(name, price)'
     )
     .eq('user_id', userId)
     .order('created_at', { ascending: false })

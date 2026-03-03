@@ -1,7 +1,8 @@
-// v2.0 - PBN 백링크 상품 전용 양식 추가 (2026-03-03)
+// v3.0 - 플랜 백링크 상품 전용 양식 추가 (2026-03-03)
 /**
  * 상품 구매 폼 컴포넌트
  * - PBN 백링크: 사이트 URL, 키워드 입력 (수량 고정 1)
+ * - 플랜 백링크: 사이트 URL, 키워드, 서브키워드 옵션, 비율 설정 (수량 고정 1)
  * - 기타 상품: 수량, 요청사항 입력
  */
 
@@ -21,23 +22,42 @@ type Props = {
 export default function ProductPurchaseForm({ productId, productName, price }: Props) {
   const router = useRouter()
 
-  // PBN 백링크 상품인지 확인 (상품명에 "PBN"이 포함되어 있으면)
+  // 상품 타입 확인
   const isPBNProduct = productName.includes('PBN')
+  const isPlanProduct = productName.includes('플랜')
 
   // 기본 필드
   const [quantity, setQuantity] = useState(1)
   const [note, setNote] = useState('')
 
-  // PBN 전용 필드
+  // 백링크 공통 필드
   const [siteUrl, setSiteUrl] = useState('')
   const [keywords, setKeywords] = useState('')
+
+  // 플랜 백링크 전용 필드
+  const [useSubKeywords, setUseSubKeywords] = useState(true)
+  const [mainKeywordRatio, setMainKeywordRatio] = useState(70)
+  const [subKeywordRatio, setSubKeywordRatio] = useState(30)
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // PBN 상품은 수량 고정 1, 기타 상품은 입력된 수량 사용
-  const actualQuantity = isPBNProduct ? 1 : quantity
+  // 백링크 상품은 수량 고정 1, 기타 상품은 입력된 수량 사용
+  const actualQuantity = isPBNProduct || isPlanProduct ? 1 : quantity
   const totalPrice = price * actualQuantity
+
+  // 비율 조정 핸들러
+  const handleMainRatioChange = (value: number) => {
+    const newMainRatio = Math.max(0, Math.min(100, value))
+    setMainKeywordRatio(newMainRatio)
+    setSubKeywordRatio(100 - newMainRatio)
+  }
+
+  const handleSubRatioChange = (value: number) => {
+    const newSubRatio = Math.max(0, Math.min(100, value))
+    setSubKeywordRatio(newSubRatio)
+    setMainKeywordRatio(100 - newSubRatio)
+  }
 
   /**
    * 구매 요청 처리
@@ -46,8 +66,8 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
     e.preventDefault()
     setMessage(null)
 
-    // PBN 상품 필수 필드 검증
-    if (isPBNProduct) {
+    // 백링크 상품 필수 필드 검증
+    if (isPBNProduct || isPlanProduct) {
       if (!siteUrl.trim()) {
         setMessage({ type: 'error', text: '사이트 URL을 입력해주세요' })
         return
@@ -65,8 +85,11 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
         productId,
         actualQuantity,
         note,
-        isPBNProduct ? siteUrl : undefined,
-        isPBNProduct ? keywords : undefined
+        isPBNProduct || isPlanProduct ? siteUrl : undefined,
+        isPBNProduct || isPlanProduct ? keywords : undefined,
+        isPlanProduct ? useSubKeywords : undefined,
+        isPlanProduct ? mainKeywordRatio : undefined,
+        isPlanProduct ? subKeywordRatio : undefined
       )
 
       if (result.success) {
@@ -104,8 +127,8 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
         <p className="text-lg font-semibold text-gray-900 dark:text-white">{productName}</p>
       </div>
 
-      {/* PBN 백링크 상품: 사이트 URL, 키워드 입력 */}
-      {isPBNProduct ? (
+      {/* 백링크 상품: 사이트 URL, 키워드 입력 */}
+      {isPBNProduct || isPlanProduct ? (
         <>
           {/* 사이트 URL (필수) */}
           <div>
@@ -128,20 +151,113 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
           {/* 키워드 (필수) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              키워드 <span className="text-red-500">*</span>
+              메인 키워드 <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <textarea
               value={keywords}
               onChange={e => setKeywords(e.target.value)}
+              rows={3}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder="예) SEO 최적화, 백링크 구매"
+              placeholder="예) SEO 최적화, 백링크 구매, 검색엔진 최적화"
               required
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              타겟 키워드를 입력해주세요 (여러 개는 쉼표로 구분)
+              {isPlanProduct
+                ? '타겟 키워드를 입력해주세요 (여러 개 입력 가능, 쉼표로 구분)'
+                : '타겟 키워드를 입력해주세요 (여러 개는 쉼표로 구분)'}
             </p>
           </div>
+
+          {/* 플랜 백링크 전용: 서브키워드 옵션 */}
+          {isPlanProduct && (
+            <>
+              {/* 서브키워드 추가 옵션 */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="useSubKeywords"
+                    checked={useSubKeywords}
+                    onChange={e => setUseSubKeywords(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <div className="flex-1">
+                    <label
+                      htmlFor="useSubKeywords"
+                      className="text-sm font-semibold text-gray-900 dark:text-white cursor-pointer"
+                    >
+                      서브키워드 추가 (권장)
+                    </label>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      메인키워드를 기반으로 생성된 다양한 LSI키워드 및 롱테일키워드를 자동으로
+                      추가합니다. 약 100개 가량 추가되며, SEO 측면에서 자연스럽고 효율이 좋습니다.
+                    </p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                        ✓ 자연스러운 링크 프로필
+                      </span>
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                        ✓ 다양한 키워드 커버
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 키워드 비율 설정 */}
+                {useSubKeywords && (
+                  <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
+                      키워드 비율 설정
+                    </p>
+
+                    {/* 메인키워드 비율 */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-gray-700 dark:text-gray-300">
+                          메인키워드
+                        </label>
+                        <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                          {mainKeywordRatio}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={mainKeywordRatio}
+                        onChange={e => handleMainRatioChange(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                      />
+                    </div>
+
+                    {/* 서브키워드 비율 */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-xs text-gray-700 dark:text-gray-300">
+                          서브키워드 (LSI/롱테일)
+                        </label>
+                        <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                          {subKeywordRatio}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={subKeywordRatio}
+                        onChange={e => handleSubRatioChange(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                      />
+                    </div>
+
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      💡 권장 비율: 메인 70% / 서브 30% (자연스러운 백링크 프로필)
+                    </p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
 
           {/* 요청사항 (선택) */}
           <div>

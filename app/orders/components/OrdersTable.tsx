@@ -18,6 +18,9 @@ type OrderRow = {
   note?: string | null
   site_url?: string | null
   keywords?: string | null
+  use_sub_keywords?: boolean | null
+  main_keyword_ratio?: number | null
+  sub_keyword_ratio?: number | null
   created_at: string
   report_path?: string | null
   report_filename?: string | null
@@ -211,11 +214,11 @@ export default function OrdersTable({ orders }: Props) {
                 </div>
               </div>
 
-              {/* PBN 백링크 정보 */}
+              {/* 백링크 정보 */}
               {(modal.data.site_url || modal.data.keywords) && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
                   <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">
-                    🏆 PBN 백링크 정보
+                    🏆 백링크 정보
                   </h4>
                   <div className="space-y-2 text-sm">
                     {modal.data.site_url && (
@@ -231,11 +234,28 @@ export default function OrdersTable({ orders }: Props) {
                     {modal.data.keywords && (
                       <div>
                         <span className="text-blue-700 dark:text-blue-400 font-medium">
-                          키워드:
+                          메인 키워드:
                         </span>
                         <div className="mt-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-2 rounded">
                           {modal.data.keywords}
                         </div>
+                      </div>
+                    )}
+                    {modal.data.use_sub_keywords && (
+                      <div>
+                        <span className="text-green-700 dark:text-green-400 font-medium">
+                          서브키워드:
+                        </span>
+                        <div className="mt-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-2 rounded">
+                          ✓ 사용 (약 100개 LSI/롱테일 키워드 자동 생성)
+                        </div>
+                        {modal.data.main_keyword_ratio !== null &&
+                          modal.data.sub_keyword_ratio !== null && (
+                            <div className="mt-2 text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-2 rounded">
+                              비율: 메인 {modal.data.main_keyword_ratio}% / 서브{' '}
+                              {modal.data.sub_keyword_ratio}%
+                            </div>
+                          )}
                       </div>
                     )}
                   </div>

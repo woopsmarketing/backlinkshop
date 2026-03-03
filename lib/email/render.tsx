@@ -23,6 +23,9 @@ export function renderOrderCreatedCustomerEmail(props: {
   note?: string
   siteUrl?: string
   keywords?: string
+  useSubKeywords?: boolean
+  mainKeywordRatio?: number
+  subKeywordRatio?: number
 }) {
   return <OrderCreatedCustomerEmail {...props} />
 }
@@ -39,6 +42,9 @@ export function renderOrderCreatedAdminEmail(props: {
   note?: string
   siteUrl?: string
   keywords?: string
+  useSubKeywords?: boolean
+  mainKeywordRatio?: number
+  subKeywordRatio?: number
 }) {
   return <OrderCreatedAdminEmail {...props} />
 }

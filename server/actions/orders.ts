@@ -1,8 +1,9 @@
-// v1.2 - PBN 백링크 주문 필드 추가 (2026-03-03)
+// v1.3 - 플랜 백링크 주문 필드 추가 (2026-03-03)
 /**
  * 주문 관련 Server Actions
  * 상품 구매(주문 생성) 및 이메일 알림
  * - PBN 백링크 상품: 사이트 URL, 키워드 필수
+ * - 플랜 백링크 상품: 사이트 URL, 키워드, 서브키워드 옵션, 비율 설정
  */
 
 'use server'
@@ -20,15 +21,21 @@ import { renderOrderCreatedCustomerEmail, renderOrderCreatedAdminEmail } from '@
  * @param productId 상품 ID
  * @param quantity 수량
  * @param note 요청사항
- * @param siteUrl 사이트 URL (PBN 백링크 상품에서 필수)
- * @param keywords 키워드 (PBN 백링크 상품에서 필수)
+ * @param siteUrl 사이트 URL (백링크 상품에서 필수)
+ * @param keywords 키워드 (백링크 상품에서 필수)
+ * @param useSubKeywords 서브키워드 사용 여부 (플랜 백링크 전용)
+ * @param mainKeywordRatio 메인키워드 비율 (플랜 백링크 전용)
+ * @param subKeywordRatio 서브키워드 비율 (플랜 백링크 전용)
  */
 export async function createOrderAction(
   productId: string,
   quantity: number,
   note?: string,
   siteUrl?: string,
-  keywords?: string
+  keywords?: string,
+  useSubKeywords?: boolean,
+  mainKeywordRatio?: number,
+  subKeywordRatio?: number
 ) {
   try {
     const user = await requireAuth()
@@ -59,9 +66,11 @@ export async function createOrderAction(
     }
     const totalPrice = productPrice * quantity
 
-    // 4. PBN 백링크 상품 필수 필드 검증
+    // 4. 백링크 상품 필수 필드 검증
     const isPBNProduct = product.name.includes('PBN')
-    if (isPBNProduct) {
+    const isPlanProduct = product.name.includes('플랜')
+    
+    if (isPBNProduct || isPlanProduct) {
       if (!siteUrl || !siteUrl.trim()) {
         return { success: false, error: '사이트 URL을 입력해주세요' }
       }
@@ -82,6 +91,9 @@ export async function createOrderAction(
         note: note || null,
         site_url: siteUrl || null,
         keywords: keywords || null,
+        use_sub_keywords: useSubKeywords ?? null,
+        main_keyword_ratio: mainKeywordRatio ?? null,
+        sub_keyword_ratio: subKeywordRatio ?? null,
       })
       .select()
       .single()
@@ -119,6 +131,9 @@ export async function createOrderAction(
           note: note || undefined,
           siteUrl: siteUrl || undefined,
           keywords: keywords || undefined,
+          useSubKeywords: useSubKeywords,
+          mainKeywordRatio: mainKeywordRatio,
+          subKeywordRatio: subKeywordRatio,
         })
       ).catch(err => {
         console.error('고객 이메일 발송 실패:', err)
@@ -137,6 +152,9 @@ export async function createOrderAction(
           note: note || undefined,
           siteUrl: siteUrl || undefined,
           keywords: keywords || undefined,
+          useSubKeywords: useSubKeywords,
+          mainKeywordRatio: mainKeywordRatio,
+          subKeywordRatio: subKeywordRatio,
         })
       ).catch(err => {
         console.error('관리자 이메일 발송 실패:', err)

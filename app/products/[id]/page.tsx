@@ -46,7 +46,13 @@ export default async function ProductDetailPage(props: Props) {
       return ['직접 구축 네트워크', '고품질 도메인', '강력한 링크 파워']
     }
     if (name.includes('플랜')) {
-      return ['다양한 백링크 조합', '자연스러운 프로필', '안정적 성장']
+      return [
+        '키워드 무제한 입력 가능',
+        '서브키워드 자동 생성 (LSI/롱테일)',
+        '자연스러운 백링크 프로필 구축',
+        '다양한 백링크 유형 조합',
+        'SEO 효율 극대화',
+      ]
     }
     if (name.includes('온페이지')) {
       return ['기술 SEO 진단', '구조/메타 점검', '리포트 제공']

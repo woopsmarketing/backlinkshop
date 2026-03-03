@@ -110,11 +110,8 @@ export async function saveOrderReportMetaAction(
     }
 
     // 3. 유저 이메일 및 상품명 조회 (이메일 발송용)
-    const { data: userProfile } = await adminClient
-      .from('profiles')
-      .select('email')
-      .eq('id', order.user_id)
-      .single()
+    const { data: userData } = await adminClient.auth.admin.getUserById(order.user_id)
+    const userEmail = userData?.user?.email
 
     const { data: product } = await adminClient
       .from('products')
@@ -122,7 +119,6 @@ export async function saveOrderReportMetaAction(
       .eq('id', order.product_id)
       .single()
 
-    const userEmail = userProfile?.email
     const productName = product?.name || '알 수 없는 상품'
 
     // 4. 이메일 발송 (고객에게 보고서 업로드 알림)
