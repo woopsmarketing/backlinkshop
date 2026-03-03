@@ -1,11 +1,12 @@
 /**
  * 이메일 미리보기 및 테스트 발송 페이지
+ * 간단하게 이메일 내용을 확인하고 테스트 발송할 수 있습니다
  */
 
 'use client'
 
 import { useState } from 'react'
-import { AdminNav } from '../../components/AdminNav'
+import Link from 'next/link'
 import { sendEmail } from '@/lib/email/send-email'
 import { AnnouncementEmail } from '@/lib/email/templates/announcement'
 
@@ -54,9 +55,12 @@ export default function EmailTestPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">이메일 테스트</h1>
-
-        <AdminNav current="emails" />
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">이메일 테스트</h1>
+          <Link href="/admin/emails" className="text-sm text-blue-600 hover:text-blue-700">
+            ← 이메일 관리로 돌아가기
+          </Link>
+        </div>
 
         <div className="mt-8 bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">📧 이메일 미리보기 및 테스트 발송</h2>
@@ -80,9 +84,7 @@ export default function EmailTestPage() {
                   onClick={handleTestSend}
                   disabled={sending}
                   className={`px-6 py-2 rounded-lg font-semibold text-white transition-colors ${
-                    sending
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700'
+                    sending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
                   }`}
                 >
                   {sending ? '발송 중...' : '테스트 발송'}
@@ -93,9 +95,7 @@ export default function EmailTestPage() {
             {result && (
               <div
                 className={`border-l-4 p-4 rounded ${
-                  result.success
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-red-500 bg-red-50'
+                  result.success ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'
                 }`}
               >
                 <p
@@ -105,11 +105,7 @@ export default function EmailTestPage() {
                 >
                   {result.success ? '✅ 발송 완료' : '❌ 발송 실패'}
                 </p>
-                <p
-                  className={`text-sm mt-1 ${
-                    result.success ? 'text-green-800' : 'text-red-800'
-                  }`}
-                >
+                <p className={`text-sm mt-1 ${result.success ? 'text-green-800' : 'text-red-800'}`}>
                   {result.message}
                 </p>
               </div>
