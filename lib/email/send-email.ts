@@ -92,6 +92,13 @@ export async function sendEmailToAdmin(
 }
 
 /**
+ * 지연 함수 (Rate Limit 회피용)
+ */
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+/**
  * 여러 수신자에게 동일한 이메일 발송
  * @param recipients 수신자 이메일 배열
  * @param subject 제목
@@ -103,8 +110,9 @@ export async function sendBulkEmail(
   react: ReactNode
 ): Promise<SendEmailResult[]> {
   console.log(`📧 [일괄 이메일 발송] 총 ${recipients.length}명에게 발송 시작`)
+  console.log(`⏱️ [Rate Limit 준수] 각 이메일 사이 0.6초 대기 (Resend 제한: 초당 2개)`)
 
-  // 각 이메일 발송 (순차 처리로 변경하여 로그 확인 용이)
+  // 각 이메일 발송 (Rate Limit 준수: 초당 2개 = 0.5초 간격)
   const results: SendEmailResult[] = []
   let successCount = 0
   let failCount = 0
@@ -126,6 +134,12 @@ export async function sendBulkEmail(
       console.log(
         `📊 [진행률] ${i + 1}/${recipients.length} (성공: ${successCount}, 실패: ${failCount})`
       )
+    }
+
+    // Rate Limit 회피: 마지막 이메일이 아니면 0.6초 대기
+    // (Resend 제한: 초당 2개 = 0.5초 간격, 여유있게 0.6초)
+    if (i < recipients.length - 1) {
+      await delay(600)
     }
   }
 
