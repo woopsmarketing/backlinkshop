@@ -1,7 +1,8 @@
-// v1.2 - 요청 메모 모달 표시 추가 (2026-02-05)
+// v1.3 - PBN 백링크 주문 정보 표시 추가 (2026-03-03)
 /**
  * 관리자 주문 테이블
  * 주문 상태 변경 버튼 제공
+ * PBN 백링크 주문: 사이트 URL, 키워드 표시
  */
 
 'use client'
@@ -23,27 +24,29 @@ const statusLabel: Record<string, string> = {
   failed: '실패',
 }
 
+type ModalType = 'note' | 'details'
+
 export default function AdminOrdersTable({ orders }: Props) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  const [noteModal, setNoteModal] = useState<{
+  const [modal, setModal] = useState<{
+    type: ModalType
     open: boolean
-    note: string
-    orderId: string
+    data: AdminOrderRow | null
   } | null>(null)
 
   /**
-   * 요청 메모 모달 열기
+   * 상세 정보 모달 열기
    */
-  const openNoteModal = (note: string, orderId: string) => {
-    setNoteModal({ open: true, note, orderId })
+  const openDetailsModal = (order: AdminOrderRow) => {
+    setModal({ type: 'details', open: true, data: order })
   }
 
   /**
-   * 요청 메모 모달 닫기
+   * 모달 닫기
    */
-  const closeNoteModal = () => {
-    setNoteModal(null)
+  const closeModal = () => {
+    setModal(null)
   }
 
   /**
@@ -105,7 +108,7 @@ export default function AdminOrdersTable({ orders }: Props) {
                   상태
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-                  요청사항
+                  상세정보
                 </th>
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
                   보고서

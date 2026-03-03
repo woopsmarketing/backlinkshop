@@ -8,7 +8,7 @@
 import Link from 'next/link'
 
 type AdminNavProps = {
-  current: 'topups' | 'orders' | 'products' | 'coupons' | 'users'
+  current: 'topups' | 'orders' | 'products' | 'coupons' | 'users' | 'emails'
   stats?: {
     pendingOrders?: number
     processingOrders?: number
@@ -38,6 +38,7 @@ export default function AdminNav({ current, stats }: AdminNavProps) {
     },
     { key: 'products', label: '상품 관리', href: '/admin/products' },
     { key: 'coupons', label: '쿠폰 관리', href: '/admin/coupons' },
+    { key: 'emails', label: '이메일 발송', href: '/admin/emails' },
   ]
 
   return (

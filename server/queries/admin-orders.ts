@@ -1,4 +1,4 @@
-// v1.0 - 관리자 주문 조회 추가 (2026-02-05)
+// v1.1 - PBN 백링크 주문 필드 추가 (2026-03-03)
 /**
  * 관리자용 주문 조회 함수
  * 상태 필터 및 최신순 정렬
@@ -14,6 +14,8 @@ export type AdminOrderRow = {
   total_price: number
   status: string
   note: string | null
+  site_url?: string | null
+  keywords?: string | null
   report_path?: string | null
   report_filename?: string | null
   report_uploaded_at?: string | null
@@ -32,7 +34,7 @@ export async function getAdminOrders(status?: string) {
     let query = adminClient
       .from('orders')
       .select(
-        'id, user_id, product_id, quantity, total_price, status, note, report_path, report_filename, report_uploaded_at, created_at, products(name)'
+        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, report_path, report_filename, report_uploaded_at, created_at, products(name)'
       )
       .order('created_at', { ascending: false })
 
