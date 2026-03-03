@@ -6,7 +6,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AdminNav } from '../components/AdminNav'
+import AdminNav from '../components/AdminNav'
 import { sendAnnouncementToAllUsersAction } from '@/server/actions/admin-emails'
 
 export default function AdminEmailsPage() {
@@ -61,9 +61,7 @@ export default function AdminEmailsPage() {
                 onClick={handleSendAnnouncement}
                 disabled={sending}
                 className={`px-6 py-3 rounded-lg font-semibold text-white transition-colors ${
-                  sending
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
+                  sending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >
                 {sending ? '발송 중...' : '모든 회원에게 발송'}
@@ -73,9 +71,7 @@ export default function AdminEmailsPage() {
             {result && (
               <div
                 className={`border-l-4 p-4 rounded ${
-                  result.success
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-red-500 bg-red-50'
+                  result.success ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'
                 }`}
               >
                 <h3
@@ -85,11 +81,7 @@ export default function AdminEmailsPage() {
                 >
                   {result.success ? '✅ 발송 완료' : '❌ 발송 실패'}
                 </h3>
-                <p
-                  className={`text-sm ${
-                    result.success ? 'text-green-800' : 'text-red-800'
-                  }`}
-                >
+                <p className={`text-sm ${result.success ? 'text-green-800' : 'text-red-800'}`}>
                   {result.message}
                 </p>
 
@@ -97,9 +89,7 @@ export default function AdminEmailsPage() {
                   <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
                     <div className="bg-white p-3 rounded">
                       <div className="text-gray-600">총 발송</div>
-                      <div className="text-2xl font-bold text-gray-900">
-                        {result.stats.total}
-                      </div>
+                      <div className="text-2xl font-bold text-gray-900">{result.stats.total}</div>
                     </div>
                     <div className="bg-white p-3 rounded">
                       <div className="text-green-600">성공</div>
@@ -109,9 +99,7 @@ export default function AdminEmailsPage() {
                     </div>
                     <div className="bg-white p-3 rounded">
                       <div className="text-red-600">실패</div>
-                      <div className="text-2xl font-bold text-red-600">
-                        {result.stats.fail}
-                      </div>
+                      <div className="text-2xl font-bold text-red-600">{result.stats.fail}</div>
                     </div>
                   </div>
                 )}
