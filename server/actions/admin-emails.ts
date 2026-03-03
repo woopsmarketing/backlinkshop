@@ -24,22 +24,23 @@ export async function sendAnnouncementToAllUsersAction() {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 2. 모든 회원 이메일 조회 (auth.users에서 직접 조회)
-    const { data: usersData, error: usersError } = await adminClient.auth.admin.listUsers()
+    // 2. 모든 회원 이메일 조회
+    const { data: profiles, error: profilesError } = await adminClient
+      .from('profiles')
+      .select('email')
+      .not('email', 'is', null)
 
-    if (usersError) {
-      console.error('회원 조회 실패:', usersError)
+    if (profilesError) {
+      console.error('회원 조회 실패:', profilesError)
       return { success: false, error: '회원 목록을 가져오는데 실패했습니다' }
     }
 
-    if (!usersData?.users || usersData.users.length === 0) {
+    if (!profiles || profiles.length === 0) {
       return { success: false, error: '발송할 회원이 없습니다' }
     }
 
     // 3. 이메일 주소 추출
-    const emails = usersData.users
-      .map(u => u.email)
-      .filter((email): email is string => email !== undefined && email !== null)
+    const emails = profiles.map(p => p.email).filter((email): email is string => email !== null)
 
     if (emails.length === 0) {
       return { success: false, error: '유효한 이메일 주소가 없습니다' }

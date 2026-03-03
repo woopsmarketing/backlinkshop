@@ -84,15 +84,13 @@ export async function approveTopupRequestAction(requestId: string) {
     }
 
     // 4. 유저 이메일 및 현재 잔액 조회 (이메일 발송용)
-    const { data: userData } = await adminClient.auth.admin.getUserById(request.user_id)
-    const userEmail = userData?.user?.email
-
     const { data: profile } = await adminClient
       .from('profiles')
-      .select('credit_balance')
+      .select('email, credit_balance')
       .eq('id', request.user_id)
       .single()
 
+    const userEmail = profile?.email
     const newBalance = profile?.credit_balance || totalCredits
 
     // 5. 이메일 발송 (고객에게 충전 승인 알림)
