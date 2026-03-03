@@ -57,6 +57,7 @@ export async function getAdminOrders(status?: string) {
     const orders = (data || []).map(order => ({
       ...order,
       products: Array.isArray(order.products) ? order.products[0] || null : order.products,
+      profiles: Array.isArray(order.profiles) ? order.profiles[0] || null : order.profiles,
     }))
 
     return orders as AdminOrderRow[]
