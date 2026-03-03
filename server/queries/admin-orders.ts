@@ -38,7 +38,7 @@ export async function getAdminOrders(status?: string) {
     let query = adminClient
       .from('orders')
       .select(
-        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, use_sub_keywords, main_keyword_ratio, sub_keyword_ratio, report_path, report_filename, report_uploaded_at, created_at, products(name), profiles(email)'
+        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, use_sub_keywords, main_keyword_ratio, sub_keyword_ratio, report_path, report_filename, report_uploaded_at, created_at, products(name)'
       )
       .order('created_at', { ascending: false })
 
@@ -53,11 +53,27 @@ export async function getAdminOrders(status?: string) {
       return []
     }
 
+    if (!data || data.length === 0) {
+      return []
+    }
+
+    // 모든 user_id 수집
+    const userIds = [...new Set(data.map(order => order.user_id))]
+
+    // profiles 데이터 별도 조회
+    const { data: profilesData } = await adminClient
+      .from('profiles')
+      .select('user_id, email')
+      .in('user_id', userIds)
+
+    // user_id를 키로 하는 profiles 맵 생성
+    const profilesMap = new Map((profilesData || []).map(profile => [profile.user_id, profile]))
+
     // Supabase JOIN 결과를 안전하게 변환
     const orders = (data || []).map(order => ({
       ...order,
       products: Array.isArray(order.products) ? order.products[0] || null : order.products,
-      profiles: Array.isArray(order.profiles) ? order.profiles[0] || null : order.profiles,
+      profiles: profilesMap.get(order.user_id) || null,
     }))
 
     return orders as AdminOrderRow[]
