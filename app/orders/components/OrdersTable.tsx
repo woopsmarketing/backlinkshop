@@ -21,7 +21,7 @@ type OrderRow = {
   created_at: string
   report_path?: string | null
   report_filename?: string | null
-  products?: { name: string; price: number } | null
+  products?: { name: string; price: number } | { name: string; price: number }[] | null
 }
 
 type Props = {
@@ -88,7 +88,9 @@ export default function OrdersTable({ orders }: Props) {
             {orders.map(order => (
               <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                 <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                  {order.products?.name || '알 수 없는 상품'}
+                  {Array.isArray(order.products)
+                    ? order.products[0]?.name || '알 수 없는 상품'
+                    : order.products?.name || '알 수 없는 상품'}
                 </td>
                 <td className="py-3 px-4 text-center text-sm text-gray-700 dark:text-gray-300">
                   {order.quantity}
@@ -169,7 +171,9 @@ export default function OrdersTable({ orders }: Props) {
                   <div className="flex justify-between">
                     <span className="text-gray-600 dark:text-gray-400">상품명:</span>
                     <span className="text-gray-900 dark:text-white">
-                      {modal.data.products?.name || '알 수 없는 상품'}
+                      {Array.isArray(modal.data.products)
+                        ? modal.data.products[0]?.name || '알 수 없는 상품'
+                        : modal.data.products?.name || '알 수 없는 상품'}
                     </span>
                   </div>
                   <div className="flex justify-between">
