@@ -154,16 +154,12 @@ export default function AdminOrdersTable({ orders }: Props) {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                    {order.note ? (
-                      <button
-                        onClick={() => openNoteModal(order.note as string, order.id)}
-                        className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
-                      >
-                        보기
-                      </button>
-                    ) : (
-                      '-'
-                    )}
+                    <button
+                      onClick={() => openDetailsModal(order)}
+                      className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                    >
+                      상세보기
+                    </button>
                   </td>
                   <td className="py-3 px-4 text-center">
                     <ReportUploadButton
