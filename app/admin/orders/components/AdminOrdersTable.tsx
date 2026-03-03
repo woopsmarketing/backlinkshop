@@ -96,6 +96,9 @@ export default function AdminOrdersTable({ orders }: Props) {
                   주문 ID
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+                  회원 이메일
+                </th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
                   상품명
                 </th>
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -126,6 +129,9 @@ export default function AdminOrdersTable({ orders }: Props) {
                 <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                     {order.id.slice(0, 8)}...
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                    {order.profiles?.email || '이메일 없음'}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                     {Array.isArray(order.products)
