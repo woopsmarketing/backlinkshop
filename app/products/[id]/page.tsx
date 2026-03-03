@@ -55,7 +55,17 @@ export default async function ProductDetailPage(props: Props) {
       ]
     }
     if (name.includes('온페이지')) {
-      return ['기술 SEO 진단', '구조/메타 점검', '리포트 제공']
+      return [
+        '도메인 상태 및 권위도 분석',
+        '구글 인덱싱 현황 점검',
+        '내부 HTML 구조 검증 (메타태그, 헤딩, 스키마)',
+        '페이지 속도 및 Core Web Vitals 측정',
+        '모바일 최적화 상태 확인',
+        '내부 링크 구조 분석',
+        '콘텐츠 품질 및 키워드 최적화 평가',
+        '기술적 SEO 이슈 전수 조사 (0-100점 종합 진단)',
+        '상세 개선 보고서 제공 (PDF)',
+      ]
     }
     if (name.includes('콘텐츠')) {
       return ['키워드 최적화', '콘텐츠 품질 개선', '전환율 강화']

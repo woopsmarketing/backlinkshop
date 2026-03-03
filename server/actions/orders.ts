@@ -66,11 +66,12 @@ export async function createOrderAction(
     }
     const totalPrice = productPrice * quantity
 
-    // 4. 백링크 상품 필수 필드 검증
+    // 4. 백링크 및 SEO 점검 상품 필수 필드 검증
     const isPBNProduct = product.name.includes('PBN')
     const isPlanProduct = product.name.includes('플랜')
-    
-    if (isPBNProduct || isPlanProduct) {
+    const isOnPageProduct = product.name.includes('온페이지')
+
+    if (isPBNProduct || isPlanProduct || isOnPageProduct) {
       if (!siteUrl || !siteUrl.trim()) {
         return { success: false, error: '사이트 URL을 입력해주세요' }
       }
