@@ -1,4 +1,4 @@
-// v1.0 - 주문 조회 유틸 추가 (2026-02-05)
+// v1.1 - PBN 백링크 주문 필드 추가 (2026-03-03)
 /**
  * 주문 관련 조회 함수
  * 유저 주문 내역 조회
@@ -16,7 +16,9 @@ export async function getMyOrders(userId: string, limit = 50) {
 
   const { data, error } = await supabase
     .from('orders')
-    .select('id, quantity, total_price, status, created_at, report_path, report_filename, products(name, price)')
+    .select(
+      'id, quantity, total_price, status, note, site_url, keywords, created_at, report_path, report_filename, products(name, price)'
+    )
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -52,4 +54,3 @@ export async function getRecentReports(userId: string, limit = 5) {
 
   return data || []
 }
-

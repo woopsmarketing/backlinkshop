@@ -1,4 +1,4 @@
-// v1.2 - 로그인 에러 핸들링 및 환경변수 검증 추가 (2026-02-11)
+// v1.3 - 프로필 생성 시 이메일 저장 추가 (2026-03-03)
 /**
  * 인증 관련 Server Actions
  * 로그인, 회원가입, 로그아웃, 초기화 처리
@@ -151,10 +151,14 @@ async function handleFirstLogin(userId: string) {
 
     const supabase = await createServerSupabaseClient()
 
-    // 1. profiles 생성 (이미 있으면 무시)
+    // 1. 사용자 정보 가져오기 (이메일 저장용)
+    const { data: userData } = await supabase.auth.getUser()
+    const userEmail = userData?.user?.email || null
+
+    // 2. profiles 생성 (이미 있으면 무시)
     const { error: profileError } = await supabase
       .from('profiles')
-      .insert({ user_id: userId, role: 'user' })
+      .insert({ user_id: userId, role: 'user', email: userEmail })
       .select()
       .single()
 
@@ -162,7 +166,7 @@ async function handleFirstLogin(userId: string) {
       throw profileError
     }
 
-    // 2. 가입 보너스 지급 (apply_credit_delta 함수 사용)
+    // 3. 가입 보너스 지급 (apply_credit_delta 함수 사용)
     // credit_balances와 credit_ledger가 자동으로 생성됨
     if (SIGNUP_BONUS_AMOUNT > 0) {
       const { error: creditError } = await supabase.rpc('apply_credit_delta', {
@@ -179,13 +183,12 @@ async function handleFirstLogin(userId: string) {
       }
     }
 
-    // 3. 관리자에게 신규 회원가입 알림 이메일 발송
-    const { data: userData } = await supabase.auth.getUser()
-    if (userData?.user?.email) {
+    // 4. 관리자에게 신규 회원가입 알림 이메일 발송
+    if (userEmail) {
       await sendEmailToAdmin(
-        `[신규 회원가입] ${userData.user.email}`,
+        `[신규 회원가입] ${userEmail}`,
         renderUserRegisteredAdminEmail({
-          userEmail: userData.user.email,
+          userEmail: userEmail,
           userId: userId,
           registeredAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
         })

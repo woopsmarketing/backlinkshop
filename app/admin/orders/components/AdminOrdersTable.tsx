@@ -213,27 +213,104 @@ export default function AdminOrdersTable({ orders }: Props) {
         </div>
       )}
 
-      {/* 요청 메모 모달 */}
-      {noteModal?.open && (
+      {/* 상세 정보 모달 */}
+      {modal?.open && modal.data && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={closeNoteModal}
+          onClick={closeModal}
         >
           <div
-            className="w-full max-w-lg rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl"
+            className="w-full max-w-2xl rounded-xl bg-white dark:bg-gray-800 p-6 shadow-xl max-h-[90vh] overflow-y-auto"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">요청 메모</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">주문 상세 정보</h3>
               <button
-                onClick={closeNoteModal}
+                onClick={closeModal}
                 className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 닫기
               </button>
             </div>
-            <div className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
-              {noteModal.note}
+
+            <div className="space-y-4">
+              {/* 기본 정보 */}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-3">기본 정보</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">주문 ID:</span>
+                    <span className="text-gray-900 dark:text-white font-mono">{modal.data.id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">상품명:</span>
+                    <span className="text-gray-900 dark:text-white">
+                      {Array.isArray(modal.data.products)
+                        ? modal.data.products[0]?.name || '알 수 없는 상품'
+                        : modal.data.products?.name || '알 수 없는 상품'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">수량:</span>
+                    <span className="text-gray-900 dark:text-white">{modal.data.quantity}개</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">총액:</span>
+                    <span className="text-gray-900 dark:text-white font-semibold">
+                      {formatCredits(Number(modal.data.total_price))} 크레딧
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 dark:text-gray-400">주문일:</span>
+                    <span className="text-gray-900 dark:text-white">
+                      {formatDate(modal.data.created_at)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* PBN 백링크 정보 */}
+              {(modal.data.site_url || modal.data.keywords) && (
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-semibold text-blue-900 dark:text-blue-300 mb-3">
+                    🏆 PBN 백링크 정보
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {modal.data.site_url && (
+                      <div>
+                        <span className="text-blue-700 dark:text-blue-400 font-medium">
+                          사이트 URL:
+                        </span>
+                        <div className="mt-1 text-gray-900 dark:text-white break-all bg-white dark:bg-gray-800 p-2 rounded">
+                          {modal.data.site_url}
+                        </div>
+                      </div>
+                    )}
+                    {modal.data.keywords && (
+                      <div>
+                        <span className="text-blue-700 dark:text-blue-400 font-medium">
+                          키워드:
+                        </span>
+                        <div className="mt-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-2 rounded">
+                          {modal.data.keywords}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 요청사항 */}
+              {modal.data.note && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
+                  <h4 className="font-semibold text-yellow-900 dark:text-yellow-300 mb-3">
+                    📝 요청사항
+                  </h4>
+                  <div className="text-sm text-gray-900 dark:text-white whitespace-pre-wrap">
+                    {modal.data.note}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
