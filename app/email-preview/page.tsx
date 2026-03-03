@@ -3,9 +3,12 @@
  * /email-preview 접속하여 실제 이메일 렌더링 확인
  */
 
-import { AnnouncementEmail } from '@/lib/email/templates/announcement'
+import { renderAnnouncementEmail } from '@/lib/email/render'
 
 export default function EmailPreviewPage() {
+  // 서버 컴포넌트에서 이메일 렌더링
+  const emailContent = renderAnnouncementEmail({ customerEmail: '고객@example.com' })
+
   return (
     <div style={{ padding: '40px', background: '#f3f4f6', minHeight: '100vh' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -18,9 +21,7 @@ export default function EmailPreviewPage() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           }}
         >
-          <h1 style={{ margin: 0, fontSize: '24px', color: '#111827' }}>
-            📧 이메일 미리보기
-          </h1>
+          <h1 style={{ margin: 0, fontSize: '24px', color: '#111827' }}>📧 이메일 미리보기</h1>
           <p style={{ margin: '10px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
             아래는 실제 고객에게 발송될 이메일 내용입니다
           </p>
@@ -34,7 +35,7 @@ export default function EmailPreviewPage() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           }}
         >
-          <AnnouncementEmail customerEmail="고객@example.com" />
+          {emailContent}
         </div>
 
         <div

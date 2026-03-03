@@ -10,6 +10,7 @@ import { OrderStatusChangedEmail } from './templates/order-status-changed'
 import { ReportUploadedEmail } from './templates/report-uploaded'
 import { TopupApprovedEmail } from './templates/topup-approved'
 import { UserRegisteredAdminEmail } from './templates/user-registered-admin'
+import { AnnouncementEmail } from './templates/announcement'
 
 /**
  * 주문 생성 - 고객 이메일 렌더링
@@ -94,4 +95,11 @@ export function renderUserRegisteredAdminEmail(props: {
   registeredAt: string
 }) {
   return <UserRegisteredAdminEmail {...props} />
+}
+
+/**
+ * 공지사항 이메일 렌더링
+ */
+export function renderAnnouncementEmail(props: { customerEmail: string }) {
+  return <AnnouncementEmail {...props} />
 }

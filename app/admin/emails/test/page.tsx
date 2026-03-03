@@ -7,8 +7,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { sendEmail } from '@/lib/email/send-email'
-import { AnnouncementEmail } from '@/lib/email/templates/announcement'
+import { sendTestEmailAction } from '@/server/actions/admin-test-email'
 
 export default function EmailTestPage() {
   const [testEmail, setTestEmail] = useState('vnfm0580@gmail.com')
@@ -25,23 +24,9 @@ export default function EmailTestPage() {
     setResult(null)
 
     try {
-      const res = await sendEmail(
-        testEmail,
-        '[백링크샵] 중요 공지사항 - 주문 정보 확인 요청',
-        <AnnouncementEmail customerEmail={testEmail} />
-      )
-
-      if (res.success) {
-        setResult({
-          success: true,
-          message: `테스트 이메일이 ${testEmail}로 발송되었습니다!`,
-        })
-      } else {
-        setResult({
-          success: false,
-          message: res.error || '이메일 발송에 실패했습니다',
-        })
-      }
+      // Server Action 호출
+      const res = await sendTestEmailAction(testEmail)
+      setResult(res)
     } catch (error) {
       setResult({
         success: false,
