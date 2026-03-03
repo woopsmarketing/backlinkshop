@@ -9,6 +9,7 @@ import { OrderCreatedAdminEmail } from './templates/order-created-admin'
 import { OrderStatusChangedEmail } from './templates/order-status-changed'
 import { ReportUploadedEmail } from './templates/report-uploaded'
 import { TopupApprovedEmail } from './templates/topup-approved'
+import { UserRegisteredAdminEmail } from './templates/user-registered-admin'
 
 /**
  * 주문 생성 - 고객 이메일 렌더링
@@ -20,6 +21,8 @@ export function renderOrderCreatedCustomerEmail(props: {
   quantity: number
   totalPrice: number
   note?: string
+  siteUrl?: string
+  keywords?: string
 }) {
   return <OrderCreatedCustomerEmail {...props} />
 }
@@ -34,6 +37,8 @@ export function renderOrderCreatedAdminEmail(props: {
   quantity: number
   totalPrice: number
   note?: string
+  siteUrl?: string
+  keywords?: string
 }) {
   return <OrderCreatedAdminEmail {...props} />
 }
@@ -72,4 +77,15 @@ export function renderTopupApprovedEmail(props: {
   newBalance: number
 }) {
   return <TopupApprovedEmail {...props} />
+}
+
+/**
+ * 신규 회원가입 - 관리자 알림 이메일 렌더링
+ */
+export function renderUserRegisteredAdminEmail(props: {
+  userEmail: string
+  userId: string
+  registeredAt: string
+}) {
+  return <UserRegisteredAdminEmail {...props} />
 }

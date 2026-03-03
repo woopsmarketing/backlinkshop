@@ -7,7 +7,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from '../auth/session'
-import { redeemCoupon as redeemCouponMutation, createTopupRequest as createTopupRequestMutation } from '../mutations/credits'
+import {
+  redeemCoupon as redeemCouponMutation,
+  createTopupRequest as createTopupRequestMutation,
+} from '../mutations/credits'
 
 /**
  * 쿠폰 사용 Server Action
@@ -39,11 +42,7 @@ export async function redeemCouponAction(code: string) {
  * @param amount 충전 크레딧
  * @param note 요청 메모
  */
-export async function createTopupRequestAction(
-  packageId: string,
-  amount: number,
-  note?: string
-) {
+export async function createTopupRequestAction(packageId: string, amount: number, note?: string) {
   try {
     // 로그인 확인
     const user = await requireAuth()

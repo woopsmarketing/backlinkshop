@@ -90,4 +90,3 @@ export async function expireCouponAction(code: string) {
     return { success: false, error: '쿠폰 만료 처리 중 오류가 발생했습니다' }
   }
 }
-

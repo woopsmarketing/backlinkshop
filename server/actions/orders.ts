@@ -1,7 +1,8 @@
-// v1.1 - 주문 생성 시 이메일 알림 추가 (2026-03-01)
+// v1.2 - PBN 백링크 주문 필드 추가 (2026-03-03)
 /**
  * 주문 관련 Server Actions
  * 상품 구매(주문 생성) 및 이메일 알림
+ * - PBN 백링크 상품: 사이트 URL, 키워드 필수
  */
 
 'use server'
@@ -19,8 +20,16 @@ import { renderOrderCreatedCustomerEmail, renderOrderCreatedAdminEmail } from '@
  * @param productId 상품 ID
  * @param quantity 수량
  * @param note 요청사항
+ * @param siteUrl 사이트 URL (PBN 백링크 상품에서 필수)
+ * @param keywords 키워드 (PBN 백링크 상품에서 필수)
  */
-export async function createOrderAction(productId: string, quantity: number, note?: string) {
+export async function createOrderAction(
+  productId: string,
+  quantity: number,
+  note?: string,
+  siteUrl?: string,
+  keywords?: string
+) {
   try {
     const user = await requireAuth()
     const supabase = await createServerSupabaseClient()
@@ -50,6 +59,18 @@ export async function createOrderAction(productId: string, quantity: number, not
     }
     const totalPrice = productPrice * quantity
 
+    // 4. PBN 백링크 상품 필수 필드 검증
+    const isPBNProduct = product.name.includes('PBN')
+    if (isPBNProduct) {
+      if (!siteUrl || !siteUrl.trim()) {
+        return { success: false, error: '사이트 URL을 입력해주세요' }
+      }
+      if (!keywords || !keywords.trim()) {
+        return { success: false, error: '키워드를 입력해주세요' }
+      }
+    }
+
+    // 5. 주문 생성
     const { data: order, error: orderError } = await adminClient
       .from('orders')
       .insert({
@@ -59,6 +80,8 @@ export async function createOrderAction(productId: string, quantity: number, not
         total_price: totalPrice,
         status: 'pending',
         note: note || null,
+        site_url: siteUrl || null,
+        keywords: keywords || null,
       })
       .select()
       .single()
@@ -67,7 +90,7 @@ export async function createOrderAction(productId: string, quantity: number, not
       return { success: false, error: '주문 생성에 실패했습니다' }
     }
 
-    // 4. 크레딧 차감 (원장 기록)
+    // 6. 크레딧 차감 (원장 기록)
     const { error: creditError } = await adminClient.rpc('apply_credit_delta', {
       p_user_id: user.id,
       p_amount: -totalPrice,
@@ -82,7 +105,7 @@ export async function createOrderAction(productId: string, quantity: number, not
       return { success: false, error: '크레딧이 부족합니다' }
     }
 
-    // 5. 이메일 발송 (고객)
+    // 7. 이메일 발송 (고객)
     if (user.email) {
       await sendEmail(
         user.email,
@@ -94,13 +117,15 @@ export async function createOrderAction(productId: string, quantity: number, not
           quantity,
           totalPrice,
           note: note || undefined,
+          siteUrl: siteUrl || undefined,
+          keywords: keywords || undefined,
         })
       ).catch(err => {
         console.error('고객 이메일 발송 실패:', err)
         // 이메일 실패해도 주문은 성공으로 처리
       })
 
-      // 6. 이메일 발송 (관리자)
+      // 8. 이메일 발송 (관리자)
       await sendEmailToAdmin(
         `[신규 주문] ${product.name} - ${user.email}`,
         renderOrderCreatedAdminEmail({
@@ -110,6 +135,8 @@ export async function createOrderAction(productId: string, quantity: number, not
           quantity,
           totalPrice,
           note: note || undefined,
+          siteUrl: siteUrl || undefined,
+          keywords: keywords || undefined,
         })
       ).catch(err => {
         console.error('관리자 이메일 발송 실패:', err)
@@ -117,7 +144,7 @@ export async function createOrderAction(productId: string, quantity: number, not
       })
     }
 
-    // 7. 캐시 갱신
+    // 9. 캐시 갱신
     revalidatePath('/orders')
     revalidatePath('/dashboard')
     revalidatePath('/credits')

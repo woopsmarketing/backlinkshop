@@ -9,6 +9,8 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '../supabase/client'
 import { SIGNUP_BONUS_AMOUNT, CREDIT_REASON } from '@/lib/constants'
+import { sendEmailToAdmin } from '@/lib/email/send-email'
+import { renderUserRegisteredAdminEmail } from '@/lib/email/render'
 
 /**
  * Supabase 환경변수 확인
@@ -175,6 +177,22 @@ async function handleFirstLogin(userId: string) {
         console.error('가입 보너스 지급 실패:', creditError)
         // 보너스 지급 실패해도 계속 진행
       }
+    }
+
+    // 3. 관리자에게 신규 회원가입 알림 이메일 발송
+    const { data: userData } = await supabase.auth.getUser()
+    if (userData?.user?.email) {
+      await sendEmailToAdmin(
+        `[신규 회원가입] ${userData.user.email}`,
+        renderUserRegisteredAdminEmail({
+          userEmail: userData.user.email,
+          userId: userId,
+          registeredAt: new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+        })
+      ).catch(err => {
+        console.error('회원가입 알림 이메일 발송 실패:', err)
+        // 이메일 실패해도 회원가입은 성공으로 처리
+      })
     }
   } catch (error) {
     console.error('첫 로그인 처리 오류:', error)

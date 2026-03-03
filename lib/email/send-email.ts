@@ -49,6 +49,7 @@ export async function sendEmail(
       to: [to],
       subject,
       react,
+      replyTo: ADMIN_EMAIL, // 답장은 관리자 이메일로 전달
     })
 
     if (error) {

@@ -11,6 +11,8 @@ interface OrderCreatedAdminEmailProps {
   quantity: number
   totalPrice: number
   note?: string
+  siteUrl?: string
+  keywords?: string
 }
 
 export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
@@ -20,6 +22,8 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
   quantity,
   totalPrice,
   note,
+  siteUrl,
+  keywords,
 }) => (
   <html>
     <head>
@@ -124,10 +128,28 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
             <span className="value">{productName}</span>
           </div>
 
-          <div className="info-row">
-            <span className="label">수량</span>
-            <span className="value">{quantity}개</span>
-          </div>
+          {!siteUrl && (
+            <div className="info-row">
+              <span className="label">수량</span>
+              <span className="value">{quantity}개</span>
+            </div>
+          )}
+
+          {siteUrl && (
+            <div className="info-row">
+              <span className="label">사이트 URL</span>
+              <span className="value" style={{ wordBreak: 'break-all' }}>
+                {siteUrl}
+              </span>
+            </div>
+          )}
+
+          {keywords && (
+            <div className="info-row">
+              <span className="label">키워드</span>
+              <span className="value">{keywords}</span>
+            </div>
+          )}
 
           <div className="info-row">
             <span className="label">결제 금액</span>

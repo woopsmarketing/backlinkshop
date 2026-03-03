@@ -79,10 +79,7 @@ export async function toggleProductStatusAction(productId: string, status: strin
 
     const adminClient = createAdminSupabaseClient()
 
-    const { error } = await adminClient
-      .from('products')
-      .update({ status })
-      .eq('id', productId)
+    const { error } = await adminClient.from('products').update({ status }).eq('id', productId)
 
     if (error) {
       console.error('상품 상태 변경 실패:', error)
@@ -98,4 +95,3 @@ export async function toggleProductStatusAction(productId: string, status: strin
     return { success: false, error: '상품 상태 변경 중 오류가 발생했습니다' }
   }
 }
-
