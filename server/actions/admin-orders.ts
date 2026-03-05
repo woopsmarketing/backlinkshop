@@ -259,10 +259,10 @@ export async function retryGoatPBNApiAction(orderId: string) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 주문 조회
+    // 1. 주문 조회 (user_id 추가)
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('id, site_url, keywords, quantity, product_id, goat_campaign_id, api_error')
+      .select('id, site_url, keywords, quantity, product_id, user_id, goat_campaign_id, api_error')
       .eq('id', orderId)
       .single()
 
@@ -281,32 +281,47 @@ export async function retryGoatPBNApiAction(orderId: string) {
       return { success: false, error: '사이트 URL 또는 키워드가 없습니다' }
     }
 
-    // 4. 상품명 조회 (PBN 상품인지 확인)
+    // 4. 상품명 및 사용자 이메일 조회
     const { data: product } = await adminClient
       .from('products')
       .select('name')
       .eq('id', order.product_id)
       .single()
 
-    const isPBNProduct = product?.name.includes('PBN') && !product?.name.includes('플랜')
+    const productName = product?.name || '알 수 없는 상품'
 
-    if (!isPBNProduct) {
+    const {
+      data: { user: authUser },
+    } = await adminClient.auth.admin.getUserById(order.user_id)
+    const userEmail = authUser?.email
+
+    if (!userEmail) {
+      return { success: false, error: '사용자 이메일을 찾을 수 없습니다' }
+    }
+
+    if (!isPBNProduct(productName)) {
       return { success: false, error: 'PBN 백링크 상품이 아닙니다' }
     }
 
     console.log('🔄 GOAT PBN API 재시도 시작:', {
       orderId: order.id,
+      productName: productName,
       siteUrl: order.site_url,
       keywords: order.keywords,
     })
 
     // 5. GOAT PBN API 호출
+    const duration = getProductDuration(productName)
+
     try {
       const campaignResult = await createGoatPBNCampaign({
         orderId: order.id,
+        productName: productName,
+        customerEmail: userEmail,
         siteUrl: order.site_url,
         keywords: order.keywords,
         quantity: order.quantity,
+        duration: duration,
       })
 
       if (campaignResult.success && campaignResult.campaign_id) {
