@@ -16,6 +16,8 @@ interface OrderCreatedCustomerEmailProps {
   useSubKeywords?: boolean
   mainKeywordRatio?: number
   subKeywordRatio?: number
+  goatCampaignId?: string
+  apiError?: string
 }
 
 export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps> = ({
@@ -30,6 +32,8 @@ export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps>
   useSubKeywords,
   mainKeywordRatio,
   subKeywordRatio,
+  goatCampaignId,
+  apiError,
 }) => (
   <html>
     <head>
@@ -195,6 +199,47 @@ export const OrderCreatedCustomerEmail: React.FC<OrderCreatedCustomerEmailProps>
             주문 내역 확인하기
           </a>
         </div>
+
+        {goatCampaignId && (
+          <div
+            style={{
+              background: '#d1fae5',
+              border: '2px solid #10b981',
+              padding: '15px',
+              borderRadius: '6px',
+              marginTop: '20px',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              <strong>✅ 캠페인이 자동으로 시작되었습니다!</strong>
+              <br />
+              PBN 백링크 구축이 자동으로 진행됩니다.
+              <br />
+              캠페인 ID:{' '}
+              <code style={{ background: '#f3f4f6', padding: '2px 6px', borderRadius: '3px' }}>
+                {goatCampaignId}
+              </code>
+            </p>
+          </div>
+        )}
+
+        {apiError && (
+          <div
+            style={{
+              background: '#fef3c7',
+              border: '2px solid #f59e0b',
+              padding: '15px',
+              borderRadius: '6px',
+              marginTop: '20px',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              <strong>⚠️ 자동 캠페인 생성 실패</strong>
+              <br />
+              관리자가 수동으로 처리할 예정입니다. 곧 연락드리겠습니다.
+            </p>
+          </div>
+        )}
 
         <div
           style={{ background: '#e0e7ff', padding: '15px', borderRadius: '6px', marginTop: '20px' }}

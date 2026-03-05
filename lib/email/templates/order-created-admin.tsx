@@ -16,6 +16,8 @@ interface OrderCreatedAdminEmailProps {
   useSubKeywords?: boolean
   mainKeywordRatio?: number
   subKeywordRatio?: number
+  goatCampaignId?: string
+  apiError?: string
 }
 
 export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
@@ -30,6 +32,8 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
   useSubKeywords,
   mainKeywordRatio,
   subKeywordRatio,
+  goatCampaignId,
+  apiError,
 }) => (
   <html>
     <head>
@@ -191,6 +195,49 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
           </div>
         )}
 
+        {goatCampaignId && (
+          <div
+            style={{
+              background: '#d1fae5',
+              border: '2px solid #10b981',
+              padding: '15px',
+              borderRadius: '6px',
+              marginTop: '20px',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              <strong>✅ GOAT PBN 캠페인 자동 생성 완료</strong>
+              <br />
+              캠페인 ID:{' '}
+              <code style={{ background: '#f3f4f6', padding: '2px 6px', borderRadius: '3px' }}>
+                {goatCampaignId}
+              </code>
+              <br />
+              PBN 백링크 구축이 자동으로 진행 중입니다.
+            </p>
+          </div>
+        )}
+
+        {apiError && (
+          <div
+            style={{
+              background: '#fef2f2',
+              border: '2px solid #ef4444',
+              padding: '15px',
+              borderRadius: '6px',
+              marginTop: '20px',
+            }}
+          >
+            <p style={{ margin: 0, fontSize: '14px' }}>
+              <strong>❌ GOAT PBN API 호출 실패</strong>
+              <br />
+              에러: {apiError}
+              <br />
+              <strong>→ 수동 처리가 필요합니다!</strong>
+            </p>
+          </div>
+        )}
+
         <div style={{ textAlign: 'center' }}>
           <a
             href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/admin/orders`}
@@ -206,13 +253,25 @@ export const OrderCreatedAdminEmail: React.FC<OrderCreatedAdminEmailProps> = ({
           <p style={{ margin: 0, fontSize: '14px' }}>
             <strong>💡 처리 절차</strong>
             <br />
-            1. 관리자 페이지에서 주문 상세 확인
-            <br />
-            2. &quot;처리중&quot; 상태로 변경 후 작업 시작
-            <br />
-            3. 작업 완료 후 보고서 업로드
-            <br />
-            4. &quot;완료&quot; 상태로 변경
+            {goatCampaignId ? (
+              <>
+                1. GOAT PBN에서 캠페인 진행 상황 확인
+                <br />
+                2. 작업 완료 후 보고서 업로드
+                <br />
+                3. &quot;완료&quot; 상태로 변경
+              </>
+            ) : (
+              <>
+                1. 관리자 페이지에서 주문 상세 확인
+                <br />
+                2. &quot;처리중&quot; 상태로 변경 후 작업 시작
+                <br />
+                3. 작업 완료 후 보고서 업로드
+                <br />
+                4. &quot;완료&quot; 상태로 변경
+              </>
+            )}
           </p>
         </div>
       </div>

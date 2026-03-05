@@ -1,7 +1,9 @@
+// v1.2 - GOAT PBN API 연동 필드 추가 (2026-03-05)
 // v1.1 - PBN 백링크 주문 필드 추가 (2026-03-03)
 /**
  * 관리자용 주문 조회 함수
  * 상태 필터 및 최신순 정렬
+ * GOAT PBN 캠페인 ID 및 API 에러 정보 포함
  */
 
 import { createAdminSupabaseClient } from '../supabase/admin'
@@ -19,6 +21,8 @@ export type AdminOrderRow = {
   use_sub_keywords?: boolean | null
   main_keyword_ratio?: number | null
   sub_keyword_ratio?: number | null
+  goat_campaign_id?: string | null
+  api_error?: string | null
   report_path?: string | null
   report_filename?: string | null
   report_uploaded_at?: string | null
@@ -38,7 +42,7 @@ export async function getAdminOrders(status?: string) {
     let query = adminClient
       .from('orders')
       .select(
-        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, use_sub_keywords, main_keyword_ratio, sub_keyword_ratio, report_path, report_filename, report_uploaded_at, created_at, products(name)'
+        'id, user_id, product_id, quantity, total_price, status, note, site_url, keywords, use_sub_keywords, main_keyword_ratio, sub_keyword_ratio, goat_campaign_id, api_error, report_path, report_filename, report_uploaded_at, created_at, products(name)'
       )
       .order('created_at', { ascending: false })
 

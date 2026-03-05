@@ -27,6 +27,8 @@ export function renderOrderCreatedCustomerEmail(props: {
   useSubKeywords?: boolean
   mainKeywordRatio?: number
   subKeywordRatio?: number
+  goatCampaignId?: string
+  apiError?: string
 }) {
   return <OrderCreatedCustomerEmail {...props} />
 }
@@ -46,6 +48,8 @@ export function renderOrderCreatedAdminEmail(props: {
   useSubKeywords?: boolean
   mainKeywordRatio?: number
   subKeywordRatio?: number
+  goatCampaignId?: string
+  apiError?: string
 }) {
   return <OrderCreatedAdminEmail {...props} />
 }

@@ -1,15 +1,17 @@
+// v1.4 - GOAT PBN API 연동 정보 표시 및 재시도 버튼 추가 (2026-03-05)
 // v1.3 - PBN 백링크 주문 정보 표시 추가 (2026-03-03)
 /**
  * 관리자 주문 테이블
  * 주문 상태 변경 버튼 제공
  * PBN 백링크 주문: 사이트 URL, 키워드 표시
+ * GOAT PBN 캠페인 ID 및 API 에러 표시, 재시도 버튼
  */
 
 'use client'
 
 import { useState } from 'react'
 import { formatCredits, formatDate } from '@/lib/utils'
-import { updateOrderStatusAction } from '@/server/actions/admin-orders'
+import { updateOrderStatusAction, retryGoatPBNApiAction } from '@/server/actions/admin-orders'
 import ReportUploadButton from './ReportUploadButton'
 import type { AdminOrderRow } from '@/server/queries/admin-orders'
 
@@ -28,6 +30,7 @@ type ModalType = 'note' | 'details'
 
 export default function AdminOrdersTable({ orders }: Props) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [retryingId, setRetryingId] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [modal, setModal] = useState<{
     type: ModalType
@@ -67,6 +70,34 @@ export default function AdminOrdersTable({ orders }: Props) {
       setMessage({ type: 'error', text: '상태 변경 중 오류가 발생했습니다' })
     } finally {
       setLoadingId(null)
+    }
+  }
+
+  /**
+   * GOAT PBN API 재시도 처리
+   */
+  const handleRetryGoatPBN = async (id: string) => {
+    if (!confirm('GOAT PBN API를 재시도하시겠습니까?')) {
+      return
+    }
+
+    setRetryingId(id)
+    setMessage(null)
+
+    try {
+      const result = await retryGoatPBNApiAction(id)
+      if (result.success) {
+        setMessage({
+          type: 'success',
+          text: `캠페인 생성 성공! ID: ${result.campaignId}`,
+        })
+      } else {
+        setMessage({ type: 'error', text: result.error || 'API 재시도 실패' })
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'API 재시도 중 오류가 발생했습니다' })
+    } finally {
+      setRetryingId(null)
     }
   }
 
@@ -134,9 +165,29 @@ export default function AdminOrdersTable({ orders }: Props) {
                     {order.profiles?.email || '이메일 없음'}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                    {Array.isArray(order.products)
-                      ? order.products[0]?.name || '알 수 없는 상품'
-                      : order.products?.name || '알 수 없는 상품'}
+                    <div className="flex items-center gap-2">
+                      <span>
+                        {Array.isArray(order.products)
+                          ? order.products[0]?.name || '알 수 없는 상품'
+                          : order.products?.name || '알 수 없는 상품'}
+                      </span>
+                      {(order as any).goat_campaign_id && (
+                        <span
+                          className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded"
+                          title="GOAT PBN 캠페인 생성됨"
+                        >
+                          🚀
+                        </span>
+                      )}
+                      {(order as any).api_error && (
+                        <span
+                          className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded"
+                          title="API 에러 발생"
+                        >
+                          ⚠️
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="py-3 px-4 text-center text-sm text-gray-700 dark:text-gray-300">
                     {order.quantity}
@@ -315,6 +366,54 @@ export default function AdminOrdersTable({ orders }: Props) {
                           )}
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* GOAT PBN 캠페인 정보 */}
+              {(modal.data as any).goat_campaign_id && (
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                  <h4 className="font-semibold text-green-900 dark:text-green-300 mb-3">
+                    ✅ GOAT PBN 캠페인
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-green-700 dark:text-green-400 font-medium">
+                        캠페인 ID:
+                      </span>
+                      <div className="mt-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-2 rounded font-mono">
+                        {(modal.data as any).goat_campaign_id}
+                      </div>
+                    </div>
+                    <div className="text-green-700 dark:text-green-400 text-xs">
+                      PBN 백링크가 자동으로 구축 중입니다.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* GOAT PBN API 에러 */}
+              {(modal.data as any).api_error && (
+                <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
+                  <h4 className="font-semibold text-red-900 dark:text-red-300 mb-3">
+                    ❌ GOAT PBN API 에러
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-red-700 dark:text-red-400 font-medium">
+                        에러 메시지:
+                      </span>
+                      <div className="mt-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 p-2 rounded">
+                        {(modal.data as any).api_error}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleRetryGoatPBN(modal.data!.id)}
+                      disabled={retryingId === modal.data!.id}
+                      className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                    >
+                      {retryingId === modal.data!.id ? '재시도 중...' : '🔄 API 재시도'}
+                    </button>
                   </div>
                 </div>
               )}
