@@ -15,7 +15,11 @@ import { createAdminSupabaseClient } from '../supabase/admin'
 import { sendEmail } from '@/lib/email/send-email'
 import { renderOrderStatusChangedEmail } from '@/lib/email/render'
 import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
-import { getProductDuration, isPBNProduct } from '@/lib/constants/product-config'
+import {
+  getProductDuration,
+  isPBNProduct,
+  extractPBNQuantity,
+} from '@/lib/constants/product-config'
 
 const allowedStatuses = ['pending', 'processing', 'completed', 'failed'] as const
 
@@ -128,15 +132,18 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
       userEmail
     ) {
       try {
+        const duration = getProductDuration(productName)
+        const pbnQuantity = extractPBNQuantity(productName)
+
         console.log('🚀 GOAT PBN 캠페인 생성 시작 (관리자 처리중 클릭):', {
           orderId: order.id,
           productName,
           siteUrl: order.site_url,
           keywords: order.keywords,
-          quantity: order.quantity,
+          orderQuantity: order.quantity, // 항상 1
+          pbnQuantity: pbnQuantity, // 상품명에서 추출 (50, 100 등)
+          duration: duration,
         })
-
-        const duration = getProductDuration(productName)
 
         const campaignResult = await createGoatPBNCampaign({
           orderId: order.id,
@@ -144,7 +151,7 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
           customerEmail: userEmail,
           siteUrl: order.site_url,
           keywords: order.keywords,
-          quantity: order.quantity,
+          quantity: pbnQuantity, // 상품명에서 추출한 수량
           duration: duration,
         })
 
@@ -303,16 +310,20 @@ export async function retryGoatPBNApiAction(orderId: string) {
       return { success: false, error: 'PBN 백링크 상품이 아닙니다' }
     }
 
+    const duration = getProductDuration(productName)
+    const pbnQuantity = extractPBNQuantity(productName)
+
     console.log('🔄 GOAT PBN API 재시도 시작:', {
       orderId: order.id,
       productName: productName,
       siteUrl: order.site_url,
       keywords: order.keywords,
+      orderQuantity: order.quantity, // 항상 1
+      pbnQuantity: pbnQuantity, // 상품명에서 추출 (50, 100 등)
+      duration: duration,
     })
 
     // 5. GOAT PBN API 호출
-    const duration = getProductDuration(productName)
-
     try {
       const campaignResult = await createGoatPBNCampaign({
         orderId: order.id,
@@ -320,7 +331,7 @@ export async function retryGoatPBNApiAction(orderId: string) {
         customerEmail: userEmail,
         siteUrl: order.site_url,
         keywords: order.keywords,
-        quantity: order.quantity,
+        quantity: pbnQuantity, // 상품명에서 추출한 수량
         duration: duration,
       })
 

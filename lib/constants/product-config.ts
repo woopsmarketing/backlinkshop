@@ -36,3 +36,32 @@ export function getProductDuration(productName: string): number {
 export function isPBNProduct(productName: string): boolean {
   return productName.includes('PBN') && !productName.includes('플랜')
 }
+
+/**
+ * 상품명에서 PBN 수량 추출
+ *
+ * 예시:
+ * - "PBN 백링크 50" → 50
+ * - "PBN 백링크 100" → 100
+ * - "PBN백링크50" → 50
+ * - "PBN 백링크" → 50 (기본값)
+ *
+ * @param productName 상품명
+ * @returns PBN 수량
+ */
+export function extractPBNQuantity(productName: string): number {
+  // 상품명에서 숫자 추출 (예: "PBN 백링크 50" → "50")
+  const match = productName.match(/PBN.*?(\d+)/)
+
+  if (match && match[1]) {
+    const quantity = parseInt(match[1], 10)
+    // 유효한 숫자인지 확인
+    if (Number.isFinite(quantity) && quantity > 0) {
+      return quantity
+    }
+  }
+
+  // 매칭 실패 시 기본값 반환
+  console.warn(`⚠️ 상품명에서 수량 추출 실패: "${productName}", 기본값 50 사용`)
+  return 50
+}

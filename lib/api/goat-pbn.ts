@@ -13,6 +13,7 @@ import type {
   GoatPBNCampaignResponse,
   CreateGoatCampaignParams,
 } from '@/types/goat-pbn'
+import { extractPBNQuantity } from '@/lib/constants/product-config'
 
 /**
  * GOAT PBN API 기본 설정
@@ -64,7 +65,16 @@ export async function createGoatPBNCampaign(
 
   const campaignName = `${params.productName}_${timestamp}_${params.customerEmail}`
 
-  // 4. 요청 본문 구성
+  // 4. 상품명에서 실제 PBN 수량 추출
+  const pbnQuantity = extractPBNQuantity(params.productName)
+
+  console.log('📊 PBN 수량 추출:', {
+    productName: params.productName,
+    extractedQuantity: pbnQuantity,
+    orderQuantity: params.quantity, // 참고용 (항상 1)
+  })
+
+  // 5. 요청 본문 구성
   const requestBody: GoatPBNCampaignRequest = {
     // 기본 정보
     campaignName: campaignName,
@@ -73,7 +83,7 @@ export async function createGoatPBNCampaign(
     siteIds: [], // 자동 배포: 빈 배열이면 모든 사이트 선택
     targetSite: params.siteUrl,
     keywords: keywordsArray,
-    quantity: params.quantity,
+    quantity: pbnQuantity, // 상품명에서 추출한 수량 (50, 100 등)
     duration: params.duration, // 상품별 동적 기간
 
     // 콘텐츠 생성 옵션
@@ -97,7 +107,7 @@ export async function createGoatPBNCampaign(
     orderId: params.orderId,
     targetSite: params.siteUrl,
     keywordsCount: keywordsArray.length,
-    quantity: params.quantity,
+    quantity: pbnQuantity, // 추출된 수량
     duration: params.duration,
   })
 
