@@ -47,38 +47,58 @@ export async function createGoatPBNCampaign(
     throw new Error('유효한 키워드가 없습니다')
   }
 
-  // 3. 요청 본문 구성
+  // 3. 캠페인 이름 생성: {상품명}_{날짜}_{이메일}
+  const now = new Date()
+  const timestamp = now
+    .toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+    .replace(/\. /g, '-')
+    .replace(/\./g, '')
+    .replace(/ /g, '_')
+
+  const campaignName = `${params.productName}_${timestamp}_${params.customerEmail}`
+
+  // 4. 요청 본문 구성
   const requestBody: GoatPBNCampaignRequest = {
     // 기본 정보
-    campaignName: `Backlink-shop 주문 #${params.orderId}`,
-    description: `Backlink-shop에서 자동 생성된 PBN 백링크 캠페인`,
-    siteId: process.env.GOAT_PBN_DEFAULT_SITE_ID || '', // 환경변수에서 기본 사이트 ID 가져오기
+    campaignName: campaignName,
+    description: 'Backlinkshop 에서 주문 생성됨',
+    siteId: null, // 자동 배포: null이면 API에서 첫 번째 사이트 자동 선택
+    siteIds: [], // 자동 배포: 빈 배열이면 모든 사이트 선택
     targetSite: params.siteUrl,
     keywords: keywordsArray,
     quantity: params.quantity,
-    duration: 30, // 기본 30일
+    duration: params.duration, // 상품별 동적 기간
 
-    // 콘텐츠 생성 옵션 (기본값)
-    persona: 'expert',
-    sectionCount: 5,
-    includeImages: true,
-    sectionImageCount: 2,
-    includeToc: true,
-    includeBacklinks: true,
-    includeInternalLinks: false,
+    // 콘텐츠 생성 옵션
+    persona: 'expert', // 전문가 톤앤매너
+    sectionCount: 7, // 섹션 수
+    includeImages: true, // 이미지 생성 활성화
+    sectionImageCount: 2, // 섹션당 이미지 2개
+    includeToc: true, // 목차 포함
+    includeBacklinks: true, // 외부 백링크 생성
+    includeInternalLinks: true, // 내부 링크 생성 (활성화)
 
     // 언어 및 시작 설정
-    contentLanguage: 'ko',
-    startType: 'immediate',
-    delayMinutes: 5,
+    contentLanguage: 'ko', // 한국어
+    startType: 'immediate', // 즉시 시작
+    delayMinutes: 0, // 지연 없음
   }
 
   console.log('📤 GOAT PBN API 호출 시작:', {
     url: `${GOAT_PBN_API_URL}/api/external/create-campaign`,
+    campaignName: campaignName,
     orderId: params.orderId,
     targetSite: params.siteUrl,
     keywordsCount: keywordsArray.length,
     quantity: params.quantity,
+    duration: params.duration,
   })
 
   try {

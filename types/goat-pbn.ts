@@ -10,8 +10,8 @@ export interface GoatPBNCampaignRequest {
   // 기본 정보
   campaignName: string // 캠페인 이름
   description?: string // 캠페인 설명
-  siteId: string // 대표 사이트 ID
-  siteIds?: string[] // 선택된 사이트 ID 배열 (선택)
+  siteId: string | null // 대표 사이트 ID (null이면 자동 선택)
+  siteIds?: string[] // 선택된 사이트 ID 배열 (빈 배열이면 모든 사이트)
   targetSite: string // 타겟 사이트 URL
   keywords: string[] // 키워드 배열
   quantity: number // 총 생성할 콘텐츠 수량
@@ -51,8 +51,11 @@ export interface GoatPBNCampaignResponse {
  * Backlink-shop 주문 데이터에서 추출
  */
 export interface CreateGoatCampaignParams {
-  orderId: string // 주문 ID (캠페인 이름에 사용)
+  orderId: string // 주문 ID
+  productName: string // 상품명 (캠페인 이름에 사용)
+  customerEmail: string // 주문자 이메일 (캠페인 이름에 사용)
   siteUrl: string // 타겟 사이트 URL
   keywords: string // 키워드 (쉼표로 구분된 문자열)
   quantity: number // 수량
+  duration: number // 캠페인 기간 (일)
 }

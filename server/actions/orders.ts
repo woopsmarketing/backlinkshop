@@ -16,7 +16,6 @@ import { createAdminSupabaseClient } from '../supabase/admin'
 import { CREDIT_REASON } from '@/lib/constants'
 import { sendEmail, sendEmailToAdmin } from '@/lib/email/send-email'
 import { renderOrderCreatedCustomerEmail, renderOrderCreatedAdminEmail } from '@/lib/email/render'
-import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
 
 /**
  * 상품 구매 (주문 생성)
@@ -121,66 +120,8 @@ export async function createOrderAction(
       return { success: false, error: '크레딧이 부족합니다' }
     }
 
-    // 6-1. PBN 백링크 상품인 경우 GOAT PBN API 호출
-    let goatCampaignId: string | null = null
-    let apiErrorMessage: string | null = null
-    let isApiSuccess = false
-
-    if (isPBNProduct && siteUrl && keywords) {
-      try {
-        console.log('🚀 GOAT PBN 캠페인 생성 시작:', {
-          orderId: order.id,
-          siteUrl,
-          keywords,
-          quantity,
-        })
-
-        const campaignResult = await createGoatPBNCampaign({
-          orderId: order.id,
-          siteUrl,
-          keywords,
-          quantity,
-        })
-
-        if (campaignResult.success && campaignResult.campaign_id) {
-          goatCampaignId = campaignResult.campaign_id
-          isApiSuccess = true
-
-          // campaign_id 저장 및 상태를 processing으로 변경
-          await adminClient
-            .from('orders')
-            .update({
-              goat_campaign_id: goatCampaignId,
-              status: 'processing',
-            })
-            .eq('id', order.id)
-
-          console.log('✅ GOAT PBN 캠페인 생성 성공:', {
-            orderId: order.id,
-            campaignId: goatCampaignId,
-          })
-        } else {
-          throw new Error(campaignResult.error || '캠페인 생성 실패')
-        }
-      } catch (apiError: any) {
-        // API 호출 실패 시 에러 메시지 저장 (주문은 유지)
-        apiErrorMessage = apiError.message || 'GOAT PBN API 호출 실패'
-
-        await adminClient
-          .from('orders')
-          .update({
-            api_error: apiErrorMessage,
-          })
-          .eq('id', order.id)
-
-        console.error('❌ GOAT PBN API 호출 실패:', {
-          orderId: order.id,
-          error: apiErrorMessage,
-        })
-
-        // API 실패해도 주문은 성공으로 처리 (수동 처리 필요)
-      }
-    }
+    // 주문 생성 시에는 API 호출하지 않음
+    // 관리자가 "처리중" 상태로 변경할 때 API 호출됨
 
     // 7. 이메일 발송 (고객)
     if (user.email) {
@@ -199,9 +140,6 @@ export async function createOrderAction(
           useSubKeywords: useSubKeywords,
           mainKeywordRatio: mainKeywordRatio,
           subKeywordRatio: subKeywordRatio,
-          // GOAT PBN API 결과 추가
-          goatCampaignId: goatCampaignId || undefined,
-          apiError: apiErrorMessage || undefined,
         })
       ).catch(err => {
         console.error('고객 이메일 발송 실패:', err)
@@ -223,9 +161,6 @@ export async function createOrderAction(
           useSubKeywords: useSubKeywords,
           mainKeywordRatio: mainKeywordRatio,
           subKeywordRatio: subKeywordRatio,
-          // GOAT PBN API 결과 추가
-          goatCampaignId: goatCampaignId || undefined,
-          apiError: apiErrorMessage || undefined,
         })
       ).catch(err => {
         console.error('관리자 이메일 발송 실패:', err)

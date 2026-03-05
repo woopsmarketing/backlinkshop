@@ -15,6 +15,7 @@ import { createAdminSupabaseClient } from '../supabase/admin'
 import { sendEmail } from '@/lib/email/send-email'
 import { renderOrderStatusChangedEmail } from '@/lib/email/render'
 import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
+import { getProductDuration, isPBNProduct } from '@/lib/constants/product-config'
 
 const allowedStatuses = ['pending', 'processing', 'completed', 'failed'] as const
 
@@ -38,10 +39,10 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 1. 주문 확인
+    // 1. 주문 확인 (추가 필드: site_url, keywords, quantity)
     const { data: order, error: orderError } = await adminClient
       .from('orders')
-      .select('id, status, total_price, user_id, product_id')
+      .select('id, status, total_price, user_id, product_id, site_url, keywords, quantity')
       .eq('id', orderId)
       .single()
 
@@ -100,24 +101,11 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
       }
     }
 
-    // 3. 상태 업데이트
-    const updatePayload: Record<string, any> = { status }
-    if (status === 'completed') {
-      updatePayload.completed_at = new Date().toISOString()
-    }
+    // 3. pending → processing 상태 변경 시 PBN 상품이면 GOAT PBN API 호출
+    let goatCampaignId: string | null = null
+    let apiErrorMessage: string | null = null
 
-    const { error: updateError } = await adminClient
-      .from('orders')
-      .update(updatePayload)
-      .eq('id', orderId)
-
-    if (updateError) {
-      console.error('주문 상태 업데이트 실패:', updateError)
-      return { success: false, error: '주문 상태 업데이트 실패' }
-    }
-
-    // 4. 유저 이메일 및 상품명 조회 (이메일 발송용)
-    // auth.users에서 직접 이메일 가져오기 (profiles.email이 null일 수 있음)
+    // 유저 이메일 및 상품명 조회 (API 호출 및 이메일 발송용)
     const {
       data: { user: authUser },
     } = await adminClient.auth.admin.getUserById(order.user_id)
@@ -131,13 +119,97 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
 
     const productName = product?.name || '알 수 없는 상품'
 
+    if (
+      order.status === 'pending' &&
+      status === 'processing' &&
+      isPBNProduct(productName) &&
+      order.site_url &&
+      order.keywords &&
+      userEmail
+    ) {
+      try {
+        console.log('🚀 GOAT PBN 캠페인 생성 시작 (관리자 처리중 클릭):', {
+          orderId: order.id,
+          productName,
+          siteUrl: order.site_url,
+          keywords: order.keywords,
+          quantity: order.quantity,
+        })
+
+        const duration = getProductDuration(productName)
+
+        const campaignResult = await createGoatPBNCampaign({
+          orderId: order.id,
+          productName: productName,
+          customerEmail: userEmail,
+          siteUrl: order.site_url,
+          keywords: order.keywords,
+          quantity: order.quantity,
+          duration: duration,
+        })
+
+        if (campaignResult.success && campaignResult.campaign_id) {
+          goatCampaignId = campaignResult.campaign_id
+
+          console.log('✅ GOAT PBN 캠페인 생성 성공:', {
+            orderId: order.id,
+            campaignId: goatCampaignId,
+          })
+        } else {
+          throw new Error(campaignResult.error || '캠페인 생성 실패')
+        }
+      } catch (apiError: any) {
+        apiErrorMessage = apiError.message || 'GOAT PBN API 호출 실패'
+
+        console.error('❌ GOAT PBN API 호출 실패:', {
+          orderId: order.id,
+          error: apiErrorMessage,
+        })
+
+        // API 실패 시 상태 변경 중단하고 에러 저장
+        await adminClient
+          .from('orders')
+          .update({
+            api_error: apiErrorMessage,
+          })
+          .eq('id', orderId)
+
+        return {
+          success: false,
+          error: `캠페인 생성 실패: ${apiErrorMessage}`,
+        }
+      }
+    }
+
+    // 4. 상태 업데이트
+    const updatePayload: Record<string, any> = { status }
+    if (status === 'completed') {
+      updatePayload.completed_at = new Date().toISOString()
+    }
+    if (goatCampaignId) {
+      updatePayload.goat_campaign_id = goatCampaignId
+      updatePayload.api_error = null // 에러 초기화
+    }
+
+    const { error: updateError } = await adminClient
+      .from('orders')
+      .update(updatePayload)
+      .eq('id', orderId)
+
+    if (updateError) {
+      console.error('주문 상태 업데이트 실패:', updateError)
+      return { success: false, error: '주문 상태 업데이트 실패' }
+    }
+
     console.log(
       '📧 [상태 변경 이메일] userEmail:',
       userEmail,
       'productName:',
       productName,
       'authUser:',
-      authUser?.id
+      authUser?.id,
+      'goatCampaignId:',
+      goatCampaignId
     )
 
     // 5. 이메일 발송 (고객에게 상태 변경 알림)
