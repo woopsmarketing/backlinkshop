@@ -162,13 +162,36 @@ async function handleFirstLogin(userId: string) {
       .select()
       .single()
 
-    if (profileError && profileError.code !== '23505') {
+    // 중복 키 에러(23505)면 이미 초기화된 사용자이므로 종료
+    if (profileError && profileError.code === '23505') {
+      console.log('이미 초기화된 사용자:', userId)
+      return
+    }
+
+    // 다른 에러는 throw
+    if (profileError) {
       throw profileError
     }
 
-    // 3. 가입 보너스 지급 (apply_credit_delta 함수 사용)
-    // credit_balances와 credit_ledger가 자동으로 생성됨
+    // 3. 가입 보너스 지급 전 중복 확인
+    // 이미 가입 보너스를 받았는지 체크
     if (SIGNUP_BONUS_AMOUNT > 0) {
+      const { data: existingBonus } = await supabase
+        .from('credit_ledger')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('reason', CREDIT_REASON.SIGNUP_BONUS)
+        .limit(1)
+        .single()
+
+      // 이미 가입 보너스를 받았으면 중복 지급 방지
+      if (existingBonus) {
+        console.log('이미 가입 보너스를 받은 사용자:', userId)
+        return
+      }
+
+      // 4. 가입 보너스 지급 (apply_credit_delta 함수 사용)
+      // credit_balances와 credit_ledger가 자동으로 생성됨
       const { error: creditError } = await supabase.rpc('apply_credit_delta', {
         p_user_id: userId,
         p_amount: SIGNUP_BONUS_AMOUNT,
@@ -183,7 +206,7 @@ async function handleFirstLogin(userId: string) {
       }
     }
 
-    // 4. 관리자에게 신규 회원가입 알림 이메일 발송
+    // 5. 관리자에게 신규 회원가입 알림 이메일 발송
     if (userEmail) {
       await sendEmailToAdmin(
         `[신규 회원가입] ${userEmail}`,
