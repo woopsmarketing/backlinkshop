@@ -66,8 +66,8 @@ export default async function DashboardPage() {
   // 인기 상품
   const popularProducts = [
     findProduct('PBN 백링크 50'),
-    findProduct('PBN 백링크 100'),
-    findProduct('플랜 백링크 20'),
+    findProduct('로직 업그레이드 PBN 100'),
+    findProduct('플랜 백링크 A'),
     findProduct('온페이지 SEO 점검'),
   ].filter(Boolean)
 
