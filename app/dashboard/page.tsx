@@ -1,7 +1,9 @@
+// v1.3 - 빠른 이동 섹션 추가 (2026-03-09)
 // v1.2 - 보고서 다운로드 섹션 추가 (2026-02-05)
 /**
  * 대시보드 페이지
  * 잔액, 주문 요약, CTA 버튼, 상단 메뉴
+ * 30만 크레딧 추천 상품, 인기 상품 빠른 구매, 전문가 상담 섹션
  */
 
 import { createServerSupabaseClient } from '@/server/supabase/client'
@@ -13,6 +15,7 @@ import { redirect } from 'next/navigation'
 import TopNav from '@/app/components/TopNav'
 import { getRecentReports } from '@/server/queries/orders'
 import ReportDownloadButton from '@/app/components/ReportDownloadButton'
+import { getActiveProducts } from '@/server/queries/products'
 
 export default async function DashboardPage() {
   // 유저 확인
@@ -43,6 +46,35 @@ export default async function DashboardPage() {
 
   // 최근 보고서 조회
   const recentReports = await getRecentReports(user.id, 5)
+
+  // 빠른 구매용 상품 조회
+  const allProducts = await getActiveProducts()
+
+  /**
+   * 특정 상품명으로 상품 찾기
+   * @param name 상품명
+   */
+  const findProduct = (name: string) => {
+    return allProducts.find((p: any) => p.name === name)
+  }
+
+  // 30만 크레딧 추천 상품
+  const starterProducts = [findProduct('PBN 백링크 50'), findProduct('온페이지 SEO 점검')].filter(
+    Boolean
+  )
+
+  // 인기 상품
+  const popularProducts = [
+    findProduct('PBN 백링크 50'),
+    findProduct('PBN 백링크 100'),
+    findProduct('플랜 백링크 20'),
+    findProduct('온페이지 SEO 점검'),
+  ].filter(Boolean)
+
+  // 현재 잔액
+  const currentBalance = balance?.balance || 0
+  // 30만 크레딧 이상인 경우 추천 상품 섹션 표시
+  const showStarterSection = currentBalance >= 300000
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -119,6 +151,121 @@ export default async function DashboardPage() {
             >
               주문 내역 보기 →
             </Link>
+          </div>
+        </div>
+
+        {/* 30만 크레딧으로 시작하기 섹션 (조건부) */}
+        {showStarterSection && starterProducts.length > 0 && (
+          <div className="mt-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">🎯</span>
+              <h2 className="text-xl font-bold text-green-900 dark:text-green-100">
+                30만 크레딧으로 시작하기
+              </h2>
+            </div>
+            <p className="text-green-700 dark:text-green-300 text-sm mb-6">
+              가입 보너스로 바로 시작할 수 있는 추천 상품입니다
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              {starterProducts.map((product: any) => {
+                const isRecommended = product.name === '온페이지 SEO 점검'
+                return (
+                  <div
+                    key={product.id}
+                    className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow-md"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {product.name}
+                      </h3>
+                      {isRecommended && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium">
+                          추천
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                      {product.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                        {formatCredits(Number(product.price))} 크레딧
+                      </p>
+                      <Link
+                        href={`/products/${product.id}`}
+                        className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
+                      >
+                        바로 구매
+                      </Link>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 인기 상품 빠른 구매 섹션 */}
+        {popularProducts.length > 0 && (
+          <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-3xl">⚡</span>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                인기 상품 빠른 구매
+              </h2>
+            </div>
+            <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+              {popularProducts.map((product: any) => (
+                <div
+                  key={product.id}
+                  className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[2.5rem]">
+                    {product.name}
+                  </h3>
+                  <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3">
+                    {formatCredits(Number(product.price))}
+                  </p>
+                  <Link
+                    href={`/products/${product.id}`}
+                    className="block w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg transition-colors text-sm font-medium"
+                  >
+                    구매하기
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 전문가 실시간 상담 섹션 */}
+        <div className="mt-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-8 text-white shadow-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-start gap-4 flex-1">
+              <span className="text-5xl">💬</span>
+              <div>
+                <h2 className="text-2xl font-bold mb-2">전문가와 실시간 상담</h2>
+                <p className="text-purple-100 text-sm">
+                  SEO 전문가와 1:1 상담을 통해 최적의 전략을 수립하세요
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://t.me/goat82"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 py-3 px-6 bg-white hover:bg-gray-100 text-purple-600 rounded-lg transition-colors font-semibold shadow-lg whitespace-nowrap"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
+              </svg>
+              텔레그램으로 상담하기
+            </a>
           </div>
         </div>
 
