@@ -1,8 +1,11 @@
+// v3.1 - 온페이지 SEO/콘텐츠 최적화 상품 양식 추가 (2026-03-09)
 // v3.0 - 플랜 백링크 상품 전용 양식 추가 (2026-03-03)
 /**
  * 상품 구매 폼 컴포넌트
  * - PBN 백링크: 사이트 URL, 키워드 입력 (수량 고정 1)
  * - 플랜 백링크: 사이트 URL, 키워드, 서브키워드 옵션, 비율 설정 (수량 고정 1)
+ * - 온페이지 SEO 점검: 사이트 URL, 핵심 키워드 1개 입력 (수량 고정 1)
+ * - 콘텐츠 최적화: 사이트 URL, 핵심 키워드 1개 입력 (수량 고정 1)
  * - 기타 상품: 수량, 요청사항 입력
  */
 
@@ -26,6 +29,7 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
   const isPBNProduct = productName.includes('PBN')
   const isPlanProduct = productName.includes('플랜')
   const isOnPageProduct = productName.includes('온페이지')
+  const isContentProduct = productName.includes('콘텐츠')
 
   // 기본 필드
   const [quantity, setQuantity] = useState(1)
@@ -43,8 +47,9 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  // 백링크 및 SEO 점검 상품은 수량 고정 1, 기타 상품은 입력된 수량 사용
-  const actualQuantity = isPBNProduct || isPlanProduct || isOnPageProduct ? 1 : quantity
+  // 백링크 및 SEO 점검/콘텐츠 최적화 상품은 수량 고정 1, 기타 상품은 입력된 수량 사용
+  const actualQuantity =
+    isPBNProduct || isPlanProduct || isOnPageProduct || isContentProduct ? 1 : quantity
   const totalPrice = price * actualQuantity
 
   // 비율 조정 핸들러
@@ -67,8 +72,8 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
     e.preventDefault()
     setMessage(null)
 
-    // 백링크 및 SEO 점검 상품 필수 필드 검증
-    if (isPBNProduct || isPlanProduct || isOnPageProduct) {
+    // 백링크 및 SEO 점검/콘텐츠 최적화 상품 필수 필드 검증
+    if (isPBNProduct || isPlanProduct || isOnPageProduct || isContentProduct) {
       if (!siteUrl.trim()) {
         setMessage({ type: 'error', text: '사이트 URL을 입력해주세요' })
         return
@@ -86,8 +91,8 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
         productId,
         actualQuantity,
         note,
-        isPBNProduct || isPlanProduct || isOnPageProduct ? siteUrl : undefined,
-        isPBNProduct || isPlanProduct || isOnPageProduct ? keywords : undefined,
+        isPBNProduct || isPlanProduct || isOnPageProduct || isContentProduct ? siteUrl : undefined,
+        isPBNProduct || isPlanProduct || isOnPageProduct || isContentProduct ? keywords : undefined,
         isPlanProduct ? useSubKeywords : undefined,
         isPlanProduct ? mainKeywordRatio : undefined,
         isPlanProduct ? subKeywordRatio : undefined
@@ -128,8 +133,8 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
         <p className="text-lg font-semibold text-gray-900 dark:text-white">{productName}</p>
       </div>
 
-      {/* 백링크 및 SEO 점검 상품: 사이트 URL, 키워드 입력 */}
-      {isPBNProduct || isPlanProduct || isOnPageProduct ? (
+      {/* 백링크 및 SEO 점검/콘텐츠 최적화 상품: 사이트 URL, 키워드 입력 */}
+      {isPBNProduct || isPlanProduct || isOnPageProduct || isContentProduct ? (
         <>
           {/* 사이트 URL (필수) */}
           <div>
@@ -147,27 +152,33 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {isOnPageProduct
                 ? 'SEO 점검을 받을 사이트의 URL을 입력해주세요'
-                : '백링크를 받을 사이트의 URL을 입력해주세요'}
+                : isContentProduct
+                  ? '콘텐츠 최적화를 받을 사이트의 URL을 입력해주세요'
+                  : '백링크를 받을 사이트의 URL을 입력해주세요'}
             </p>
           </div>
 
           {/* 키워드 (필수) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {isOnPageProduct ? '타겟 키워드' : '메인 키워드'}{' '}
+              {isOnPageProduct || isContentProduct ? '핵심 키워드' : '메인 키워드'}{' '}
               <span className="text-red-500">*</span>
             </label>
-            <textarea
+            <input
+              type="text"
               value={keywords}
               onChange={e => setKeywords(e.target.value)}
-              rows={3}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder="예) SEO 최적화, 백링크 구매, 검색엔진 최적화"
+              placeholder={
+                isOnPageProduct || isContentProduct
+                  ? '예) SEO 최적화'
+                  : '예) SEO 최적화, 백링크 구매, 검색엔진 최적화'
+              }
               required
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              {isOnPageProduct
-                ? '점검할 타겟 키워드를 입력해주세요 (여러 개는 쉼표로 구분)'
+              {isOnPageProduct || isContentProduct
+                ? '핵심 키워드 1개를 입력해주세요'
                 : isPlanProduct
                   ? '타겟 키워드를 입력해주세요 (여러 개 입력 가능, 쉼표로 구분)'
                   : '타겟 키워드를 입력해주세요 (여러 개는 쉼표로 구분)'}
