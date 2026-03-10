@@ -1,3 +1,4 @@
+// v1.6 - PBN 주문 즉시 자동처리 (주문 생성 시 바로 캠페인 생성 + processing 전환) (2026-03-10)
 // v1.5 - 온페이지 SEO/콘텐츠 최적화 상품 검증 추가 (2026-03-09)
 // v1.4 - GOAT PBN API 연동 추가 (2026-03-05)
 // v1.3 - 플랜 백링크 주문 필드 추가 (2026-03-03)
@@ -18,7 +19,13 @@ import { createServerSupabaseClient } from '../supabase/client'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { CREDIT_REASON } from '@/lib/constants'
 import { sendEmail, sendEmailToAdmin } from '@/lib/email/send-email'
-import { renderOrderCreatedCustomerEmail, renderOrderCreatedAdminEmail } from '@/lib/email/render'
+import {
+  renderOrderCreatedCustomerEmail,
+  renderOrderCreatedAdminEmail,
+  renderOrderStatusChangedEmail,
+} from '@/lib/email/render'
+import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
+import { getProductDuration, extractPBNQuantity } from '@/lib/constants/product-config'
 
 /**
  * 상품 구매 (주문 생성)
@@ -86,7 +93,52 @@ export async function createOrderAction(
       }
     }
 
-    // 5. 주문 생성
+    // 5. PBN 상품이면 주문 저장 전에 GOAT PBN 캠페인 먼저 생성
+    // API 성공 여부에 따라 초기 status와 campaign_id 결정
+    let initialStatus: 'pending' | 'processing' = 'pending'
+    let goatCampaignId: string | null = null
+    let pbnApiError: string | null = null
+
+    if (isPBNProduct && siteUrl && keywords && user.email) {
+      try {
+        const duration = getProductDuration(product.name)
+        const pbnQuantity = extractPBNQuantity(product.name)
+
+        console.log('🚀 PBN 주문 즉시 캠페인 생성 시작:', {
+          productName: product.name,
+          siteUrl,
+          pbnQuantity,
+          duration,
+        })
+
+        const campaignResult = await createGoatPBNCampaign({
+          orderId: 'pending-order', // 주문 ID는 아직 없으므로 임시값
+          productName: product.name,
+          customerEmail: user.email,
+          siteUrl,
+          keywords,
+          quantity: pbnQuantity,
+          duration,
+        })
+
+        if (campaignResult.success && campaignResult.campaign_id) {
+          initialStatus = 'processing'
+          goatCampaignId = campaignResult.campaign_id
+          console.log(
+            '✅ PBN 캠페인 생성 성공 - 주문을 processing으로 저장:',
+            campaignResult.campaign_id
+          )
+        } else {
+          throw new Error(campaignResult.error || '캠페인 생성 실패')
+        }
+      } catch (apiError: any) {
+        // API 실패 시 pending으로 저장하고 api_error 기록 (관리자가 재시도 가능)
+        pbnApiError = apiError.message || 'GOAT PBN API 호출 실패'
+        console.error('❌ PBN 캠페인 생성 실패 - 주문을 pending으로 저장:', pbnApiError)
+      }
+    }
+
+    // 6. 주문 생성
     const { data: order, error: orderError } = await adminClient
       .from('orders')
       .insert({
@@ -94,13 +146,15 @@ export async function createOrderAction(
         product_id: productId,
         quantity,
         total_price: totalPrice,
-        status: 'pending',
+        status: initialStatus,
         note: note || null,
         site_url: siteUrl || null,
         keywords: keywords || null,
         use_sub_keywords: useSubKeywords ?? null,
         main_keyword_ratio: mainKeywordRatio ?? null,
         sub_keyword_ratio: subKeywordRatio ?? null,
+        goat_campaign_id: goatCampaignId,
+        api_error: pbnApiError,
       })
       .select()
       .single()
@@ -109,7 +163,7 @@ export async function createOrderAction(
       return { success: false, error: '주문 생성에 실패했습니다' }
     }
 
-    // 6. 크레딧 차감 (원장 기록)
+    // 7. 크레딧 차감 (원장 기록)
     const { error: creditError } = await adminClient.rpc('apply_credit_delta', {
       p_user_id: user.id,
       p_amount: -totalPrice,
@@ -124,33 +178,47 @@ export async function createOrderAction(
       return { success: false, error: '크레딧이 부족합니다' }
     }
 
-    // 주문 생성 시에는 API 호출하지 않음
-    // 관리자가 "처리중" 상태로 변경할 때 API 호출됨
-
-    // 7. 이메일 발송 (고객)
+    // 8. 이메일 발송
     if (user.email) {
-      await sendEmail(
-        user.email,
-        '주문이 접수되었습니다 - 백링크샵',
-        renderOrderCreatedCustomerEmail({
-          customerEmail: user.email,
-          orderId: order.id,
-          productName: product.name,
-          quantity,
-          totalPrice,
-          note: note || undefined,
-          siteUrl: siteUrl || undefined,
-          keywords: keywords || undefined,
-          useSubKeywords: useSubKeywords,
-          mainKeywordRatio: mainKeywordRatio,
-          subKeywordRatio: subKeywordRatio,
+      if (isPBNProduct && initialStatus === 'processing') {
+        // PBN 주문 + 캠페인 생성 성공 → 처리중 상태 이메일 발송
+        await sendEmail(
+          user.email,
+          '주문 상태가 변경되었습니다 - 백링크샵',
+          renderOrderStatusChangedEmail({
+            customerEmail: user.email,
+            orderId: order.id,
+            productName: product.name,
+            oldStatus: 'pending',
+            newStatus: 'processing',
+          })
+        ).catch(err => {
+          console.error('고객 처리중 이메일 발송 실패:', err)
         })
-      ).catch(err => {
-        console.error('고객 이메일 발송 실패:', err)
-        // 이메일 실패해도 주문은 성공으로 처리
-      })
+      } else {
+        // 비PBN 주문 또는 PBN API 실패 → 주문 접수 이메일 발송
+        await sendEmail(
+          user.email,
+          '주문이 접수되었습니다 - 백링크샵',
+          renderOrderCreatedCustomerEmail({
+            customerEmail: user.email,
+            orderId: order.id,
+            productName: product.name,
+            quantity,
+            totalPrice,
+            note: note || undefined,
+            siteUrl: siteUrl || undefined,
+            keywords: keywords || undefined,
+            useSubKeywords: useSubKeywords,
+            mainKeywordRatio: mainKeywordRatio,
+            subKeywordRatio: subKeywordRatio,
+          })
+        ).catch(err => {
+          console.error('고객 이메일 발송 실패:', err)
+        })
+      }
 
-      // 8. 이메일 발송 (관리자)
+      // 9. 관리자 이메일 발송 (모든 주문 공통)
       await sendEmailToAdmin(
         `[신규 주문] ${product.name} - ${user.email}`,
         renderOrderCreatedAdminEmail({
@@ -168,7 +236,6 @@ export async function createOrderAction(
         })
       ).catch(err => {
         console.error('관리자 이메일 발송 실패:', err)
-        // 이메일 실패해도 주문은 성공으로 처리
       })
     }
 
