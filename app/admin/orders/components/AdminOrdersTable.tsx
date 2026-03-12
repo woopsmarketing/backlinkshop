@@ -112,7 +112,13 @@ export default function AdminOrdersTable({ orders }: Props) {
     setEmailError(null)
 
     try {
-      const result = await sendCustomEmailToOrderAction(orderId, emailSubject, emailBody)
+      const email = orders.find(o => o.id === orderId)?.profiles?.email
+      if (!email) {
+        setEmailError('고객 이메일을 찾을 수 없습니다')
+        setSendingEmailId(null)
+        return
+      }
+      const result = await sendCustomEmailToOrderAction(email, emailSubject, emailBody)
       if (result.success) {
         setMessage({ type: 'success', text: result.message || '이메일 발송 완료' })
         setEmailOpenId(null)
