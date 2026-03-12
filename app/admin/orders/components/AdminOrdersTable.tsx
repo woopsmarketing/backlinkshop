@@ -39,6 +39,7 @@ export default function AdminOrdersTable({ orders }: Props) {
   const [emailSubject, setEmailSubject] = useState('')
   const [emailBody, setEmailBody] = useState('')
   const [sendingEmailId, setSendingEmailId] = useState<string | null>(null)
+  const [emailError, setEmailError] = useState<string | null>(null)
 
   const [modal, setModal] = useState<{
     type: ModalType
@@ -89,10 +90,12 @@ export default function AdminOrdersTable({ orders }: Props) {
       setEmailOpenId(null)
       setEmailSubject('')
       setEmailBody('')
+      setEmailError(null)
     } else {
       setEmailOpenId(orderId)
       setEmailSubject('')
       setEmailBody('')
+      setEmailError(null)
     }
   }
 
@@ -106,7 +109,7 @@ export default function AdminOrdersTable({ orders }: Props) {
     }
 
     setSendingEmailId(orderId)
-    setMessage(null)
+    setEmailError(null)
 
     try {
       const result = await sendCustomEmailToOrderAction(orderId, emailSubject, emailBody)
@@ -115,11 +118,12 @@ export default function AdminOrdersTable({ orders }: Props) {
         setEmailOpenId(null)
         setEmailSubject('')
         setEmailBody('')
+        setEmailError(null)
       } else {
-        setMessage({ type: 'error', text: result.error || '이메일 발송 실패' })
+        setEmailError(result.error || '이메일 발송 실패')
       }
     } catch {
-      setMessage({ type: 'error', text: '이메일 발송 중 오류가 발생했습니다' })
+      setEmailError('이메일 발송 중 오류가 발생했습니다')
     } finally {
       setSendingEmailId(null)
     }
@@ -335,6 +339,11 @@ export default function AdminOrdersTable({ orders }: Props) {
                           <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
                             ✉️ {order.profiles?.email || '이메일 없음'} 에게 이메일 발송
                           </p>
+                          {emailError && (
+                            <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-sm text-red-700 dark:text-red-400">
+                              {emailError}
+                            </div>
+                          )}
                           <input
                             type="text"
                             placeholder="제목"
