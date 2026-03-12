@@ -9,7 +9,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { formatCredits, formatDate } from '@/lib/utils'
 import { updateOrderStatusAction, retryGoatPBNApiAction } from '@/server/actions/admin-orders'
 import { sendCustomEmailToOrderAction } from '@/server/actions/admin-emails'
@@ -212,165 +212,164 @@ export default function AdminOrdersTable({ orders }: Props) {
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {orders.map(order => (
-                <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                    {order.id.slice(0, 8)}...
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                    {order.profiles?.email || '이메일 없음'}
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                    <div className="flex items-center gap-2">
-                      <span>
-                        {Array.isArray(order.products)
-                          ? order.products[0]?.name || '알 수 없는 상품'
-                          : order.products?.name || '알 수 없는 상품'}
-                      </span>
-                      {(order as any).goat_campaign_id && (
-                        <span
-                          className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded"
-                          title="GOAT PBN 캠페인 생성됨"
-                        >
-                          🚀
+                <Fragment key={order.id}>
+                  <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                      {order.id.slice(0, 8)}...
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                      {order.profiles?.email || '이메일 없음'}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
+                      <div className="flex items-center gap-2">
+                        <span>
+                          {Array.isArray(order.products)
+                            ? order.products[0]?.name || '알 수 없는 상품'
+                            : order.products?.name || '알 수 없는 상품'}
                         </span>
-                      )}
-                      {(order as any).api_error && (
-                        <span
-                          className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded"
-                          title="API 에러 발생"
-                        >
-                          ⚠️
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-center text-sm text-gray-700 dark:text-gray-300">
-                    {order.quantity}
-                  </td>
-                  <td className="py-3 px-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    {formatCredits(Number(order.total_price))} 크레딧
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        order.status === 'completed'
-                          ? 'bg-green-100 text-green-700'
-                          : order.status === 'processing'
-                            ? 'bg-blue-100 text-blue-700'
-                            : order.status === 'failed'
-                              ? 'bg-red-100 text-red-700'
-                              : 'bg-yellow-100 text-yellow-700'
-                      }`}
-                    >
-                      {statusLabel[order.status] || order.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
-                    <button
-                      onClick={() => openDetailsModal(order)}
-                      className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                    >
-                      상세보기
-                    </button>
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <ReportUploadButton
-                      orderId={order.id}
-                      hasReport={!!order.report_path}
-                      fileName={order.report_filename || undefined}
-                    />
-                  </td>
-                  <td className="py-3 px-4 text-right text-sm text-gray-600 dark:text-gray-400">
-                    {formatDate(order.created_at)}
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      {order.status === 'pending' && (
-                        <button
-                          onClick={() => handleUpdate(order.id, 'processing')}
-                          disabled={loadingId === order.id}
-                          className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:bg-gray-400"
-                        >
-                          처리중
-                        </button>
-                      )}
-                      {order.status === 'processing' && (
-                        <button
-                          onClick={() => handleUpdate(order.id, 'completed')}
-                          disabled={loadingId === order.id}
-                          className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md disabled:bg-gray-400"
-                        >
-                          완료
-                        </button>
-                      )}
-                      {order.status !== 'failed' && order.status !== 'completed' && (
-                        <button
-                          onClick={() => handleUpdate(order.id, 'failed')}
-                          disabled={loadingId === order.id}
-                          className="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md disabled:bg-gray-400"
-                        >
-                          실패
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-center">
-                    <button
-                      onClick={() => toggleEmailPanel(order.id)}
-                      className={`px-3 py-1 text-xs rounded-md ${
-                        emailOpenId === order.id
-                          ? 'bg-gray-400 hover:bg-gray-500 text-white'
-                          : 'bg-purple-600 hover:bg-purple-700 text-white'
-                      }`}
-                    >
-                      {emailOpenId === order.id ? '취소' : '이메일'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {/* 이메일 작성 패널 (인라인) */}
-              {orders.map(order =>
-                emailOpenId === order.id ? (
-                  <tr key={`email-${order.id}`} className="bg-purple-50 dark:bg-purple-900/20">
-                    <td colSpan={11} className="px-6 py-4">
-                      <div className="space-y-3">
-                        <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
-                          ✉️ {order.profiles?.email || '이메일 없음'} 에게 이메일 발송
-                        </p>
-                        <input
-                          type="text"
-                          placeholder="제목"
-                          value={emailSubject}
-                          onChange={e => setEmailSubject(e.target.value)}
-                          className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                        <textarea
-                          placeholder="고객에게 전달할 메시지를 입력하세요..."
-                          value={emailBody}
-                          onChange={e => setEmailBody(e.target.value)}
-                          rows={4}
-                          className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-                        />
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => toggleEmailPanel(order.id)}
-                            className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
+                        {(order as any).goat_campaign_id && (
+                          <span
+                            className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded"
+                            title="GOAT PBN 캠페인 생성됨"
                           >
-                            취소
-                          </button>
-                          <button
-                            onClick={() => handleSendEmail(order.id)}
-                            disabled={sendingEmailId === order.id}
-                            className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            🚀
+                          </span>
+                        )}
+                        {(order as any).api_error && (
+                          <span
+                            className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded"
+                            title="API 에러 발생"
                           >
-                            {sendingEmailId === order.id ? '발송 중...' : '이메일 전송'}
-                          </button>
-                        </div>
+                            ⚠️
+                          </span>
+                        )}
                       </div>
                     </td>
+                    <td className="py-3 px-4 text-center text-sm text-gray-700 dark:text-gray-300">
+                      {order.quantity}
+                    </td>
+                    <td className="py-3 px-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
+                      {formatCredits(Number(order.total_price))} 크레딧
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          order.status === 'completed'
+                            ? 'bg-green-100 text-green-700'
+                            : order.status === 'processing'
+                              ? 'bg-blue-100 text-blue-700'
+                              : order.status === 'failed'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        {statusLabel[order.status] || order.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-600 dark:text-gray-400">
+                      <button
+                        onClick={() => openDetailsModal(order)}
+                        className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                      >
+                        상세보기
+                      </button>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <ReportUploadButton
+                        orderId={order.id}
+                        hasReport={!!order.report_path}
+                        fileName={order.report_filename || undefined}
+                      />
+                    </td>
+                    <td className="py-3 px-4 text-right text-sm text-gray-600 dark:text-gray-400">
+                      {formatDate(order.created_at)}
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        {order.status === 'pending' && (
+                          <button
+                            onClick={() => handleUpdate(order.id, 'processing')}
+                            disabled={loadingId === order.id}
+                            className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:bg-gray-400"
+                          >
+                            처리중
+                          </button>
+                        )}
+                        {order.status === 'processing' && (
+                          <button
+                            onClick={() => handleUpdate(order.id, 'completed')}
+                            disabled={loadingId === order.id}
+                            className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-md disabled:bg-gray-400"
+                          >
+                            완료
+                          </button>
+                        )}
+                        {order.status !== 'failed' && order.status !== 'completed' && (
+                          <button
+                            onClick={() => handleUpdate(order.id, 'failed')}
+                            disabled={loadingId === order.id}
+                            className="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md disabled:bg-gray-400"
+                          >
+                            실패
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <button
+                        onClick={() => toggleEmailPanel(order.id)}
+                        className={`px-3 py-1 text-xs rounded-md ${
+                          emailOpenId === order.id
+                            ? 'bg-gray-400 hover:bg-gray-500 text-white'
+                            : 'bg-purple-600 hover:bg-purple-700 text-white'
+                        }`}
+                      >
+                        {emailOpenId === order.id ? '취소' : '이메일'}
+                      </button>
+                    </td>
                   </tr>
-                ) : null
-              )}
+                  {emailOpenId === order.id && (
+                    <tr className="bg-purple-50 dark:bg-purple-900/20">
+                      <td colSpan={11} className="px-6 py-4">
+                        <div className="space-y-3">
+                          <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
+                            ✉️ {order.profiles?.email || '이메일 없음'} 에게 이메일 발송
+                          </p>
+                          <input
+                            type="text"
+                            placeholder="제목"
+                            value={emailSubject}
+                            onChange={e => setEmailSubject(e.target.value)}
+                            className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <textarea
+                            placeholder="고객에게 전달할 메시지를 입력하세요..."
+                            value={emailBody}
+                            onChange={e => setEmailBody(e.target.value)}
+                            rows={4}
+                            className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() => toggleEmailPanel(order.id)}
+                              className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
+                            >
+                              취소
+                            </button>
+                            <button
+                              onClick={() => handleSendEmail(order.id)}
+                              disabled={sendingEmailId === order.id}
+                              className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                              {sendingEmailId === order.id ? '발송 중...' : '이메일 전송'}
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))}
             </tbody>
           </table>
         </div>
