@@ -1,15 +1,16 @@
 /**
  * 관리자 이메일 발송 Server Actions
- * 일괄 이메일 발송 등
+ * 일괄 이메일 발송, 주문별 개별 메시지 발송
  */
 
 'use server'
 
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
-import { sendBulkEmail } from '@/lib/email/send-email'
+import { sendBulkEmail, sendEmail } from '@/lib/email/send-email'
 import * as React from 'react'
 import { AnnouncementEmail } from '@/lib/email/templates/announcement'
+import { CustomMessageEmail } from '@/lib/email/templates/custom-message'
 
 /**
  * 모든 회원에게 공지사항 이메일 일괄 발송
@@ -79,6 +80,66 @@ export async function sendAnnouncementToAllUsersAction() {
     }
   } catch (error) {
     console.error('일괄 이메일 발송 오류:', error)
+    return { success: false, error: '이메일 발송 중 오류가 발생했습니다' }
+  }
+}
+
+/**
+ * 특정 주문의 고객에게 개별 메시지 이메일 발송
+ */
+export async function sendCustomEmailToOrderAction(
+  orderId: string,
+  subject: string,
+  message: string
+) {
+  try {
+    // 1. 관리자 권한 확인
+    const user = await getCurrentUser()
+    if (!user || !(await isAdmin())) {
+      return { success: false, error: '관리자 권한이 필요합니다' }
+    }
+
+    if (!subject.trim() || !message.trim()) {
+      return { success: false, error: '제목과 메시지를 모두 입력해주세요' }
+    }
+
+    const adminClient = createAdminSupabaseClient()
+
+    // 2. 주문 조회 및 고객 이메일 확인
+    const { data: order, error: orderError } = await adminClient
+      .from('orders')
+      .select('id, user_id, profiles(email)')
+      .eq('id', orderId)
+      .single()
+
+    if (orderError || !order) {
+      console.error('❌ [주문 조회 실패]', orderError)
+      return { success: false, error: '주문을 찾을 수 없습니다' }
+    }
+
+    const profiles = order.profiles as { email: string } | { email: string }[] | null
+    const customerEmail = Array.isArray(profiles) ? profiles[0]?.email : profiles?.email
+
+    if (!customerEmail) {
+      return { success: false, error: '고객 이메일을 찾을 수 없습니다' }
+    }
+
+    // 3. 이메일 발송
+    const result = await sendEmail(
+      customerEmail,
+      subject,
+      React.createElement(CustomMessageEmail, { customerEmail, subject, message })
+    )
+
+    if (!result.success) {
+      console.error('❌ [개별 이메일 발송 실패]', result.error)
+      return { success: false, error: result.error || '이메일 발송에 실패했습니다' }
+    }
+
+    console.log(`✅ [개별 이메일 발송 완료] orderId: ${orderId}, to: ${customerEmail}`)
+    return { success: true, message: `${customerEmail}에게 이메일을 발송했습니다` }
+  } catch (error) {
+    console.error('개별 이메일 발송 오류:', error)
     return { success: false, error: '이메일 발송 중 오류가 발생했습니다' }
   }
 }

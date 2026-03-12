@@ -12,6 +12,7 @@
 import { useState } from 'react'
 import { formatCredits, formatDate } from '@/lib/utils'
 import { updateOrderStatusAction, retryGoatPBNApiAction } from '@/server/actions/admin-orders'
+import { sendCustomEmailToOrderAction } from '@/server/actions/admin-emails'
 import ReportUploadButton from './ReportUploadButton'
 import type { AdminOrderRow } from '@/server/queries/admin-orders'
 
@@ -32,6 +33,13 @@ export default function AdminOrdersTable({ orders }: Props) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [retryingId, setRetryingId] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+
+  // 이메일 발송 상태
+  const [emailOpenId, setEmailOpenId] = useState<string | null>(null)
+  const [emailSubject, setEmailSubject] = useState('')
+  const [emailBody, setEmailBody] = useState('')
+  const [sendingEmailId, setSendingEmailId] = useState<string | null>(null)
+
   const [modal, setModal] = useState<{
     type: ModalType
     open: boolean
@@ -70,6 +78,50 @@ export default function AdminOrdersTable({ orders }: Props) {
       setMessage({ type: 'error', text: '상태 변경 중 오류가 발생했습니다' })
     } finally {
       setLoadingId(null)
+    }
+  }
+
+  /**
+   * 이메일 패널 토글
+   */
+  const toggleEmailPanel = (orderId: string) => {
+    if (emailOpenId === orderId) {
+      setEmailOpenId(null)
+      setEmailSubject('')
+      setEmailBody('')
+    } else {
+      setEmailOpenId(orderId)
+      setEmailSubject('')
+      setEmailBody('')
+    }
+  }
+
+  /**
+   * 이메일 발송
+   */
+  const handleSendEmail = async (orderId: string) => {
+    if (!emailSubject.trim() || !emailBody.trim()) {
+      setMessage({ type: 'error', text: '제목과 메시지를 모두 입력해주세요' })
+      return
+    }
+
+    setSendingEmailId(orderId)
+    setMessage(null)
+
+    try {
+      const result = await sendCustomEmailToOrderAction(orderId, emailSubject, emailBody)
+      if (result.success) {
+        setMessage({ type: 'success', text: result.message || '이메일 발송 완료' })
+        setEmailOpenId(null)
+        setEmailSubject('')
+        setEmailBody('')
+      } else {
+        setMessage({ type: 'error', text: result.error || '이메일 발송 실패' })
+      }
+    } catch {
+      setMessage({ type: 'error', text: '이메일 발송 중 오류가 발생했습니다' })
+    } finally {
+      setSendingEmailId(null)
     }
   }
 
@@ -152,6 +204,9 @@ export default function AdminOrdersTable({ orders }: Props) {
                 </th>
                 <th className="text-center py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
                   처리
+                </th>
+                <th className="text-center py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+                  이메일
                 </th>
               </tr>
             </thead>
@@ -259,8 +314,63 @@ export default function AdminOrdersTable({ orders }: Props) {
                       )}
                     </div>
                   </td>
+                  <td className="py-3 px-4 text-center">
+                    <button
+                      onClick={() => toggleEmailPanel(order.id)}
+                      className={`px-3 py-1 text-xs rounded-md ${
+                        emailOpenId === order.id
+                          ? 'bg-gray-400 hover:bg-gray-500 text-white'
+                          : 'bg-purple-600 hover:bg-purple-700 text-white'
+                      }`}
+                    >
+                      {emailOpenId === order.id ? '취소' : '이메일'}
+                    </button>
+                  </td>
                 </tr>
               ))}
+              {/* 이메일 작성 패널 (인라인) */}
+              {orders.map(order =>
+                emailOpenId === order.id ? (
+                  <tr key={`email-${order.id}`} className="bg-purple-50 dark:bg-purple-900/20">
+                    <td colSpan={11} className="px-6 py-4">
+                      <div className="space-y-3">
+                        <p className="text-sm font-medium text-purple-800 dark:text-purple-300">
+                          ✉️ {order.profiles?.email || '이메일 없음'} 에게 이메일 발송
+                        </p>
+                        <input
+                          type="text"
+                          placeholder="제목"
+                          value={emailSubject}
+                          onChange={e => setEmailSubject(e.target.value)}
+                          className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        />
+                        <textarea
+                          placeholder="고객에게 전달할 메시지를 입력하세요..."
+                          value={emailBody}
+                          onChange={e => setEmailBody(e.target.value)}
+                          rows={4}
+                          className="w-full px-3 py-2 text-sm border border-purple-300 dark:border-purple-700 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => toggleEmailPanel(order.id)}
+                            className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600"
+                          >
+                            취소
+                          </button>
+                          <button
+                            onClick={() => handleSendEmail(order.id)}
+                            disabled={sendingEmailId === order.id}
+                            className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-md disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          >
+                            {sendingEmailId === order.id ? '발송 중...' : '이메일 전송'}
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ) : null
+              )}
             </tbody>
           </table>
         </div>
