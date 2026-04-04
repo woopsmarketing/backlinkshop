@@ -16,6 +16,7 @@ import TopNav from '@/app/components/TopNav'
 import { getRecentReports } from '@/server/queries/orders'
 import ReportDownloadButton from '@/app/components/ReportDownloadButton'
 import { getActiveProducts } from '@/server/queries/products'
+import OnboardingChecklist from './components/OnboardingChecklist'
 
 export default async function DashboardPage() {
   // 유저 확인
@@ -43,6 +44,21 @@ export default async function DashboardPage() {
     .from('orders')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
+
+  // SEO 점검 주문 여부 (온보딩 체크리스트용)
+  const { data: seoOrders } = await supabase
+    .from('orders')
+    .select('id, products!inner(name)')
+    .eq('user_id', user.id)
+    .like('products.name', '%SEO%')
+    .limit(1)
+
+  // 충전 이력 여부 (온보딩 체크리스트용)
+  const { count: topupCount } = await supabase
+    .from('topup_requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('status', 'approved')
 
   // 최근 보고서 조회
   const recentReports = await getRecentReports(user.id, 5)
@@ -97,6 +113,17 @@ export default async function DashboardPage() {
               <div className="text-6xl opacity-20">💰</div>
             </div>
           </div>
+
+          {/* 온보딩 체크리스트 (주문 없는 신규 사용자) */}
+          {(orderCount || 0) === 0 && (
+            <div className="col-span-full">
+              <OnboardingChecklist
+                hasSeoOrder={!!seoOrders && seoOrders.length > 0}
+                hasTopup={(topupCount || 0) > 0}
+                balance={currentBalance}
+              />
+            </div>
+          )}
 
           {/* 주문 통계 카드 */}
           <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
@@ -270,7 +297,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* 환영 메시지 (가입 보너스 안내) */}
-        {balance?.balance === 300 && (
+        {balance?.balance === 200000 && (orderCount || 0) === 0 && (
           <div className="mt-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
             <div className="flex items-start gap-4">
               <span className="text-3xl">🎉</span>

@@ -10,7 +10,7 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { CREDIT_REASON } from '@/lib/constants'
-import { calculateTopupBonus } from '@/lib/topup'
+import { calculateTopupBonus, calculateFirstChargeBonus } from '@/lib/topup'
 import { sendEmail } from '@/lib/email/send-email'
 import { renderTopupApprovedEmail } from '@/lib/email/render'
 
@@ -51,8 +51,17 @@ export async function approveTopupRequestAction(requestId: string) {
       return { success: false, error: '유효하지 않은 충전 금액입니다' }
     }
 
-    // 2. 보너스 계산 후 크레딧 지급
-    const bonusInfo = calculateTopupBonus(requestAmount)
+    // 2. 첫 충전 여부 확인 후 보너스 계산
+    const { count: prevApprovedCount } = await adminClient
+      .from('topup_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', request.user_id)
+      .eq('status', 'approved')
+
+    const isFirstCharge = (prevApprovedCount || 0) === 0
+    const bonusInfo = isFirstCharge
+      ? calculateFirstChargeBonus(requestAmount)
+      : calculateTopupBonus(requestAmount)
     const totalCredits = requestAmount + bonusInfo.bonus
 
     const { error: creditError } = await adminClient.rpc('apply_credit_delta', {
@@ -85,7 +94,9 @@ export async function approveTopupRequestAction(requestId: string) {
 
     // 4. 유저 이메일 및 현재 잔액 조회 (이메일 발송용)
     // auth.users에서 직접 이메일 가져오기 (profiles.email이 null일 수 있음)
-    const { data: { user: authUser } } = await adminClient.auth.admin.getUserById(request.user_id)
+    const {
+      data: { user: authUser },
+    } = await adminClient.auth.admin.getUserById(request.user_id)
     const userEmail = authUser?.email
 
     const { data: profile } = await adminClient

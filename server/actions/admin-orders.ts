@@ -13,7 +13,7 @@ import { revalidatePath } from 'next/cache'
 import { getCurrentUser, isAdmin } from '../auth/session'
 import { createAdminSupabaseClient } from '../supabase/admin'
 import { sendEmail } from '@/lib/email/send-email'
-import { renderOrderStatusChangedEmail } from '@/lib/email/render'
+import { renderOrderStatusChangedEmail, renderSeoReportEmail } from '@/lib/email/render'
 import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
 import {
   getProductDuration,
@@ -233,8 +233,26 @@ export async function updateOrderStatusAction(orderId: string, status: string) {
         })
       ).catch(err => {
         console.error('상태 변경 이메일 발송 실패:', err)
-        // 이메일 실패해도 상태 변경은 성공으로 처리
       })
+
+      // SEO 점검 상품 완료 시 SEO 리포트 이메일 추가 발송
+      if (
+        status === 'completed' &&
+        (productName.includes('SEO') || productName.includes('온페이지'))
+      ) {
+        await sendEmail(
+          userEmail,
+          `온페이지 SEO 점검 결과가 준비되었습니다 - 백링크샵`,
+          renderSeoReportEmail({
+            customerEmail: userEmail,
+            orderId: order.id,
+            siteUrl: order.site_url || undefined,
+            keywords: order.keywords || undefined,
+          })
+        ).catch(err => {
+          console.error('SEO 리포트 이메일 발송 실패:', err)
+        })
+      }
     }
 
     revalidatePath('/admin/orders')

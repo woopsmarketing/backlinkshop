@@ -11,6 +11,7 @@ import { ReportUploadedEmail } from './templates/report-uploaded'
 import { TopupApprovedEmail } from './templates/topup-approved'
 import { UserRegisteredAdminEmail } from './templates/user-registered-admin'
 import { AnnouncementEmail } from './templates/announcement'
+import { SeoReportEmail } from './templates/seo-report'
 
 /**
  * 주문 생성 - 고객 이메일 렌더링
@@ -99,6 +100,18 @@ export function renderUserRegisteredAdminEmail(props: {
   registeredAt: string
 }) {
   return <UserRegisteredAdminEmail {...props} />
+}
+
+/**
+ * SEO 점검 결과 이메일 렌더링
+ */
+export function renderSeoReportEmail(props: {
+  customerEmail: string
+  orderId: string
+  siteUrl?: string
+  keywords?: string
+}) {
+  return <SeoReportEmail {...props} />
 }
 
 /**

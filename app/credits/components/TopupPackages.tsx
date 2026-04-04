@@ -8,16 +8,19 @@
 
 import { useMemo, useState } from 'react'
 import { createTopupRequestAction } from '@/server/actions/credits'
-import { calculateTopupBonus, TOPUP_BONUS_TIERS } from '@/lib/topup'
+import { calculateTopupBonus, calculateFirstChargeBonus, TOPUP_BONUS_TIERS } from '@/lib/topup'
 import { formatCredits, formatPrice } from '@/lib/utils'
 
-export default function TopupPackages() {
+export default function TopupPackages({ isFirstCharge = false }: { isFirstCharge?: boolean }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [amount, setAmount] = useState(100000)
 
-  // 보너스 계산 (1크레딧=1원 기준)
-  const bonusInfo = useMemo(() => calculateTopupBonus(amount), [amount])
+  // 보너스 계산 (1크레딧=1원 기준, 첫 충전 시 100% 보너스)
+  const bonusInfo = useMemo(
+    () => (isFirstCharge ? calculateFirstChargeBonus(amount) : calculateTopupBonus(amount)),
+    [amount, isFirstCharge]
+  )
 
   const handleRequest = async () => {
     setLoading(true)
@@ -71,6 +74,21 @@ export default function TopupPackages() {
           }`}
         >
           {message.text}
+        </div>
+      )}
+
+      {/* 첫 충전 100% 보너스 배너 */}
+      {isFirstCharge && (
+        <div className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-xl text-center">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">
+            &#127873; 첫 충전 100% 보너스!
+          </p>
+          <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+            <strong className="text-orange-600 dark:text-orange-400">
+              5만원 충전 &#8594; 10만 크레딧
+            </strong>{' '}
+            지급 (1회 한정)
+          </p>
         </div>
       )}
 
@@ -129,14 +147,24 @@ export default function TopupPackages() {
 
         {/* 보너스 안내 */}
         <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-3 text-xs text-gray-600 dark:text-gray-300">
-          <p className="mb-2 font-semibold">보너스 구간</p>
-          <ul className="space-y-1">
-            {TOPUP_BONUS_TIERS.map(tier => (
-              <li key={tier.minCredits}>
-                • {formatCredits(tier.minCredits)} 크레딧 이상: {Math.round(tier.bonusRate * 100)}%
-              </li>
-            ))}
-          </ul>
+          <p className="mb-2 font-semibold">
+            {isFirstCharge ? '&#127873; 첫 충전 보너스 적용 중' : '보너스 구간'}
+          </p>
+          {isFirstCharge ? (
+            <p>
+              첫 충전 시 충전 금액의 <strong className="text-orange-600">100%</strong>를 보너스로
+              지급합니다. (1회 한정)
+            </p>
+          ) : (
+            <ul className="space-y-1">
+              {TOPUP_BONUS_TIERS.map(tier => (
+                <li key={tier.minCredits}>
+                  • {formatCredits(tier.minCredits)} 크레딧 이상: {Math.round(tier.bonusRate * 100)}
+                  %
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <button

@@ -31,3 +31,18 @@ export function calculateTopupBonus(amount: number) {
 
   return { bonus: 0, rate: 0, total: amount }
 }
+
+/** 첫 충전 보너스율 (100%) */
+export const FIRST_CHARGE_BONUS_RATE = 1.0
+
+/**
+ * 첫 충전 보너스 계산
+ * 첫 충전 시 100% 보너스 (기존 구간 보너스 대신 적용)
+ */
+export function calculateFirstChargeBonus(amount: number) {
+  if (amount <= 0 || Number.isNaN(amount)) {
+    return { bonus: 0, rate: 0, total: 0 }
+  }
+  const bonus = Math.floor(amount * FIRST_CHARGE_BONUS_RATE)
+  return { bonus, rate: FIRST_CHARGE_BONUS_RATE, total: amount + bonus }
+}

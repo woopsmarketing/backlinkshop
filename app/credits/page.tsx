@@ -12,6 +12,7 @@ import TopupPackages from './components/TopupPackages'
 import LedgerTable from './components/LedgerTable'
 import { redirect } from 'next/navigation'
 import TopNav from '@/app/components/TopNav'
+import { createServerSupabaseClient } from '@/server/supabase/client'
 
 export default async function CreditsPage() {
   // 로그인 확인
@@ -26,6 +27,15 @@ export default async function CreditsPage() {
   const balance = await getBalance(user.id)
   const ledgerHistory = await getLedgerHistory(user.id, 50)
   const stats = await getLedgerStats(user.id)
+
+  // 첫 충전 여부 확인
+  const supabase = await createServerSupabaseClient()
+  const { count: approvedTopups } = await supabase
+    .from('topup_requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('status', 'approved')
+  const isFirstCharge = (approvedTopups || 0) === 0
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -53,9 +63,7 @@ export default async function CreditsPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">
-                    총 충전
-                  </h3>
+                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">총 충전</h3>
                   <span className="text-2xl">💰</span>
                 </div>
                 <p className="text-3xl font-bold text-green-600 dark:text-green-400">
@@ -65,9 +73,7 @@ export default async function CreditsPage() {
 
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">
-                    총 사용
-                  </h3>
+                  <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium">총 사용</h3>
                   <span className="text-2xl">💸</span>
                 </div>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -78,9 +84,7 @@ export default async function CreditsPage() {
 
             {/* 원장 내역 */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                크레딧 내역
-              </h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">크레딧 내역</h2>
               <LedgerTable ledger={ledgerHistory} />
             </div>
           </div>
@@ -89,18 +93,14 @@ export default async function CreditsPage() {
           <div className="space-y-6">
             {/* 쿠폰 입력 */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                쿠폰 사용
-              </h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">쿠폰 사용</h2>
               <CouponForm />
             </div>
 
             {/* 충전 패키지 */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-                크레딧 충전
-              </h2>
-              <TopupPackages />
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">크레딧 충전</h2>
+              <TopupPackages isFirstCharge={isFirstCharge} />
             </div>
           </div>
         </div>
