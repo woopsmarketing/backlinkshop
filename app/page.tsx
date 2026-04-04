@@ -1,6 +1,6 @@
 /**
  * 랜딩 페이지 - SSG (force-static)
- * 타겟 키워드: 백링크, 고품질백링크, PBN백링크, SEO백링크, 검색엔진최적화, 구글상위노출
+ * 타겟 키워드: 구글SEO, 구글상위노출, 백링크, 고품질백링크, PBN백링크, SEO백링크, 검색엔진최적화, 도메인분석
  */
 
 import Link from 'next/link'
@@ -41,6 +41,9 @@ export default function Home() {
             </a>
             <a href="#success-cases" className="hover:text-blue-600 transition-colors">
               구글 상위노출 사례
+            </a>
+            <a href="#domain-analysis" className="hover:text-blue-600 transition-colors">
+              무료 도메인 분석
             </a>
             <a href="#products" className="hover:text-blue-600 transition-colors">
               SEO 백링크 상품
@@ -87,15 +90,16 @@ export default function Home() {
         <div className="container mx-auto relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/30 backdrop-blur-md border border-red-300/50 text-white text-sm font-semibold mb-6">
-              고품질 백링크로 검색엔진최적화, 아직도 결과가 없으신가요?
+              구글SEO · 구글 상위노출, 아직도 결과가 없으신가요?
             </p>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              <strong className="text-yellow-300">구글SEO</strong>와{' '}
               <strong className="text-yellow-300">구글 상위노출</strong>을 위한
               <br />
               <strong>고품질 PBN 백링크</strong>와
               <br />
-              <span className="underline decoration-yellow-300">맞춤형 SEO 백링크 솔루션</span>
+              <span className="underline decoration-yellow-300">맞춤형 검색엔진최적화 솔루션</span>
             </h1>
 
             <div className="space-y-3 mb-8 text-lg md:text-xl text-white/95">
@@ -146,7 +150,10 @@ export default function Home() {
             </div>
 
             <p className="text-white/80 text-sm">
-              5분 내 시작 가능 · 카드 등록 불필요 · 가입 보너스 30만 크레딧 제공
+              5분 내 시작 가능 · 카드 등록 불필요 · 가입 보너스 30만 크레딧 ·{' '}
+              <a href="#domain-analysis" className="underline hover:text-white">
+                무료 도메인 분석
+              </a>
             </p>
           </div>
         </div>
@@ -182,13 +189,15 @@ export default function Home() {
 
               <div className="pt-8 border-t border-white/10 text-center">
                 <p className="text-white text-xl md:text-2xl font-bold mb-4">
-                  <span className="text-red-400">저품질 백링크에 돈을 낭비하고 계신가요?</span>
+                  <span className="text-red-400">
+                    구글SEO 없이 저품질 백링크에 돈을 낭비하고 계신가요?
+                  </span>
                 </p>
                 <p className="text-gray-300 text-lg">
-                  경쟁사는 이미 고품질 백링크로 구글 1페이지를 차지하고 있습니다
+                  경쟁사는 이미 구글SEO와 고품질 백링크로 구글 1페이지를 차지하고 있습니다
                   <br />
                   <strong className="text-yellow-300">
-                    지금 검색엔진최적화를 시작하지 않으면 격차는 더 벌어집니다
+                    지금 구글 상위노출 전략을 시작하지 않으면 격차는 더 벌어집니다
                   </strong>
                 </p>
               </div>
@@ -576,6 +585,91 @@ export default function Home() {
 
           <div className="mt-12 text-center">
             <ClientCTAButton variant="primary" size="lg" />
+          </div>
+        </div>
+      </section>
+
+      {/* 무료 도메인 분석 - 구글SEO 첫걸음 */}
+      <section
+        id="domain-analysis"
+        className="py-16 md:py-24 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900"
+      >
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <p className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20 backdrop-blur-md border border-green-400/40 text-green-300 text-sm font-semibold mb-6">
+              100% 무료 · 회원가입 불필요
+            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              구글 상위노출의 첫걸음,
+              <br />
+              <strong className="text-cyan-400">
+                내 도메인과 경쟁사 도메인을 무료로 분석하세요
+              </strong>
+            </h2>
+            <p className="text-xl text-gray-300">
+              구글SEO에서 성공하려면 먼저{' '}
+              <strong className="text-yellow-300">내 사이트의 현재 위치</strong>를 정확히 알아야
+              합니다
+              <br />
+              경쟁사 대비 부족한 점을 파악하고, 데이터 기반의 구글 상위노출 전략을 세우세요
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
+            <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-8 text-center">
+              <div className="text-5xl mb-4" aria-hidden="true">
+                &#128270;
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">도메인 권위도 분석</h3>
+              <p className="text-gray-300 text-sm">
+                DA(Domain Authority), DR(Domain Rating) 등 구글SEO 핵심 지표를 한눈에 확인하고 구글
+                상위노출 가능성을 진단합니다
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-8 text-center">
+              <div className="text-5xl mb-4" aria-hidden="true">
+                &#128202;
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">경쟁사 비교 분석</h3>
+              <p className="text-gray-300 text-sm">
+                경쟁사의 백링크 프로필, 트래픽, 키워드 순위를 비교하여 구글 상위노출에 필요한 격차를
+                정밀하게 파악합니다
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-8 text-center">
+              <div className="text-5xl mb-4" aria-hidden="true">
+                &#128640;
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3">SEO 전략 인사이트</h3>
+              <p className="text-gray-300 text-sm">
+                분석 결과를 바탕으로 어떤 백링크가 필요한지, 어떤 키워드를 공략해야 구글 상위노출에
+                유리한지 방향을 제시합니다
+              </p>
+            </div>
+          </div>
+
+          <div className="max-w-3xl mx-auto bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-2xl p-8 border border-cyan-400/30 text-center mb-8">
+            <p className="text-lg text-white mb-2">
+              <strong className="text-cyan-400">
+                백링크 구매 전, 먼저 내 도메인을 무료로 분석해보세요
+              </strong>
+            </p>
+            <p className="text-gray-300">
+              경쟁사와의 차이를 확인하면 더 정밀한 구글SEO 전략을 세울 수 있습니다.
+              <br />
+              100% 무료이며, 회원가입 없이 바로 이용 가능합니다.
+            </p>
+          </div>
+
+          <div className="text-center">
+            <a
+              href="https://domainchecker.co.kr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-lg font-bold rounded-xl hover:shadow-xl transition-all hover:scale-105"
+            >
+              무료 도메인 분석 시작하기 &#8599;
+            </a>
           </div>
         </div>
       </section>
@@ -988,6 +1082,16 @@ export default function Home() {
                   >
                     콘텐츠 SEO 최적화
                   </Link>
+                </li>
+                <li>
+                  <a
+                    href="https://domainchecker.co.kr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white transition-colors"
+                  >
+                    무료 도메인 분석
+                  </a>
                 </li>
               </ul>
             </div>
