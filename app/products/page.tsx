@@ -104,12 +104,23 @@ export default async function ProductsPage(props: Props) {
                   ))}
                 </ul>
 
-                <Link
-                  href={`/products/category/${category.slug}`}
-                  className="mt-auto block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                >
-                  상품 보기
-                </Link>
+                {category.externalUrl ? (
+                  <a
+                    href={category.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  >
+                    상품 보기 &#8599;
+                  </a>
+                ) : (
+                  <Link
+                    href={`/products/category/${category.slug}`}
+                    className="mt-auto block w-full text-center py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  >
+                    상품 보기
+                  </Link>
+                )}
               </div>
             )
           })}

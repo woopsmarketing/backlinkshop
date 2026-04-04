@@ -27,6 +27,7 @@ export type ProductCategory = {
   icon: string
   highlights: string[]
   comingSoon?: boolean
+  externalUrl?: string
   rule: CategoryRule
 }
 
@@ -65,11 +66,11 @@ export const PRODUCT_CATEGORIES: ProductCategory[] = [
   },
   {
     slug: 'domain',
-    title: '도메인',
-    description: '프로젝트에 맞는 고품질 도메인 추천',
+    title: '도메인 분석',
+    description: '100% 무료로 경쟁사·내 도메인을 정밀 분석하여 SEO 전략 수립',
     icon: '🌐',
-    highlights: ['신뢰도 확보', '브랜딩 강화', '맞춤 추천'],
-    comingSoon: true,
+    highlights: ['무료 도메인 분석', '경쟁사 비교 분석', '정밀 SEO 인사이트'],
+    externalUrl: 'https://domainchecker.co.kr',
     rule: { includeKeywords: ['도메인'] },
   },
   {
