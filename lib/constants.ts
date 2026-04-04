@@ -55,4 +55,4 @@ export const CREDIT_REASON = {
 } as const
 
 // 기본 가입 보너스 (선택 사항)
-export const SIGNUP_BONUS_AMOUNT = 300_000 // 30만 크레딧
+export const SIGNUP_BONUS_AMOUNT = 200_000 // 20만 크레딧

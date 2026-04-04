@@ -102,6 +102,13 @@ export default function Home() {
               <span className="underline decoration-yellow-300">맞춤형 검색엔진최적화 솔루션</span>
             </h1>
 
+            <div className="inline-block mb-8 px-8 py-4 rounded-2xl bg-yellow-400/20 backdrop-blur-md border-2 border-yellow-300/50">
+              <p className="text-2xl md:text-3xl font-extrabold text-yellow-300">
+                회원가입만 하면 20만 크레딧 무료 지급!
+              </p>
+              <p className="text-white/80 text-sm mt-1">온페이지 SEO 점검을 무료로 체험해보세요</p>
+            </div>
+
             <div className="space-y-3 mb-8 text-lg md:text-xl text-white/95">
               <p className="flex items-center justify-center gap-3">
                 <span className="text-yellow-300 text-xl" aria-hidden="true">
@@ -150,7 +157,7 @@ export default function Home() {
             </div>
 
             <p className="text-white/80 text-sm">
-              5분 내 시작 가능 · 카드 등록 불필요 · 가입 보너스 30만 크레딧 ·{' '}
+              5분 내 시작 가능 · 카드 등록 불필요 · 가입 보너스 20만 크레딧 ·{' '}
               <a href="#domain-analysis" className="underline hover:text-white">
                 무료 도메인 분석
               </a>
@@ -757,7 +764,7 @@ export default function Home() {
                     &#10003;
                   </span>
                   <span className="text-gray-700">
-                    <strong>무료 30만 크레딧으로 시작</strong>
+                    <strong>무료 20만 크레딧으로 시작</strong>
                     <br />
                     한정 예산 최적화
                   </span>
@@ -895,7 +902,7 @@ export default function Home() {
               예산은 고객이 정하되, 최적의 SEO 백링크 전략은 우리가 제안합니다
             </h3>
             <p className="text-lg text-white/90 mb-6">
-              무료 30만 크레딧으로 SEO 진단과 맞춤 검색엔진최적화 전략을 먼저 받아보세요
+              무료 20만 크레딧으로 온페이지 SEO 점검을 먼저 받아보세요
               <br />
               <strong className="text-yellow-300">만족하시면 그때 결제하시면 됩니다</strong>
             </p>
@@ -1025,7 +1032,7 @@ export default function Home() {
               지금 시작하세요
             </h2>
             <p className="text-xl text-white/90 mb-8">
-              <strong className="text-yellow-300">무료 30만 크레딧</strong>으로 SEO 백링크 효과를
+              <strong className="text-yellow-300">무료 20만 크레딧</strong>으로 온페이지 SEO 점검을
               먼저 테스트하세요
             </p>
             <ClientCTAButton variant="white" size="lg" className="!text-2xl !px-12 !py-6" />

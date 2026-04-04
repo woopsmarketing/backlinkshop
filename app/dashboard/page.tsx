@@ -3,7 +3,7 @@
 /**
  * 대시보드 페이지
  * 잔액, 주문 요약, CTA 버튼, 상단 메뉴
- * 30만 크레딧 추천 상품, 인기 상품 빠른 구매, 전문가 상담 섹션
+ * 20만 크레딧 추천 상품, 인기 상품 빠른 구매, 전문가 상담 섹션
  */
 
 import { createServerSupabaseClient } from '@/server/supabase/client'
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
     return allProducts.find((p: any) => p.name === name)
   }
 
-  // 30만 크레딧 추천 상품
+  // 20만 크레딧 추천 상품
   const starterProducts = [findProduct('PBN 백링크 50'), findProduct('온페이지 SEO 점검')].filter(
     Boolean
   )
@@ -73,8 +73,8 @@ export default async function DashboardPage() {
 
   // 현재 잔액
   const currentBalance = balance?.balance || 0
-  // 30만 크레딧 이상인 경우 추천 상품 섹션 표시
-  const showStarterSection = currentBalance >= 300000
+  // 20만 크레딧 이상인 경우 추천 상품 섹션 표시
+  const showStarterSection = currentBalance >= 200000
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -154,13 +154,13 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* 30만 크레딧으로 시작하기 섹션 (조건부) */}
+        {/* 20만 크레딧으로 시작하기 섹션 (조건부) */}
         {showStarterSection && starterProducts.length > 0 && (
           <div className="mt-8 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-6">
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl">🎯</span>
               <h2 className="text-xl font-bold text-green-900 dark:text-green-100">
-                30만 크레딧으로 시작하기
+                20만 크레딧으로 시작하기
               </h2>
             </div>
             <p className="text-green-700 dark:text-green-300 text-sm mb-6">
@@ -279,7 +279,7 @@ export default async function DashboardPage() {
                   환영합니다!
                 </h3>
                 <p className="text-green-700 dark:text-green-300 text-sm">
-                  가입 보너스 30만 크레딧이 지급되었습니다. 마음껏 사용해보세요!
+                  가입 보너스 20만 크레딧이 지급되었습니다. 마음껏 사용해보세요!
                 </p>
               </div>
             </div>

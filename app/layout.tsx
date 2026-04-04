@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '백링크샵 - 구글SEO · 구글 상위노출 전문 | 고품질 백링크',
     description:
-      '구글SEO 전문 백링크샵. PBN 백링크와 고품질 SEO 백링크로 구글 상위노출. 무료 도메인 분석 제공. 무료 30만 크레딧.',
+      '구글SEO 전문 백링크샵. PBN 백링크와 고품질 SEO 백링크로 구글 상위노출. 무료 도메인 분석 제공. 무료 20만 크레딧.',
     images: ['https://www.backlinkshop.co.kr/logo.png'],
   },
   robots: {
