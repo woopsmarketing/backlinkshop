@@ -229,7 +229,7 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
                 <DataRow label="단어 수" value={`${p.wordCount}개`} ok={p.wordCount >= 300} />
                 <DataRow
                   label="텍스트/HTML 비율"
-                  value={`${p.textToHtmlRatio}%`}
+                  value={`${p.textToHtmlRatio}%${p.textToHtmlRatio < 10 ? ' — JS 렌더링 사이트(SPA)일 수 있음' : ''}`}
                   ok={p.textToHtmlRatio >= 10}
                 />
                 <DataRow
@@ -412,59 +412,73 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           </>
         )}
 
-        {/* ===== 하단 간소 CTA ===== */}
+        {/* ===== 하단 CTA ===== */}
         <div
           style={{
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            borderRadius: '10px',
-            padding: '20px',
-            margin: '20px 0',
+            background: 'linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%)',
+            borderRadius: '12px',
+            padding: '28px',
+            margin: '24px 0',
+            textAlign: 'center',
           }}
         >
-          <p style={{ margin: '0 0 10px 0', fontSize: '15px', fontWeight: 700, color: '#166534' }}>
-            다음 단계가 궁금하신가요?
+          <h3 style={{ margin: '0 0 6px 0', fontSize: '20px', fontWeight: 700, color: 'white' }}>
+            점검 결과를 바탕으로 순위를 올려보세요
+          </h3>
+          <p style={{ margin: '0 0 18px 0', fontSize: '14px', color: 'rgba(255,255,255,0.85)' }}>
+            내부 최적화 개선 후 고품질 백링크를 함께 구축하면 효과가 극대화됩니다
           </p>
-          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#374151' }}>
-            &#8594;{' '}
-            <a
-              href={`${APP_URL}/products/category/pbn`}
-              style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
-            >
-              PBN 백링크
-            </a>{' '}
-            — 고품질 백링크로 순위 상승
-          </p>
-          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#374151' }}>
-            &#8594;{' '}
+          <a
+            href={`${APP_URL}/products/category/pbn`}
+            style={{
+              display: 'inline-block',
+              background: '#facc15',
+              color: '#1e3a5f',
+              padding: '14px 32px',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '15px',
+              marginRight: '10px',
+            }}
+          >
+            PBN 백링크 상품 보기
+          </a>
+          <a
+            href="https://domainchecker.co.kr"
+            style={{
+              display: 'inline-block',
+              background: 'rgba(255,255,255,0.15)',
+              color: 'white',
+              padding: '14px 32px',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '15px',
+              border: '1px solid rgba(255,255,255,0.3)',
+            }}
+          >
+            무료 도메인 분석
+          </a>
+          <div style={{ marginTop: '14px' }}>
             <a
               href={`${APP_URL}/products/category/plan`}
-              style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+              style={{
+                color: 'rgba(255,255,255,0.8)',
+                fontSize: '13px',
+                textDecoration: 'none',
+                marginRight: '16px',
+              }}
             >
-              플랜 백링크
-            </a>{' '}
-            — 10가지 이상 백링크 조합
-          </p>
-          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#374151' }}>
-            &#8594;{' '}
-            <a
-              href="https://domainchecker.co.kr"
-              style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
-            >
-              무료 도메인 분석
-            </a>{' '}
-            — 경쟁사 대비 내 사이트 비교
-          </p>
-          <p style={{ margin: 0, fontSize: '13px', color: '#374151' }}>
-            &#8594;{' '}
+              플랜 백링크 보기 &#8594;
+            </a>
             <a
               href="https://t.me/goat82"
-              style={{ color: '#7c3aed', fontWeight: 600, textDecoration: 'none' }}
+              style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', textDecoration: 'none' }}
             >
-              텔레그램 상담
-            </a>{' '}
-            — 맞춤 전략 제안
-          </p>
+              텔레그램 상담 &#8594;
+            </a>
+          </div>
         </div>
 
         <div className="bonus-box">
