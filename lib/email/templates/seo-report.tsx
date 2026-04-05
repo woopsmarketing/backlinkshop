@@ -1,6 +1,6 @@
 /**
  * 온페이지 SEO 점검 결과 이메일 템플릿
- * 점검 결과 요약 + 백링크 서비스 CTA
+ * 자동 분석 결과 + 점수 + CTA 포함
  */
 
 import * as React from 'react'
@@ -10,15 +10,31 @@ interface SeoReportEmailProps {
   orderId: string
   siteUrl?: string
   keywords?: string
+  score?: number | null
+  analysisHtml?: string
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.backlinkshop.co.kr'
+
+function getScoreColor(score: number): string {
+  if (score >= 80) return '#16a34a'
+  if (score >= 60) return '#ca8a04'
+  return '#dc2626'
+}
+
+function getScoreLabel(score: number): string {
+  if (score >= 80) return '양호'
+  if (score >= 60) return '보통'
+  return '개선 필요'
+}
 
 export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
   customerEmail,
   orderId,
   siteUrl,
   keywords,
+  score,
+  analysisHtml,
 }) => (
   <html>
     <head>
@@ -43,12 +59,62 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           padding: 30px;
           border-radius: 0 0 10px 10px;
         }
+        .score-card {
+          background: white;
+          border-radius: 12px;
+          padding: 30px;
+          margin: 20px 0;
+          text-align: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .score-number {
+          font-size: 64px;
+          font-weight: 800;
+          line-height: 1;
+          margin: 10px 0;
+        }
         .site-info {
           background: white;
           border: 1px solid #e5e7eb;
-          padding: 20px;
+          padding: 16px;
           border-radius: 8px;
+          margin: 16px 0;
+        }
+        .analysis-section {
+          background: white;
+          border-radius: 8px;
+          padding: 24px;
           margin: 20px 0;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+          font-size: 14px;
+          line-height: 1.8;
+        }
+        .analysis-section h2 {
+          font-size: 18px;
+          color: #111827;
+          border-bottom: 2px solid #e5e7eb;
+          padding-bottom: 8px;
+          margin-top: 24px;
+        }
+        .analysis-section h3 {
+          font-size: 16px;
+          color: #1e40af;
+          margin-top: 20px;
+        }
+        .analysis-section ul {
+          padding-left: 20px;
+        }
+        .analysis-section li {
+          margin-bottom: 8px;
+        }
+        .analysis-section strong {
+          color: #111827;
+        }
+        .analysis-section code {
+          background: #f3f4f6;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-size: 13px;
         }
         .cta-section {
           background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
@@ -57,28 +123,6 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           border-radius: 12px;
           margin: 24px 0;
           text-align: center;
-        }
-        .cta-button {
-          display: inline-block;
-          background: #facc15;
-          color: #1e3a5f;
-          padding: 14px 36px;
-          text-decoration: none;
-          border-radius: 8px;
-          font-weight: 700;
-          font-size: 16px;
-          margin-top: 16px;
-        }
-        .cta-button-secondary {
-          display: inline-block;
-          background: white;
-          color: #2563eb;
-          padding: 12px 30px;
-          text-decoration: none;
-          border-radius: 8px;
-          font-weight: 600;
-          font-size: 14px;
-          margin: 8px;
         }
         .step-card {
           background: white;
@@ -106,9 +150,10 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
     </head>
     <body>
       <div className="header">
-        <h1 style={{ margin: 0, fontSize: '26px' }}>
-          &#128203; 온페이지 SEO 점검 결과가 준비되었습니다
-        </h1>
+        <h1 style={{ margin: 0, fontSize: '26px' }}>&#128203; 온페이지 SEO 점검 결과</h1>
+        <p style={{ margin: '8px 0 0 0', opacity: 0.9, fontSize: '14px' }}>
+          자동 분석이 완료되었습니다
+        </p>
       </div>
 
       <div className="content">
@@ -117,58 +162,64 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
         </p>
 
         <p style={{ fontSize: '15px', color: '#374151' }}>
-          요청하신 온페이지 SEO 점검이 완료되었습니다. 대시보드에서 상세 리포트를 다운로드하실 수
-          있습니다.
+          요청하신 온페이지 SEO 점검이 완료되었습니다. 아래에서 분석 결과를 확인해주세요.
         </p>
 
         {/* 사이트 정보 */}
         {siteUrl && (
           <div className="site-info">
-            <p style={{ margin: '0 0 8px 0', fontWeight: 600, color: '#111827' }}>
-              점검 사이트 정보
+            <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#111827', fontSize: '14px' }}>
+              점검 대상
             </p>
-            <p style={{ margin: '4px 0', fontSize: '14px' }}>
+            <p style={{ margin: '2px 0', fontSize: '14px' }}>
               <strong>URL:</strong> {siteUrl}
             </p>
             {keywords && (
-              <p style={{ margin: '4px 0', fontSize: '14px' }}>
+              <p style={{ margin: '2px 0', fontSize: '14px' }}>
                 <strong>타겟 키워드:</strong> {keywords}
               </p>
             )}
           </div>
         )}
 
-        {/* 리포트 다운로드 */}
-        <div style={{ textAlign: 'center', margin: '24px 0' }}>
-          <a
-            href={`${APP_URL}/orders`}
-            className="cta-button-secondary"
-            style={{
-              background: '#2563eb',
-              color: 'white',
-              padding: '14px 30px',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: 600,
-            }}
-          >
-            &#128196; 리포트 다운로드하기
-          </a>
-        </div>
+        {/* SEO 점수 카드 */}
+        {score != null && (
+          <div className="score-card">
+            <p style={{ margin: 0, color: '#6b7280', fontSize: '14px' }}>SEO 점수</p>
+            <div className="score-number" style={{ color: getScoreColor(score) }}>
+              {score}
+              <span style={{ fontSize: '24px' }}>점</span>
+            </div>
+            <p
+              style={{
+                margin: '8px 0 0 0',
+                fontSize: '16px',
+                fontWeight: 600,
+                color: getScoreColor(score),
+              }}
+            >
+              {getScoreLabel(score)}
+            </p>
+          </div>
+        )}
 
-        {/* 핵심 CTA: 다음 단계 안내 */}
+        {/* AI 분석 결과 */}
+        {analysisHtml && (
+          <div className="analysis-section" dangerouslySetInnerHTML={{ __html: analysisHtml }} />
+        )}
+
+        {/* 핵심 CTA */}
         <div className="cta-section">
           <h2 style={{ margin: '0 0 8px 0', fontSize: '22px' }}>
-            &#128640; SEO 점검 결과를 최대한 활용하세요
+            &#128640; 점검 결과를 바탕으로 순위를 올리세요
           </h2>
           <p style={{ margin: '0 0 16px 0', fontSize: '15px', opacity: 0.9 }}>
-            점검에서 발견된 문제를 해결하고, 고품질 백링크로
+            발견된 문제를 해결하고, 고품질 백링크로
             <br />
             구글 상위노출을 실현하세요
           </p>
           <a
             href={`${APP_URL}/products/category/pbn`}
-            className="cta-button"
             style={{
               display: 'inline-block',
               background: '#facc15',

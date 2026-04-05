@@ -110,6 +110,8 @@ export function renderSeoReportEmail(props: {
   orderId: string
   siteUrl?: string
   keywords?: string
+  score?: number | null
+  analysisHtml?: string
 }) {
   return <SeoReportEmail {...props} />
 }

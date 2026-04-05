@@ -26,6 +26,9 @@ import {
 } from '@/lib/email/render'
 import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
 import { getProductDuration, extractPBNQuantity } from '@/lib/constants/product-config'
+import { fetchAndAnalyze } from '@/lib/seo-analyzer'
+import { markdownToHtml } from '@/lib/markdown-to-html'
+import { renderSeoReportEmail } from '@/lib/email/render'
 
 /**
  * 상품 구매 (주문 생성)
@@ -95,7 +98,7 @@ export async function createOrderAction(
 
     // 5. PBN 상품이면 주문 저장 전에 GOAT PBN 캠페인 먼저 생성
     // API 성공 여부에 따라 초기 status와 campaign_id 결정
-    let initialStatus: 'pending' | 'processing' = 'pending'
+    let initialStatus: 'pending' | 'processing' | 'completed' = 'pending'
     let goatCampaignId: string | null = null
     let pbnApiError: string | null = null
 
@@ -138,6 +141,27 @@ export async function createOrderAction(
       }
     }
 
+    // 5-2. 온페이지 SEO 상품이면 자동 분석 실행
+    let seoAnalysisResult: { score: number | null; analysisHtml: string } | null = null
+
+    if (isOnPageProduct && siteUrl) {
+      try {
+        console.log('🔍 온페이지 SEO 자동 분석 시작:', { siteUrl })
+
+        const { analysis, score } = await fetchAndAnalyze(siteUrl)
+        const analysisHtml = markdownToHtml(analysis)
+
+        seoAnalysisResult = { score, analysisHtml }
+        initialStatus = 'completed' // 자동 분석 완료 → completed
+
+        console.log('✅ 온페이지 SEO 분석 완료:', { score, siteUrl })
+      } catch (seoError: any) {
+        console.error('❌ SEO 자동 분석 실패 - pending으로 처리:', seoError.message)
+        pbnApiError = `SEO 분석 실패: ${seoError.message}`
+        // 실패 시 pending으로 유지 (관리자가 수동 처리)
+      }
+    }
+
     // 6. 주문 생성
     const { data: order, error: orderError } = await adminClient
       .from('orders')
@@ -155,6 +179,7 @@ export async function createOrderAction(
         sub_keyword_ratio: subKeywordRatio ?? null,
         goat_campaign_id: goatCampaignId,
         api_error: pbnApiError,
+        completed_at: seoAnalysisResult ? new Date().toISOString() : null,
       })
       .select()
       .single()
@@ -180,7 +205,23 @@ export async function createOrderAction(
 
     // 8. 이메일 발송
     if (user.email) {
-      if (isPBNProduct && initialStatus === 'processing') {
+      if (isOnPageProduct && seoAnalysisResult) {
+        // SEO 점검 자동 완료 → 분석 결과 이메일 발송
+        await sendEmail(
+          user.email,
+          '온페이지 SEO 점검 결과가 준비되었습니다 - 백링크샵',
+          renderSeoReportEmail({
+            customerEmail: user.email,
+            orderId: order.id,
+            siteUrl: siteUrl || undefined,
+            keywords: keywords || undefined,
+            score: seoAnalysisResult.score,
+            analysisHtml: seoAnalysisResult.analysisHtml,
+          })
+        ).catch(err => {
+          console.error('SEO 리포트 이메일 발송 실패:', err)
+        })
+      } else if (isPBNProduct && initialStatus === 'processing') {
         // PBN 주문 + 캠페인 생성 성공 → 처리중 상태 이메일 발송
         await sendEmail(
           user.email,
