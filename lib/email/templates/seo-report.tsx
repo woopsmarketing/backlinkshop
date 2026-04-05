@@ -131,7 +131,7 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           {keywords && (
             <>
               {' '}
-              타겟 키워드 <strong>"{keywords}"</strong> 기준으로 분석했습니다.
+              타겟 키워드 <strong>&ldquo;{keywords}&rdquo;</strong> 기준으로 분석했습니다.
             </>
           )}
         </p>
