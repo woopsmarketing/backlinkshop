@@ -163,6 +163,58 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           </div>
         )}
 
+        {/* ===== 상단 CTA ===== */}
+        <div
+          style={{
+            background: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '10px',
+            padding: '20px',
+            margin: '16px 0',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#1e40af' }}>
+            내부 최적화와 함께 백링크를 구축하면 구글 순위 상승이 더욱 빨라집니다
+          </p>
+          <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#6b7280' }}>
+            점검 결과를 바탕으로 고품질 PBN 백링크를 구축하면 2~4주 내 순위 변화를 체험할 수
+            있습니다
+          </p>
+          <a
+            href={`${APP_URL}/products/category/pbn`}
+            style={{
+              display: 'inline-block',
+              background: '#2563eb',
+              color: 'white',
+              padding: '12px 28px',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '14px',
+            }}
+          >
+            PBN 백링크 상품 보기
+          </a>
+          <span style={{ display: 'inline-block', width: '12px' }}></span>
+          <a
+            href="https://domainchecker.co.kr"
+            style={{
+              display: 'inline-block',
+              background: 'white',
+              color: '#2563eb',
+              padding: '12px 28px',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '14px',
+              border: '1px solid #2563eb',
+            }}
+          >
+            무료 도메인 분석
+          </a>
+        </div>
+
         {/* ===== 파싱 데이터 테이블 ===== */}
         {p && (
           <>
@@ -360,56 +412,59 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           </>
         )}
 
-        {/* ===== CTA ===== */}
-        <div className="cta-section">
-          <h2 style={{ margin: '0 0 8px 0', fontSize: '20px' }}>
-            분석 결과를 바탕으로 순위를 올리세요
-          </h2>
-          <p style={{ margin: '0 0 16px 0', fontSize: '14px', opacity: 0.9 }}>
-            내부 최적화 개선과 함께 고품질 백링크를 구축하면
-            <br />
-            2~4주 내 구글 순위 변화를 체험할 수 있습니다
+        {/* ===== 하단 간소 CTA ===== */}
+        <div
+          style={{
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            borderRadius: '10px',
+            padding: '20px',
+            margin: '20px 0',
+          }}
+        >
+          <p style={{ margin: '0 0 10px 0', fontSize: '15px', fontWeight: 700, color: '#166534' }}>
+            다음 단계가 궁금하신가요?
           </p>
-          <a
-            href={`${APP_URL}/products/category/pbn`}
-            style={{
-              display: 'inline-block',
-              background: '#facc15',
-              color: '#1e3a5f',
-              padding: '14px 36px',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: 700,
-              fontSize: '16px',
-            }}
-          >
-            PBN 백링크로 순위 올리기
-          </a>
-        </div>
-
-        <div className="step-card">
-          <p style={{ margin: 0, fontSize: '14px' }}>
-            <strong>무료 도메인 분석</strong> — 경쟁사 대비 내 사이트의 DA, 백링크 수를 비교해보세요
+          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#374151' }}>
+            &#8594;{' '}
+            <a
+              href={`${APP_URL}/products/category/pbn`}
+              style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+            >
+              PBN 백링크
+            </a>{' '}
+            — 고품질 백링크로 순위 상승
           </p>
-          <a
-            href="https://domainchecker.co.kr"
-            style={{ color: '#2563eb', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}
-          >
-            무료 도메인 분석하기 &#8594;
-          </a>
-        </div>
-
-        <div className="step-card">
-          <p style={{ margin: 0, fontSize: '14px' }}>
-            <strong>플랜 백링크</strong> — 10가지 이상 백링크 유형을 조합하여 자연스러운 링크 프로필
-            구축
+          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#374151' }}>
+            &#8594;{' '}
+            <a
+              href={`${APP_URL}/products/category/plan`}
+              style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+            >
+              플랜 백링크
+            </a>{' '}
+            — 10가지 이상 백링크 조합
           </p>
-          <a
-            href={`${APP_URL}/products/category/plan`}
-            style={{ color: '#2563eb', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}
-          >
-            플랜 백링크 상품 보기 &#8594;
-          </a>
+          <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#374151' }}>
+            &#8594;{' '}
+            <a
+              href="https://domainchecker.co.kr"
+              style={{ color: '#2563eb', fontWeight: 600, textDecoration: 'none' }}
+            >
+              무료 도메인 분석
+            </a>{' '}
+            — 경쟁사 대비 내 사이트 비교
+          </p>
+          <p style={{ margin: 0, fontSize: '13px', color: '#374151' }}>
+            &#8594;{' '}
+            <a
+              href="https://t.me/goat82"
+              style={{ color: '#7c3aed', fontWeight: 600, textDecoration: 'none' }}
+            >
+              텔레그램 상담
+            </a>{' '}
+            — 맞춤 전략 제안
+          </p>
         </div>
 
         <div className="bonus-box">
@@ -435,35 +490,6 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               크레딧 충전하기
             </a>
           </div>
-        </div>
-
-        <div
-          style={{
-            background: '#ede9fe',
-            padding: '14px',
-            borderRadius: '8px',
-            marginTop: '16px',
-            textAlign: 'center',
-          }}
-        >
-          <p style={{ margin: 0, fontSize: '13px' }}>
-            <strong>SEO 전문가 상담이 필요하신가요?</strong>
-            <br />
-            점검 결과를 바탕으로 맞춤 전략을 제안해드립니다
-          </p>
-          <a
-            href="https://t.me/goat82"
-            style={{
-              display: 'inline-block',
-              marginTop: '6px',
-              color: '#7c3aed',
-              fontSize: '13px',
-              fontWeight: 600,
-              textDecoration: 'none',
-            }}
-          >
-            텔레그램으로 상담하기 &#8594;
-          </a>
         </div>
 
         <div className="footer">

@@ -152,7 +152,7 @@ export async function createOrderAction(
       try {
         console.log('🔍 온페이지 SEO 자동 분석 시작:', { siteUrl })
 
-        const { parsed, analysis, score } = await fetchAndAnalyze(siteUrl)
+        const { parsed, analysis, score } = await fetchAndAnalyze(siteUrl, keywords)
         const analysisHtml = markdownToHtml(analysis)
 
         seoAnalysisData = { score, analysisHtml, parsedData: parsed }
