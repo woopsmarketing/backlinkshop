@@ -141,24 +141,27 @@ export async function createOrderAction(
       }
     }
 
-    // 5-2. 온페이지 SEO 상품이면 자동 분석 실행
-    let seoAnalysisResult: { score: number | null; analysisHtml: string } | null = null
+    // 5-2. 온페이지 SEO 상품이면 자동 분석 실행 (결과는 DB에 저장, 이메일은 지연 발송)
+    let seoAnalysisData: {
+      score: number | null
+      analysisHtml: string
+      parsedData: import('@/lib/seo-analyzer').ParsedSeo
+    } | null = null
 
     if (isOnPageProduct && siteUrl) {
       try {
         console.log('🔍 온페이지 SEO 자동 분석 시작:', { siteUrl })
 
-        const { analysis, score } = await fetchAndAnalyze(siteUrl)
+        const { parsed, analysis, score } = await fetchAndAnalyze(siteUrl)
         const analysisHtml = markdownToHtml(analysis)
 
-        seoAnalysisResult = { score, analysisHtml }
-        initialStatus = 'completed' // 자동 분석 완료 → completed
+        seoAnalysisData = { score, analysisHtml, parsedData: parsed }
+        initialStatus = 'processing' // 분석 완료했지만 "처리중"으로 표시 (지연 발송 위해)
 
-        console.log('✅ 온페이지 SEO 분석 완료:', { score, siteUrl })
+        console.log('✅ 온페이지 SEO 분석 완료 - 지연 발송 예약:', { score, siteUrl })
       } catch (seoError: any) {
         console.error('❌ SEO 자동 분석 실패 - pending으로 처리:', seoError.message)
         pbnApiError = `SEO 분석 실패: ${seoError.message}`
-        // 실패 시 pending으로 유지 (관리자가 수동 처리)
       }
     }
 
@@ -179,7 +182,7 @@ export async function createOrderAction(
         sub_keyword_ratio: subKeywordRatio ?? null,
         goat_campaign_id: goatCampaignId,
         api_error: pbnApiError,
-        completed_at: seoAnalysisResult ? new Date().toISOString() : null,
+        completed_at: null,
       })
       .select()
       .single()
@@ -205,22 +208,65 @@ export async function createOrderAction(
 
     // 8. 이메일 발송
     if (user.email) {
-      if (isOnPageProduct && seoAnalysisResult) {
-        // SEO 점검 자동 완료 → 분석 결과 이메일 발송
+      if (isOnPageProduct && seoAnalysisData) {
+        // SEO 점검: 주문 접수 이메일 즉시 발송 + 분석 결과는 지연 발송
         await sendEmail(
           user.email,
-          '온페이지 SEO 점검 결과가 준비되었습니다 - 백링크샵',
-          renderSeoReportEmail({
+          '온페이지 SEO 점검이 접수되었습니다 - 백링크샵',
+          renderOrderCreatedCustomerEmail({
             customerEmail: user.email,
             orderId: order.id,
+            productName: product.name,
+            quantity,
+            totalPrice,
             siteUrl: siteUrl || undefined,
             keywords: keywords || undefined,
-            score: seoAnalysisResult.score,
-            analysisHtml: seoAnalysisResult.analysisHtml,
           })
         ).catch(err => {
-          console.error('SEO 리포트 이메일 발송 실패:', err)
+          console.error('SEO 접수 이메일 발송 실패:', err)
         })
+
+        // 5~10분 후 분석 결과 이메일 발송 + 주문 완료 처리 (비동기)
+        const delayMs = (Math.floor(Math.random() * 6) + 5) * 60 * 1000 // 5~10분
+        const delayedOrderId = order.id
+        const delayedEmail = user.email
+        const delayedUserId = user.id
+        const delayedSeoData = seoAnalysisData
+
+        setTimeout(async () => {
+          try {
+            console.log('📧 SEO 리포트 지연 발송 시작:', { orderId: delayedOrderId, delayMs })
+
+            // 주문 상태를 completed로 변경
+            const delayedAdminClient = createAdminSupabaseClient()
+            await delayedAdminClient
+              .from('orders')
+              .update({
+                status: 'completed',
+                completed_at: new Date().toISOString(),
+              })
+              .eq('id', delayedOrderId)
+
+            // 분석 결과 이메일 발송
+            await sendEmail(
+              delayedEmail,
+              '온페이지 SEO 점검 결과가 준비되었습니다 - 백링크샵',
+              renderSeoReportEmail({
+                customerEmail: delayedEmail,
+                orderId: delayedOrderId,
+                siteUrl: siteUrl || undefined,
+                keywords: keywords || undefined,
+                score: delayedSeoData.score,
+                analysisHtml: delayedSeoData.analysisHtml,
+                parsedData: delayedSeoData.parsedData,
+              })
+            )
+
+            console.log('✅ SEO 리포트 지연 발송 완료:', { orderId: delayedOrderId })
+          } catch (err) {
+            console.error('❌ SEO 리포트 지연 발송 실패:', err)
+          }
+        }, delayMs)
       } else if (isPBNProduct && initialStatus === 'processing') {
         // PBN 주문 + 캠페인 생성 성공 → 처리중 상태 이메일 발송
         await sendEmail(

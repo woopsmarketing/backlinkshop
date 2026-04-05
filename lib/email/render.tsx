@@ -112,6 +112,7 @@ export function renderSeoReportEmail(props: {
   keywords?: string
   score?: number | null
   analysisHtml?: string
+  parsedData?: import('@/lib/seo-analyzer').ParsedSeo
 }) {
   return <SeoReportEmail {...props} />
 }
