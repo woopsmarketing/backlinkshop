@@ -114,7 +114,7 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
       <div className="header">
         <h1 style={{ margin: 0, fontSize: '24px' }}>온페이지 SEO 점검 결과</h1>
         <p style={{ margin: '6px 0 0 0', opacity: 0.9, fontSize: '14px' }}>
-          백링크샵 SEO 전문가가 분석을 완료했습니다
+          귀하의 사이트를 면밀히 분석하였습니다
         </p>
       </div>
 
@@ -351,10 +351,10 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
                 margin: '28px 0 12px 0',
               }}
             >
-              AI SEO 분석
+              SEO 전문가 진단 의견
             </h2>
             <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '12px' }}>
-              백링크샵 SEO 전문가가 분석한 진단 결과입니다.
+              위 데이터를 기반으로 귀하의 사이트를 면밀히 검토한 결과입니다.
             </p>
             <div className="analysis-box" dangerouslySetInnerHTML={{ __html: analysisHtml }} />
           </>
