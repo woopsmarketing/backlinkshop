@@ -28,7 +28,7 @@ import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
 import { getProductDuration, extractPBNQuantity } from '@/lib/constants/product-config'
 import { fetchAndAnalyze } from '@/lib/seo-analyzer'
 import { markdownToHtml } from '@/lib/markdown-to-html'
-import { renderSeoReportEmail } from '@/lib/email/render'
+// renderSeoReportEmail은 /api/cron/seo-reports 라우트에서 사용
 
 /**
  * 상품 구매 (주문 생성)
@@ -183,6 +183,13 @@ export async function createOrderAction(
         goat_campaign_id: goatCampaignId,
         api_error: pbnApiError,
         completed_at: null,
+        seo_report_data: seoAnalysisData
+          ? {
+              score: seoAnalysisData.score,
+              analysisHtml: seoAnalysisData.analysisHtml,
+              parsedData: seoAnalysisData.parsedData,
+            }
+          : null,
       })
       .select()
       .single()
@@ -209,7 +216,7 @@ export async function createOrderAction(
     // 8. 이메일 발송
     if (user.email) {
       if (isOnPageProduct && seoAnalysisData) {
-        // SEO 점검: 주문 접수 이메일 즉시 발송 + 분석 결과는 지연 발송
+        // SEO 점검: 접수 이메일만 즉시 발송 (분석 결과는 크론잡이 5분 후 발송)
         await sendEmail(
           user.email,
           '온페이지 SEO 점검이 접수되었습니다 - 백링크샵',
@@ -225,48 +232,6 @@ export async function createOrderAction(
         ).catch(err => {
           console.error('SEO 접수 이메일 발송 실패:', err)
         })
-
-        // 5~10분 후 분석 결과 이메일 발송 + 주문 완료 처리 (비동기)
-        const delayMs = (Math.floor(Math.random() * 6) + 5) * 60 * 1000 // 5~10분
-        const delayedOrderId = order.id
-        const delayedEmail = user.email
-        const delayedUserId = user.id
-        const delayedSeoData = seoAnalysisData
-
-        setTimeout(async () => {
-          try {
-            console.log('📧 SEO 리포트 지연 발송 시작:', { orderId: delayedOrderId, delayMs })
-
-            // 주문 상태를 completed로 변경
-            const delayedAdminClient = createAdminSupabaseClient()
-            await delayedAdminClient
-              .from('orders')
-              .update({
-                status: 'completed',
-                completed_at: new Date().toISOString(),
-              })
-              .eq('id', delayedOrderId)
-
-            // 분석 결과 이메일 발송
-            await sendEmail(
-              delayedEmail,
-              '온페이지 SEO 점검 결과가 준비되었습니다 - 백링크샵',
-              renderSeoReportEmail({
-                customerEmail: delayedEmail,
-                orderId: delayedOrderId,
-                siteUrl: siteUrl || undefined,
-                keywords: keywords || undefined,
-                score: delayedSeoData.score,
-                analysisHtml: delayedSeoData.analysisHtml,
-                parsedData: delayedSeoData.parsedData,
-              })
-            )
-
-            console.log('✅ SEO 리포트 지연 발송 완료:', { orderId: delayedOrderId })
-          } catch (err) {
-            console.error('❌ SEO 리포트 지연 발송 실패:', err)
-          }
-        }, delayMs)
       } else if (isPBNProduct && initialStatus === 'processing') {
         // PBN 주문 + 캠페인 생성 성공 → 처리중 상태 이메일 발송
         await sendEmail(

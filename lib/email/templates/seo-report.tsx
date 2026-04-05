@@ -119,17 +119,26 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
       </div>
 
       <div className="content">
-        <p style={{ fontSize: '15px', marginBottom: '6px' }}>
+        <p style={{ fontSize: '15px', marginBottom: '8px' }}>
           안녕하세요, <strong>{customerEmail}</strong>님!
         </p>
-        <p style={{ fontSize: '14px', color: '#374151', marginBottom: '16px' }}>
-          요청하신 <strong>{siteUrl}</strong>의 온페이지 SEO 점검이 완료되었습니다.
+        <p style={{ fontSize: '14px', color: '#374151', marginBottom: '8px' }}>
+          귀하의 주문을 잘 접수했으며, 귀하의 도메인인{' '}
+          <strong>{siteUrl || '요청하신 사이트'}</strong>를 면밀하게 분석하였습니다.
+        </p>
+        <p style={{ fontSize: '14px', color: '#374151', marginBottom: '8px' }}>
+          아래는 사이트의 온페이지 SEO 상태를 47개 항목에 걸쳐 정밀 진단한 결과입니다.
           {keywords && (
             <>
               {' '}
-              (타겟 키워드: <strong>{keywords}</strong>)
+              타겟 키워드 <strong>"{keywords}"</strong> 기준으로 분석했습니다.
             </>
           )}
+        </p>
+        <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
+          각 항목의 <span style={{ color: '#16a34a', fontWeight: 600 }}>&#10003;</span>는 양호,{' '}
+          <span style={{ color: '#dc2626', fontWeight: 600 }}>&#10007;</span>는 개선이 필요한
+          부분입니다. 리포트를 참고하여 내부 최적화를 진행하시면 구글 순위 상승에 큰 도움이 됩니다.
         </p>
 
         {/* SEO 점수 */}
