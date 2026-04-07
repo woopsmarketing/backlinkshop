@@ -99,9 +99,22 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
       )
 
       if (result.success) {
-        setMessage({ type: 'success', text: result.message || '주문이 완료되었습니다' })
-        // 주문 내역으로 이동
-        router.push('/orders')
+        // Google Ads 전환 추적: 온페이지 SEO 점검 구매만 추적
+        if (isOnPageProduct && typeof window !== 'undefined' && (window as any).trackPurchase) {
+          ;(window as any).trackPurchase(totalPrice)
+        }
+
+        if (isOnPageProduct) {
+          // 온페이지 SEO 점검: 안내 메시지 표시 후 지연 이동
+          setMessage({
+            type: 'success',
+            text: '주문 접수가 되었습니다. 실시간으로 현재 홈페이지의 상태를 내부 점검하고 가입하신 이메일로 보고서를 전송드리도록 하겠습니다 :)\n\n10~20분 내로 보고서가 이메일로 전송될 예정입니다.',
+          })
+          setTimeout(() => router.push('/orders'), 5000)
+        } else {
+          setMessage({ type: 'success', text: result.message || '주문이 완료되었습니다' })
+          router.push('/orders')
+        }
       } else {
         setMessage({ type: 'error', text: result.error || '주문에 실패했습니다' })
       }
@@ -123,7 +136,12 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
               : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800'
           }`}
         >
-          {message.text}
+          {message.text.split('\n').map((line, i) => (
+            <span key={i}>
+              {line}
+              {i < message.text.split('\n').length - 1 && <br />}
+            </span>
+          ))}
         </div>
       )}
 
