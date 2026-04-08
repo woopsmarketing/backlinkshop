@@ -50,3 +50,16 @@ html {
 .animate-progress {
   animation: progress 1.5s ease-out forwards;
 }
+
+/* 구매 폼 로딩 진행 바 (반복) */
+@keyframes progressPulse {
+  0% {
+    width: 5%;
+  }
+  50% {
+    width: 85%;
+  }
+  100% {
+    width: 5%;
+  }
+}

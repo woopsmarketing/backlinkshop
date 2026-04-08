@@ -352,14 +352,39 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
         </p>
       </div>
 
-      {/* 구매 버튼 */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors"
-      >
-        {loading ? '처리 중...' : '구매하기'}
-      </button>
+      {/* 구매 버튼 + 로딩 프로그레스 */}
+      {loading ? (
+        <div className="space-y-3">
+          <button
+            type="button"
+            disabled
+            className="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center gap-2"
+          >
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            주문 처리 중...
+          </button>
+          <div className="rounded-lg overflow-hidden">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-blue-500 to-cyan-400 h-2 rounded-full"
+                style={{
+                  animation: 'progressPulse 2s ease-in-out infinite',
+                }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 text-center">
+              잠시만 기다려주세요. 주문을 접수하고 있습니다
+            </p>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="submit"
+          className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+        >
+          구매하기
+        </button>
+      )}
     </form>
   )
 }
