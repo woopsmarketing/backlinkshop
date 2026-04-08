@@ -166,52 +166,143 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
         {/* ===== 상단 CTA ===== */}
         <div
           style={{
-            background: '#eff6ff',
+            background: 'linear-gradient(135deg, #eff6ff 0%, #e0f2fe 100%)',
             border: '1px solid #bfdbfe',
-            borderRadius: '10px',
-            padding: '20px',
+            borderRadius: '12px',
+            padding: '24px',
             margin: '16px 0',
-            textAlign: 'center',
           }}
         >
-          <p style={{ margin: '0 0 8px 0', fontSize: '15px', fontWeight: 600, color: '#1e40af' }}>
-            내부 최적화와 함께 백링크를 구축하면 구글 순위 상승이 더욱 빨라집니다
-          </p>
-          <p style={{ margin: '0 0 14px 0', fontSize: '13px', color: '#6b7280' }}>
-            점검 결과를 바탕으로 전문가와 상담하고, 맞춤 전략을 세워보세요
-          </p>
-          <a
-            href="https://t.me/goat82"
+          <p
             style={{
-              display: 'inline-block',
-              background: '#2563eb',
-              color: 'white',
-              padding: '12px 28px',
-              textDecoration: 'none',
-              borderRadius: '8px',
+              margin: '0 0 6px 0',
+              fontSize: '17px',
               fontWeight: 700,
-              fontSize: '14px',
+              color: '#1e40af',
+              textAlign: 'center',
             }}
           >
-            구글 상위노출 1:1 문의
-          </a>
-          <span style={{ display: 'inline-block', width: '10px' }}></span>
-          <a
-            href={`${APP_URL}/products/category/pbn`}
+            이 결과를 바탕으로 구글 상위노출을 시작해보세요
+          </p>
+          <p
             style={{
-              display: 'inline-block',
-              background: 'white',
-              color: '#2563eb',
-              padding: '12px 28px',
-              textDecoration: 'none',
-              borderRadius: '8px',
-              fontWeight: 600,
-              fontSize: '14px',
-              border: '1px solid #2563eb',
+              margin: '0 0 18px 0',
+              fontSize: '13px',
+              color: '#6b7280',
+              textAlign: 'center',
             }}
           >
-            PBN 백링크 상품 보기
-          </a>
+            내부 최적화 + 고품질 백링크를 함께 진행하면 2~4주 내 순위 변화를 체감할 수 있습니다
+          </p>
+
+          {/* 서비스 카드 그리드 */}
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'separate',
+              borderSpacing: '8px',
+            }}
+          >
+            <tbody>
+              <tr>
+                {/* 1:1 전문가 상담 */}
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <a
+                    href="https://t.me/goat82"
+                    style={{
+                      display: 'block',
+                      background: '#2563eb',
+                      borderRadius: '10px',
+                      padding: '16px 12px',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>💬</div>
+                    <div style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
+                      구글 상위노출 1:1 문의
+                    </div>
+                    <div
+                      style={{ color: 'rgba(255,255,255,0.8)', fontSize: '11px', marginTop: '4px' }}
+                    >
+                      텔레그램으로 전문가 즉시 상담
+                    </div>
+                  </a>
+                </td>
+                {/* PBN 백링크 */}
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <a
+                    href={`${APP_URL}/products/category/pbn`}
+                    style={{
+                      display: 'block',
+                      background: 'white',
+                      border: '1px solid #dbeafe',
+                      borderRadius: '10px',
+                      padding: '16px 12px',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>🏆</div>
+                    <div style={{ color: '#1e40af', fontWeight: 700, fontSize: '14px' }}>
+                      PBN 백링크 상품
+                    </div>
+                    <div style={{ color: '#6b7280', fontSize: '11px', marginTop: '4px' }}>
+                      직접 구축 네트워크로 강력한 효과
+                    </div>
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                {/* SEO 무료 분석 */}
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <a
+                    href="https://seoworld.co.kr"
+                    style={{
+                      display: 'block',
+                      background: 'white',
+                      border: '1px solid #dbeafe',
+                      borderRadius: '10px',
+                      padding: '16px 12px',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>🔍</div>
+                    <div style={{ color: '#1e40af', fontWeight: 700, fontSize: '14px' }}>
+                      SEO 무료 분석 도구
+                    </div>
+                    <div style={{ color: '#6b7280', fontSize: '11px', marginTop: '4px' }}>
+                      seoworld.co.kr
+                    </div>
+                  </a>
+                </td>
+                {/* 도메인 분석 */}
+                <td style={{ width: '50%', verticalAlign: 'top' }}>
+                  <a
+                    href="https://domainchecker.co.kr"
+                    style={{
+                      display: 'block',
+                      background: 'white',
+                      border: '1px solid #dbeafe',
+                      borderRadius: '10px',
+                      padding: '16px 12px',
+                      textDecoration: 'none',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>🌐</div>
+                    <div style={{ color: '#1e40af', fontWeight: 700, fontSize: '14px' }}>
+                      무료 도메인 분석
+                    </div>
+                    <div style={{ color: '#6b7280', fontSize: '11px', marginTop: '4px' }}>
+                      경매/만료/프리미엄 도메인 구매
+                    </div>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         {/* ===== 파싱 데이터 테이블 ===== */}
@@ -422,13 +513,13 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
           }}
         >
           <h3 style={{ margin: '0 0 6px 0', fontSize: '20px', fontWeight: 700, color: 'white' }}>
-            점검 결과를 바탕으로 순위를 올려보세요
+            다음 단계: 백링크 구축으로 순위를 올려보세요
           </h3>
           <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: 'rgba(255,255,255,0.85)' }}>
             내부 최적화 개선 후 고품질 백링크를 함께 구축하면 효과가 극대화됩니다
           </p>
 
-          {/* 메인 CTA: 1:1 문의 */}
+          {/* 메인 CTA 2개 */}
           <a
             href="https://t.me/goat82"
             style={{
@@ -440,143 +531,63 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               borderRadius: '8px',
               fontWeight: 700,
               fontSize: '15px',
+              marginRight: '10px',
             }}
           >
-            구글 상위노출 1:1 문의
+            1:1 전문가 상담
+          </a>
+          <a
+            href={`${APP_URL}/products/category/pbn`}
+            style={{
+              display: 'inline-block',
+              background: 'rgba(255,255,255,0.15)',
+              color: 'white',
+              padding: '14px 32px',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: 600,
+              fontSize: '15px',
+              border: '1px solid rgba(255,255,255,0.3)',
+            }}
+          >
+            PBN 백링크 보기
           </a>
 
-          {/* 서비스 카드 그리드 */}
-          <table
-            style={{
-              width: '100%',
-              marginTop: '20px',
-              borderCollapse: 'separate',
-              borderSpacing: '8px',
-            }}
-          >
-            <tbody>
-              <tr>
-                {/* PBN 백링크 */}
-                <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <a
-                    href={`${APP_URL}/products/category/pbn`}
-                    style={{
-                      display: 'block',
-                      background: 'rgba(255,255,255,0.12)',
-                      border: '1px solid rgba(255,255,255,0.25)',
-                      borderRadius: '10px',
-                      padding: '16px 12px',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>🏆</div>
-                    <div style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
-                      PBN 백링크 상품
-                    </div>
-                    <div
-                      style={{
-                        color: 'rgba(255,255,255,0.7)',
-                        fontSize: '12px',
-                        marginTop: '4px',
-                      }}
-                    >
-                      고품질 백링크로 순위 상승
-                    </div>
-                  </a>
-                </td>
-                {/* SEO 무료 분석 */}
-                <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <a
-                    href="https://seoworld.co.kr"
-                    style={{
-                      display: 'block',
-                      background: 'rgba(255,255,255,0.12)',
-                      border: '1px solid rgba(255,255,255,0.25)',
-                      borderRadius: '10px',
-                      padding: '16px 12px',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>🔍</div>
-                    <div style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
-                      SEO 무료 분석 도구
-                    </div>
-                    <div
-                      style={{
-                        color: 'rgba(255,255,255,0.7)',
-                        fontSize: '12px',
-                        marginTop: '4px',
-                      }}
-                    >
-                      seoworld.co.kr
-                    </div>
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                {/* 도메인 분석 */}
-                <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <a
-                    href="https://domainchecker.co.kr"
-                    style={{
-                      display: 'block',
-                      background: 'rgba(255,255,255,0.12)',
-                      border: '1px solid rgba(255,255,255,0.25)',
-                      borderRadius: '10px',
-                      padding: '16px 12px',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>🌐</div>
-                    <div style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
-                      무료 도메인 분석
-                    </div>
-                    <div
-                      style={{
-                        color: 'rgba(255,255,255,0.7)',
-                        fontSize: '12px',
-                        marginTop: '4px',
-                      }}
-                    >
-                      경매/만료/프리미엄 도메인 구매
-                    </div>
-                  </a>
-                </td>
-                {/* 플랜 백링크 */}
-                <td style={{ width: '50%', verticalAlign: 'top' }}>
-                  <a
-                    href={`${APP_URL}/products/category/plan`}
-                    style={{
-                      display: 'block',
-                      background: 'rgba(255,255,255,0.12)',
-                      border: '1px solid rgba(255,255,255,0.25)',
-                      borderRadius: '10px',
-                      padding: '16px 12px',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>📦</div>
-                    <div style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
-                      플랜 백링크
-                    </div>
-                    <div
-                      style={{
-                        color: 'rgba(255,255,255,0.7)',
-                        fontSize: '12px',
-                        marginTop: '4px',
-                      }}
-                    >
-                      다양한 백링크 유형 조합
-                    </div>
-                  </a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {/* 보조 링크 */}
+          <div style={{ marginTop: '16px' }}>
+            <a
+              href={`${APP_URL}/products/category/plan`}
+              style={{
+                color: 'rgba(255,255,255,0.8)',
+                fontSize: '13px',
+                textDecoration: 'none',
+                marginRight: '20px',
+              }}
+            >
+              플랜 백링크 &#8594;
+            </a>
+            <a
+              href="https://seoworld.co.kr"
+              style={{
+                color: 'rgba(255,255,255,0.8)',
+                fontSize: '13px',
+                textDecoration: 'none',
+                marginRight: '20px',
+              }}
+            >
+              SEO 분석 도구 &#8594;
+            </a>
+            <a
+              href="https://domainchecker.co.kr"
+              style={{
+                color: 'rgba(255,255,255,0.8)',
+                fontSize: '13px',
+                textDecoration: 'none',
+              }}
+            >
+              도메인 분석 &#8594;
+            </a>
+          </div>
         </div>
 
         <div className="bonus-box">
