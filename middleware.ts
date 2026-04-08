@@ -79,8 +79,17 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // 로그인 상태에서 로그인 페이지 접근 시 대시보드로 리디렉션
+    // 로그인 상태에서 로그인 페이지 접근 시 리디렉션
     if (user && request.nextUrl.pathname === '/login') {
+      // LP에서 온 경우 from/site 파라미터를 대시보드로 전달 (대시보드에서 SEO 상품으로 리디렉트)
+      const from = request.nextUrl.searchParams.get('from')
+      const site = request.nextUrl.searchParams.get('site')
+      if (from === 'lp') {
+        const dashUrl = new URL('/dashboard', request.url)
+        dashUrl.searchParams.set('from', 'lp')
+        if (site) dashUrl.searchParams.set('site', site)
+        return NextResponse.redirect(dashUrl)
+      }
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 

@@ -14,7 +14,7 @@
 import { useState } from 'react'
 import { createOrderAction } from '@/server/actions/orders'
 import { formatCredits } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 type Props = {
   productId: string
@@ -24,6 +24,10 @@ type Props = {
 
 export default function ProductPurchaseForm({ productId, productName, price }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // LP에서 전달된 사이트 URL 자동 입력
+  const prefilledSite = searchParams.get('site') || ''
 
   // 상품 타입 확인
   const isPBNProduct = productName.includes('PBN')
@@ -36,7 +40,7 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
   const [note, setNote] = useState('')
 
   // 백링크 공통 필드
-  const [siteUrl, setSiteUrl] = useState('')
+  const [siteUrl, setSiteUrl] = useState(prefilledSite)
   const [keywords, setKeywords] = useState('')
 
   // 플랜 백링크 전용 필드

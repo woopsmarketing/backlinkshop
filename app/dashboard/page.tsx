@@ -18,7 +18,11 @@ import ReportDownloadButton from '@/app/components/ReportDownloadButton'
 import { getActiveProducts } from '@/server/queries/products'
 import OnboardingChecklist from './components/OnboardingChecklist'
 
-export default async function DashboardPage() {
+type Props = {
+  searchParams: Promise<{ from?: string; site?: string }>
+}
+
+export default async function DashboardPage(props: Props) {
   // 유저 확인
   const user = await getCurrentUser()
 
@@ -28,6 +32,19 @@ export default async function DashboardPage() {
 
   // 첫 로그인 처리 확인
   await ensureUserInitialized()
+
+  // LP에서 온 경우: 온페이지 SEO 상품 페이지로 자동 리디렉트
+  const searchParams = await props.searchParams
+  if (searchParams.from === 'lp') {
+    const allProductsForRedirect = await getActiveProducts()
+    const seoProduct = allProductsForRedirect.find((p: any) => p.name === '온페이지 SEO 점검')
+    if (seoProduct) {
+      const redirectPath = searchParams.site
+        ? `/products/${seoProduct.id}?site=${encodeURIComponent(searchParams.site)}`
+        : `/products/${seoProduct.id}`
+      redirect(redirectPath)
+    }
+  }
 
   const supabase = await createServerSupabaseClient()
   const admin = await isAdmin()
