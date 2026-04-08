@@ -145,6 +145,40 @@ export default function LPSeoPage() {
         </div>
       </section>
 
+      {/* ── 텔레그램 상담 CTA 배너 ── */}
+      <section className="relative py-14 md:py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400" />
+        <div className="relative max-w-5xl mx-auto px-4 text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-4">
+            <div className="text-white">
+              <p className="text-sm font-medium opacity-80">일반 SEO 진단 비용</p>
+              <p className="text-3xl md:text-4xl font-extrabold line-through decoration-white/50">
+                30~50만원
+              </p>
+            </div>
+            <span className="text-white text-3xl" aria-hidden="true">
+              &rarr;
+            </span>
+            <div className="text-white">
+              <p className="text-sm font-medium opacity-80">백링크샵 회원</p>
+              <p className="text-3xl md:text-4xl font-extrabold">무료</p>
+            </div>
+          </div>
+          <a
+            href="https://t.me/goat82"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 mt-4 px-10 py-4 bg-white text-blue-600 text-lg font-bold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
+            </svg>
+            무료 SEO 상담 받기
+          </a>
+          <p className="text-white/80 text-sm mt-3">카드 등록 없이, 가입만 하면 즉시 시작</p>
+        </div>
+      </section>
+
       {/* ── SECTION 2: 핵심 성과 지표 ── */}
       <section className="py-4 bg-gray-900">
         <div className="max-w-5xl mx-auto px-4">

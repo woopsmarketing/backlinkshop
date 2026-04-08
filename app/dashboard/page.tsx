@@ -74,10 +74,8 @@ export default async function DashboardPage() {
     return allProducts.find((p: any) => p.name === name)
   }
 
-  // 20만 크레딧 추천 상품
-  const starterProducts = [findProduct('PBN 백링크 50'), findProduct('온페이지 SEO 점검')].filter(
-    Boolean
-  )
+  // 20만 크레딧 추천 상품 (온페이지 SEO 점검만 - 고품질 백링크는 20만으로 이용 불가)
+  const starterProducts = [findProduct('온페이지 SEO 점검')].filter(Boolean)
 
   // 인기 상품
   const popularProducts = [
@@ -194,40 +192,59 @@ export default async function DashboardPage() {
               가입 보너스로 바로 시작할 수 있는 추천 상품입니다
             </p>
             <div className="grid gap-4 md:grid-cols-2">
-              {starterProducts.map((product: any) => {
-                const isRecommended = product.name === '온페이지 SEO 점검'
-                return (
-                  <div
-                    key={product.id}
-                    className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow-md"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {product.name}
-                      </h3>
-                      {isRecommended && (
-                        <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium">
-                          추천
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xl font-bold text-green-600 dark:text-green-400">
-                        {formatCredits(Number(product.price))} 크레딧
-                      </p>
-                      <Link
-                        href={`/products/${product.id}`}
-                        className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
-                      >
-                        바로 구매
-                      </Link>
-                    </div>
+              {starterProducts.map((product: any) => (
+                <div
+                  key={product.id}
+                  className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow-md"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {product.name}
+                    </h3>
+                    <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium">
+                      추천
+                    </span>
                   </div>
-                )
-              })}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                    {product.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                      {formatCredits(Number(product.price))} 크레딧
+                    </p>
+                    <Link
+                      href={`/products/${product.id}`}
+                      className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    >
+                      무료 체험
+                    </Link>
+                  </div>
+                </div>
+              ))}
+
+              {/* 1:1 문의 카드 (텔레그램 연동) */}
+              <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg p-5 shadow-md text-white">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-lg font-semibold">1:1 전문가 상담</h3>
+                  <span className="text-xs px-2 py-1 rounded-full bg-white/20 font-medium">
+                    무료
+                  </span>
+                </div>
+                <p className="text-sm text-white/80 mb-4">
+                  백링크, SEO 전략이 궁금하신가요? 전문가가 직접 상담해드립니다
+                </p>
+                <a
+                  href="https://t.me/goat82"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white hover:bg-gray-100 text-blue-600 rounded-lg transition-colors text-sm font-semibold"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
+                  </svg>
+                  텔레그램으로 문의하기
+                </a>
+              </div>
             </div>
           </div>
         )}
