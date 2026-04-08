@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 import TopNav from '@/app/components/TopNav'
 import { createServerSupabaseClient } from '@/server/supabase/client'
 import Link from 'next/link'
-import CountdownTimer from './CountdownTimer'
+import AnalysisProgress from './AnalysisProgress'
 
 type Props = {
   searchParams: Promise<{ product?: string; type?: string }>
@@ -65,24 +65,10 @@ export default async function OrderSuccessPage(props: Props) {
           </p>
         </div>
 
-        {/* 온페이지 SEO: 보고서 발송 안내 + 카운트다운 */}
+        {/* 온페이지 SEO: 분석 진행 상태 */}
         {isOnPageProduct && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-2xl">
-                📧
-              </div>
-              <div className="flex-1">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                  보고서 발송 예정
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  현재 사이트를 실시간으로 분석 중입니다. 완료되면 가입하신 이메일로 상세 보고서를
-                  보내드립니다.
-                </p>
-                <CountdownTimer minutes={15} />
-              </div>
-            </div>
+            <AnalysisProgress />
           </div>
         )}
 

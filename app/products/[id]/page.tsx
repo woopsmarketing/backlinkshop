@@ -13,6 +13,7 @@ import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import TopNav from '@/app/components/TopNav'
 import { createServerSupabaseClient } from '@/server/supabase/client'
 import WelcomePopup from '../components/WelcomePopup'
+import DynamicReviews from '../components/DynamicReviews'
 
 type Props = {
   params: Promise<{ id: string }>
@@ -195,28 +196,7 @@ export default async function ProductDetailPage(props: Props) {
                 </div>
               )}
 
-              <div className="space-y-3">
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-yellow-400 text-sm">★★★★★</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">김** 대표</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    &ldquo;PBN 백링크 구축 후 3주 만에 메인 키워드가 2페이지에서 1페이지로
-                    올라왔습니다. 재구매 확정입니다.&rdquo;
-                  </p>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-yellow-400 text-sm">★★★★★</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">박** 마케터</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300">
-                    &ldquo;SEO 점검 보고서가 생각보다 훨씬 상세해서 놀랐어요. 메타태그 수정만으로
-                    CTR이 40% 올랐습니다.&rdquo;
-                  </p>
-                </div>
-              </div>
+              <DynamicReviews />
             </div>
           </div>
 
