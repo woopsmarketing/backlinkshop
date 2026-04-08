@@ -8,6 +8,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/server/supabase/client'
+import { ensureUserInitialized } from '@/server/actions/auth'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -38,6 +39,9 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
+      // 첫 로그인 처리: 프로필 생성 + 20만 크레딧 지급 (대시보드 경유하지 않아도 동작)
+      await ensureUserInitialized()
+
       // LP에서 온 경우: 온페이지 SEO 상품 페이지로 리디렉트
       if (from === 'lp') {
         // 온페이지 SEO 점검 상품 ID 조회
