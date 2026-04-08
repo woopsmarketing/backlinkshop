@@ -8,7 +8,6 @@ import { redirect } from 'next/navigation'
 import TopNav from '@/app/components/TopNav'
 import { createServerSupabaseClient } from '@/server/supabase/client'
 import Link from 'next/link'
-import AnalysisProgress from './AnalysisProgress'
 
 type Props = {
   searchParams: Promise<{ product?: string; type?: string }>
@@ -65,10 +64,59 @@ export default async function OrderSuccessPage(props: Props) {
           </p>
         </div>
 
-        {/* 온페이지 SEO: 분석 진행 상태 */}
+        {/* 온페이지 SEO: 대기 중 SEO 도구 소개 */}
         {isOnPageProduct && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
-            <AnalysisProgress />
+            <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-5">
+              귀하의 도메인을 다양한 SEO 관점에서 분석하고 있습니다. 아래 무료 도구들로 내 사이트를
+              직접 점검해보시면, 곧 이메일로 상세 보고서가 발송됩니다 :)
+            </p>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <a
+                href="https://domainchecker.co.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all group"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  🌐
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                    무료 도메인 분석
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    DA 점수, 백링크 현황, 경쟁사 비교를 무료로 확인하세요
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
+                    domainchecker.co.kr →
+                  </p>
+                </div>
+              </a>
+
+              <a
+                href="https://seoworld.co.kr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all group"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                  🔍
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                    SEO 무료 분석 도구
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    키워드 순위, 사이트 속도, 기술적 SEO를 직접 점검해보세요
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-1">
+                    seoworld.co.kr →
+                  </p>
+                </div>
+              </a>
+            </div>
           </div>
         )}
 
