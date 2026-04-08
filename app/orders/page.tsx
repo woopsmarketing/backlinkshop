@@ -10,6 +10,7 @@ import { getMyOrders } from '@/server/queries/orders'
 import { redirect } from 'next/navigation'
 import TopNav from '@/app/components/TopNav'
 import OrdersTable from './components/OrdersTable'
+import { createServerSupabaseClient } from '@/server/supabase/client'
 
 export default async function OrdersPage() {
   const user = await getCurrentUser()
@@ -21,10 +22,18 @@ export default async function OrdersPage() {
   const admin = await isAdmin()
   const orders = await getMyOrders(user.id, 50)
 
+  const supabase = await createServerSupabaseClient()
+  const { data: balanceData } = await supabase
+    .from('credit_balances')
+    .select('balance')
+    .eq('user_id', user.id)
+    .single()
+  const balance = balanceData?.balance || 0
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
-      <TopNav userEmail={user.email} isAdmin={admin} title="주문 내역" />
+      <TopNav userEmail={user.email} isAdmin={admin} title="주문 내역" balance={balance} />
 
       {/* 메인 콘텐츠 */}
       <main className="container mx-auto px-4 py-8">

@@ -12,9 +12,10 @@ type TopNavProps = {
   userEmail?: string | null
   isAdmin?: boolean
   title?: string
+  balance?: number | null
 }
 
-export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
+export default function TopNav({ userEmail, isAdmin, title, balance }: TopNavProps) {
   const links = [
     { href: '/dashboard', label: '대시보드' },
     { href: '/products', label: '상품' },
@@ -48,7 +49,16 @@ export default function TopNav({ userEmail, isAdmin, title }: TopNavProps) {
         </div>
 
         <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-          <span>{userEmail}</span>
+          {balance !== undefined && balance !== null && (
+            <Link
+              href="/credits"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"
+            >
+              <span className="text-xs">C</span>
+              {balance.toLocaleString()}
+            </Link>
+          )}
+          <span className="hidden sm:inline">{userEmail}</span>
           {/* 문의하기 버튼 */}
           <a
             href="https://t.me/@goat82"

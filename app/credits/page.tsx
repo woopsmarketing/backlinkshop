@@ -40,7 +40,12 @@ export default async function CreditsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
-      <TopNav userEmail={user.email} isAdmin={admin} title="크레딧 관리" />
+      <TopNav
+        userEmail={user.email}
+        isAdmin={admin}
+        title="크레딧 관리"
+        balance={balance.balance}
+      />
 
       {/* 메인 콘텐츠 */}
       <main className="container mx-auto px-4 py-8">

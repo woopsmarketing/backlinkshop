@@ -11,17 +11,37 @@ import ProductPurchaseForm from '../components/ProductPurchaseForm'
 import Link from 'next/link'
 import { getCurrentUser, isAdmin } from '@/server/auth/session'
 import TopNav from '@/app/components/TopNav'
+import { createServerSupabaseClient } from '@/server/supabase/client'
+import WelcomePopup from '../components/WelcomePopup'
 
 type Props = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ site?: string; welcome?: string }>
 }
 
 export default async function ProductDetailPage(props: Props) {
   // Next.js 15: params는 Promise
   const params = await props.params
+  const searchParams = await props.searchParams
   const product = await getProductById(params.id)
   const user = await getCurrentUser()
   const admin = await isAdmin()
+
+  // 잔액 조회
+  const supabase = await createServerSupabaseClient()
+  const { data: balanceData } = user
+    ? await supabase.from('credit_balances').select('balance').eq('user_id', user.id).single()
+    : { data: null }
+  const balance = balanceData?.balance || 0
+
+  // 첫 로그인 여부 (주문 0건 + 잔액 20만 = 신규 가입자)
+  const { count: orderCount } = user
+    ? await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+    : { count: 0 }
+  const isNewUser = balance === 200000 && (orderCount || 0) === 0
 
   if (!product || product.status !== 'active') {
     notFound()
@@ -80,7 +100,10 @@ export default async function ProductDetailPage(props: Props) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
-      <TopNav userEmail={user?.email} isAdmin={admin} title={product.name} />
+      <TopNav userEmail={user?.email} isAdmin={admin} title={product.name} balance={balance} />
+
+      {/* 첫 로그인 환영 팝업 */}
+      {isNewUser && <WelcomePopup />}
 
       {/* 메인 콘텐츠 */}
       <main className="container mx-auto px-4 py-8">

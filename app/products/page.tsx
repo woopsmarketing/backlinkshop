@@ -16,6 +16,7 @@ import {
 } from '@/lib/product-categories'
 import { getActiveProducts } from '@/server/queries/products'
 import { formatCredits } from '@/lib/utils'
+import { createServerSupabaseClient } from '@/server/supabase/client'
 
 type Props = {
   searchParams: Promise<{ category?: string }>
@@ -26,6 +27,13 @@ export default async function ProductsPage(props: Props) {
   await props.searchParams
   const user = await getCurrentUser()
   const admin = await isAdmin()
+
+  // 잔액 조회
+  const supabase = await createServerSupabaseClient()
+  const { data: balanceData } = user
+    ? await supabase.from('credit_balances').select('balance').eq('user_id', user.id).single()
+    : { data: null }
+  const balance = balanceData?.balance || 0
 
   // 전체 상품 조회 및 카테고리별 최저가 계산
   const allProducts = (await getActiveProducts()) as ProductSummary[]
@@ -44,7 +52,7 @@ export default async function ProductsPage(props: Props) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
-      <TopNav userEmail={user?.email} isAdmin={admin} title="상품 카테고리" />
+      <TopNav userEmail={user?.email} isAdmin={admin} title="상품 카테고리" balance={balance} />
 
       {/* 메인 콘텐츠 */}
       <main className="container mx-auto px-4 py-8">

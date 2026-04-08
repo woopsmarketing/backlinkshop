@@ -15,6 +15,7 @@ import {
   getCategoryBySlug,
   type ProductSummary,
 } from '@/lib/product-categories'
+import { createServerSupabaseClient } from '@/server/supabase/client'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -31,6 +32,13 @@ export default async function ProductCategoryPage(props: Props) {
 
   const user = await getCurrentUser()
   const admin = await isAdmin()
+
+  // 잔액 조회
+  const supabase = await createServerSupabaseClient()
+  const { data: balanceData } = user
+    ? await supabase.from('credit_balances').select('balance').eq('user_id', user.id).single()
+    : { data: null }
+  const balance = balanceData?.balance || 0
 
   const products = (await getActiveProducts()) as ProductSummary[]
   const filtered = filterProductsByCategory(category.slug, products)
@@ -58,7 +66,7 @@ export default async function ProductCategoryPage(props: Props) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
-      <TopNav userEmail={user?.email} isAdmin={admin} title={category.title} />
+      <TopNav userEmail={user?.email} isAdmin={admin} title={category.title} balance={balance} />
 
       {/* 메인 콘텐츠 */}
       <main className="container mx-auto px-4 py-8">

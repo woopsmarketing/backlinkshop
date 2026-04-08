@@ -110,7 +110,7 @@ export default async function DashboardPage(props: Props) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
-      <TopNav userEmail={user.email} isAdmin={admin} title="대시보드" />
+      <TopNav userEmail={user.email} isAdmin={admin} title="대시보드" balance={currentBalance} />
 
       {/* 메인 콘텐츠 */}
       <main className="container mx-auto px-4 py-8">
