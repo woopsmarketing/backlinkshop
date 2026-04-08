@@ -68,8 +68,8 @@ export default async function OrderSuccessPage(props: Props) {
         {isOnPageProduct && (
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-6">
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed mb-5">
-              귀하의 도메인을 다양한 SEO 관점에서 분석하고 있습니다. 아래 무료 도구들로 내 사이트를
-              직접 점검해보시면, 곧 이메일로 상세 보고서가 발송됩니다 :)
+              귀하의 도메인을 다양한 SEO 관점에서 분석하고 있습니다. 곧 이메일로 상세 보고서가
+              발송됩니다 :) 아래 무료 도구들로 직접 정밀검사도 가능하오니 언제든 방문해보세요!
             </p>
 
             <div className="grid gap-3 sm:grid-cols-2">
