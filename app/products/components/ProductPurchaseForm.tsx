@@ -108,17 +108,13 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
           ;(window as any).trackPurchase(totalPrice)
         }
 
+        // 성공 페이지로 리디렉트
+        const successUrl = new URL('/orders/success', window.location.origin)
+        successUrl.searchParams.set('product', encodeURIComponent(productName))
         if (isOnPageProduct) {
-          // 온페이지 SEO 점검: 안내 메시지 표시 후 지연 이동
-          setMessage({
-            type: 'success',
-            text: '주문 접수가 되었습니다. 실시간으로 현재 홈페이지의 상태를 내부 점검하고 가입하신 이메일로 보고서를 전송드리도록 하겠습니다 :)\n\n10~20분 내로 보고서가 이메일로 전송될 예정입니다.',
-          })
-          setTimeout(() => router.push('/orders'), 5000)
-        } else {
-          setMessage({ type: 'success', text: result.message || '주문이 완료되었습니다' })
-          router.push('/orders')
+          successUrl.searchParams.set('type', 'onpage')
         }
+        router.push(successUrl.pathname + successUrl.search)
       } else {
         setMessage({ type: 'error', text: result.error || '주문에 실패했습니다' })
       }

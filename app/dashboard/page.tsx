@@ -17,6 +17,7 @@ import { getRecentReports } from '@/server/queries/orders'
 import ReportDownloadButton from '@/app/components/ReportDownloadButton'
 import { getActiveProducts } from '@/server/queries/products'
 import OnboardingChecklist from './components/OnboardingChecklist'
+import FirstChargeBonusTimer from './components/FirstChargeBonusTimer'
 
 type Props = {
   searchParams: Promise<{ from?: string; site?: string }>
@@ -107,6 +108,10 @@ export default async function DashboardPage(props: Props) {
   // 20만 크레딧 이상인 경우 추천 상품 섹션 표시
   const showStarterSection = currentBalance >= 200000
 
+  // 첫 충전 보너스 타이머: 미충전 유저에게만 표시
+  const hasTopup = (topupCount || 0) > 0
+  const userCreatedAt = user.created_at || new Date().toISOString()
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 상단 메뉴 */}
@@ -128,6 +133,13 @@ export default async function DashboardPage(props: Props) {
               <div className="text-6xl opacity-20">💰</div>
             </div>
           </div>
+
+          {/* 첫 충전 100% 보너스 카운트다운 (미충전 유저) */}
+          {!hasTopup && (
+            <div className="col-span-full">
+              <FirstChargeBonusTimer createdAt={userCreatedAt} bonusDays={7} />
+            </div>
+          )}
 
           {/* 온보딩 체크리스트 (주문 없는 신규 사용자) */}
           {(orderCount || 0) === 0 && (
