@@ -31,7 +31,7 @@ export async function GET(request: Request) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // pending_analysis 상태 주문 조회 (최대 2건씩 처리)
+    // pending_analysis 상태 주문 조회 (한 번에 1건만 처리 - 60초 내 완료 보장)
     // 10분 이상 analyzing으로 멈춘 주문도 복구 대상 (크래시 복구)
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
 
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
       .from('orders')
       .select('id, user_id, site_url, keywords, created_at, products!inner(name), status')
       .or(`status.eq.pending_analysis,and(status.eq.analyzing,created_at.lt.${tenMinutesAgo})`)
-      .limit(2)
+      .limit(1)
 
     if (queryError) {
       console.error('[SEO Analysis Cron] 대기 주문 조회 실패:', queryError)
@@ -91,24 +91,34 @@ export async function GET(request: Request) {
         }
 
         console.log(`[SEO Analysis] 시작: ${order.id} - ${order.site_url}`)
+        const startTime = Date.now()
 
-        // 1. 온페이지 SEO 분석
-        const { parsed, analysis, score } = await fetchAndAnalyze(
-          order.site_url,
-          order.keywords || undefined
-        )
+        // 1. 온페이지 SEO 분석 + 경쟁사 분석을 병렬 실행
+        const [seoResult, competitorResult] = await Promise.allSettled([
+          fetchAndAnalyze(order.site_url, order.keywords || undefined),
+          order.keywords
+            ? analyzeCompetitors(order.keywords, order.site_url, 2)
+            : Promise.resolve(null),
+        ])
+
+        // 온페이지 SEO 결과 처리 (실패 시 throw - 이건 필수)
+        if (seoResult.status === 'rejected') {
+          throw new Error(`SEO 분석 실패: ${seoResult.reason?.message || seoResult.reason}`)
+        }
+
+        const { parsed, analysis, score } = seoResult.value
         const analysisHtml = markdownToHtml(analysis)
+        console.log(`[SEO Analysis] SEO 분석 완료 (${Date.now() - startTime}ms, 점수 ${score})`)
 
-        // 2. 경쟁사 분석 (키워드 있는 경우만, 실패해도 무시)
+        // 경쟁사 분석 결과 처리 (실패해도 무시)
         let competitorData: CompetitorAnalysis | null = null
-        if (order.keywords) {
-          try {
-            console.log(`[SEO Analysis] 경쟁사 분석 시작: ${order.keywords}`)
-            competitorData = await analyzeCompetitors(order.keywords, order.site_url, 3)
-            console.log(`[SEO Analysis] 경쟁사 분석 완료: ${competitorData.competitors.length}개`)
-          } catch (compError: any) {
-            console.error(`[SEO Analysis] 경쟁사 분석 실패 (무시):`, compError.message)
-          }
+        if (competitorResult.status === 'fulfilled') {
+          competitorData = competitorResult.value
+          console.log(
+            `[SEO Analysis] 경쟁사 분석 완료: ${competitorData?.competitors.length || 0}개`
+          )
+        } else {
+          console.error(`[SEO Analysis] 경쟁사 분석 실패 (무시):`, competitorResult.reason?.message)
         }
 
         // 3. 결과 저장 + status 변경

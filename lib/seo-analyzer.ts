@@ -458,6 +458,7 @@ ${p.textContentSample.slice(0, 500)}
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(35000), // 35초 타임아웃
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
