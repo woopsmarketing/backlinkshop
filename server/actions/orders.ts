@@ -26,9 +26,7 @@ import {
 } from '@/lib/email/render'
 import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
 import { getProductDuration, extractPBNQuantity } from '@/lib/constants/product-config'
-import { fetchAndAnalyze } from '@/lib/seo-analyzer'
-import { analyzeCompetitors, type CompetitorAnalysis } from '@/lib/competitor-analyzer'
-import { markdownToHtml } from '@/lib/markdown-to-html'
+// SEO/경쟁사 분석은 /api/cron/seo-analysis 에서 백그라운드 실행
 // renderSeoReportEmail은 /api/cron/seo-reports 라우트에서 사용
 
 /**
@@ -99,7 +97,7 @@ export async function createOrderAction(
 
     // 5. PBN 상품이면 주문 저장 전에 GOAT PBN 캠페인 먼저 생성
     // API 성공 여부에 따라 초기 status와 campaign_id 결정
-    let initialStatus: 'pending' | 'processing' | 'completed' = 'pending'
+    let initialStatus: 'pending' | 'processing' | 'completed' | 'pending_analysis' = 'pending'
     let goatCampaignId: string | null = null
     let pbnApiError: string | null = null
 
@@ -142,41 +140,11 @@ export async function createOrderAction(
       }
     }
 
-    // 5-2. 온페이지 SEO 상품이면 자동 분석 실행 (결과는 DB에 저장, 이메일은 지연 발송)
-    let seoAnalysisData: {
-      score: number | null
-      analysisHtml: string
-      parsedData: import('@/lib/seo-analyzer').ParsedSeo
-      competitorData?: CompetitorAnalysis | null
-    } | null = null
-
+    // 5-2. 온페이지 SEO 상품이면 pending_analysis 상태로 저장
+    //      실제 분석은 /api/cron/seo-analysis 에서 백그라운드 실행 (cron-job.org 호출)
     if (isOnPageProduct && siteUrl) {
-      try {
-        console.log('🔍 온페이지 SEO 자동 분석 시작:', { siteUrl })
-
-        const { parsed, analysis, score } = await fetchAndAnalyze(siteUrl, keywords)
-        const analysisHtml = markdownToHtml(analysis)
-
-        // 경쟁사 분석 (키워드가 있는 경우만, 실패해도 무시)
-        let competitorData: CompetitorAnalysis | null = null
-        if (keywords) {
-          try {
-            console.log('🔍 경쟁사 분석 시작:', { keywords, siteUrl })
-            competitorData = await analyzeCompetitors(keywords, siteUrl, 3)
-            console.log('✅ 경쟁사 분석 완료:', { competitors: competitorData.competitors.length })
-          } catch (compError: any) {
-            console.error('⚠️ 경쟁사 분석 실패 (무시):', compError.message)
-          }
-        }
-
-        seoAnalysisData = { score, analysisHtml, parsedData: parsed, competitorData }
-        initialStatus = 'processing' // 분석 완료했지만 "처리중"으로 표시 (지연 발송 위해)
-
-        console.log('✅ 온페이지 SEO 분석 완료 - 지연 발송 예약:', { score, siteUrl })
-      } catch (seoError: any) {
-        console.error('❌ SEO 자동 분석 실패 - pending으로 처리:', seoError.message)
-        pbnApiError = `SEO 분석 실패: ${seoError.message}`
-      }
+      initialStatus = 'pending_analysis'
+      console.log('📋 온페이지 SEO 주문 - pending_analysis로 저장 (백그라운드 분석 대기)')
     }
 
     // 6. 주문 생성
@@ -197,14 +165,7 @@ export async function createOrderAction(
         goat_campaign_id: goatCampaignId,
         api_error: pbnApiError,
         completed_at: null,
-        seo_report_data: seoAnalysisData
-          ? {
-              score: seoAnalysisData.score,
-              analysisHtml: seoAnalysisData.analysisHtml,
-              parsedData: seoAnalysisData.parsedData,
-              competitorData: seoAnalysisData.competitorData || null,
-            }
-          : null,
+        seo_report_data: null,
       })
       .select()
       .single()
@@ -230,7 +191,7 @@ export async function createOrderAction(
 
     // 8. 이메일 발송
     if (user.email) {
-      if (isOnPageProduct && seoAnalysisData) {
+      if (isOnPageProduct) {
         // SEO 점검: 접수 이메일만 즉시 발송 (분석 결과는 크론잡이 5분 후 발송)
         await sendEmail(
           user.email,
