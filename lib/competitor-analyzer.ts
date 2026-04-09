@@ -123,7 +123,7 @@ async function fetchBacklinkProfile(domain: string): Promise<Partial<CompetitorD
       `https://vebapi.com/api/seo/backlinkdata?website=${encodeURIComponent(domain)}`,
       {
         headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(20000),
       }
     )
 
@@ -165,7 +165,7 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
           'X-RapidAPI-Key': apiKey,
           'X-RapidAPI-Host': 'domain-metrics-check.p.rapidapi.com',
         },
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(20000),
       }
     )
 
