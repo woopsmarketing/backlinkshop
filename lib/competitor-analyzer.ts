@@ -1,6 +1,6 @@
 /**
  * 경쟁사 분석 모듈
- * 키워드로 구글 1~3위 경쟁사를 찾고 도메인/백링크 데이터를 수집
+ * 키워드로 구글 1~3위 경쟁사를 찾고 도메인/백링크/Wayback 데이터 수집
  */
 
 export interface CompetitorData {
@@ -8,19 +8,44 @@ export interface CompetitorData {
   url: string
   domain: string
   title: string
-  // 도메인 메트릭 (RapidAPI)
+
+  // RapidAPI - Moz
   mozDA?: number
+  mozPA?: number
+  mozRank?: number
+  mozLinks?: number
+  mozSpam?: number
+
+  // RapidAPI - Ahrefs
   ahrefsDR?: number
+  ahrefsRank?: number
   ahrefsBacklinks?: number
   ahrefsRefDomains?: number
   ahrefsTraffic?: number
+  ahrefsTrafficValue?: number
+  ahrefsOrganicKeywords?: number
+
+  // RapidAPI - Majestic
   majesticTF?: number
   majesticCF?: number
-  // 백링크 프로필 (VebAPI)
+  majesticLinks?: number
+  majesticRefDomains?: number
+  majesticRefEdu?: number
+  majesticRefGov?: number
+
+  // VebAPI 백링크
   backlinkTotal?: number
   backlinkDoFollow?: number
   referringDomains?: number
   referringDoFollow?: number
+
+  // Wayback
+  waybackFirstSeen?: string | null
+  waybackSnapshots?: number
+  domainAgeYears?: number
+
+  // 디버그
+  _errors?: string[]
 }
 
 export interface CompetitorAnalysis {
@@ -68,14 +93,14 @@ async function fetchSerpResults(
   })
 
   if (!res.ok) {
-    console.error('SERP API 오류:', res.status)
+    console.error('[SERP] API 오류:', res.status, await res.text().catch(() => ''))
     return []
   }
 
   const data = await res.json()
-
-  // 응답 구조: results.results[0].content.results.results.organic[]
   const organic = data?.results?.results?.[0]?.content?.results?.results?.organic || []
+
+  console.log(`[SERP] 키워드 "${keyword}" → ${organic.length}개 결과 수집`)
 
   return organic
     .slice(0, count)
@@ -89,31 +114,29 @@ async function fetchSerpResults(
 /**
  * VebAPI Backlink: 도메인의 백링크 프로필 조회
  */
-async function fetchBacklinkProfile(domain: string): Promise<{
-  backlinkTotal: number
-  backlinkDoFollow: number
-  referringDomains: number
-  referringDoFollow: number
-} | null> {
+async function fetchBacklinkProfile(domain: string): Promise<Partial<CompetitorData>> {
   const apiKey = process.env.VEBAPI_KEY
-  if (!apiKey) return null
+  if (!apiKey) return { _errors: ['VEBAPI_KEY 없음'] }
 
   try {
     const res = await fetch(
       `https://vebapi.com/api/seo/backlinkdata?website=${encodeURIComponent(domain)}`,
       {
-        headers: {
-          'X-API-KEY': apiKey,
-          'Content-Type': 'application/json',
-        },
-        signal: AbortSignal.timeout(10000),
+        headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
+        signal: AbortSignal.timeout(15000),
       }
     )
 
-    if (!res.ok) return null
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      console.error(`[Backlink] ${domain} 오류 ${res.status}:`, text.slice(0, 200))
+      return { _errors: [`백링크 API ${res.status}`] }
+    }
 
     const data = await res.json()
     const counts = data?.counts
+
+    console.log(`[Backlink] ${domain}:`, JSON.stringify(counts?.backlinks))
 
     return {
       backlinkTotal: counts?.backlinks?.total || 0,
@@ -121,26 +144,18 @@ async function fetchBacklinkProfile(domain: string): Promise<{
       referringDomains: counts?.domains?.total || 0,
       referringDoFollow: counts?.domains?.doFollow || 0,
     }
-  } catch (err) {
-    console.error('백링크 API 오류:', domain, err)
-    return null
+  } catch (err: any) {
+    console.error(`[Backlink] ${domain} 예외:`, err.message)
+    return { _errors: [`백링크 예외: ${err.message}`] }
   }
 }
 
 /**
- * RapidAPI Domain Metrics: 도메인 권위도 조회
+ * RapidAPI Domain Metrics: 도메인 전체 권위도 지표
  */
-async function fetchDomainMetrics(domain: string): Promise<{
-  mozDA: number
-  ahrefsDR: number
-  ahrefsBacklinks: number
-  ahrefsRefDomains: number
-  ahrefsTraffic: number
-  majesticTF: number
-  majesticCF: number
-} | null> {
+async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorData>> {
   const apiKey = process.env.RAPIDAPI_KEY
-  if (!apiKey) return null
+  if (!apiKey) return { _errors: ['RAPIDAPI_KEY 없음'] }
 
   try {
     const res = await fetch(
@@ -150,26 +165,93 @@ async function fetchDomainMetrics(domain: string): Promise<{
           'X-RapidAPI-Key': apiKey,
           'X-RapidAPI-Host': 'domain-metrics-check.p.rapidapi.com',
         },
-        signal: AbortSignal.timeout(10000),
+        signal: AbortSignal.timeout(15000),
       }
     )
 
-    if (!res.ok) return null
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      console.error(`[Metrics] ${domain} 오류 ${res.status}:`, text.slice(0, 200))
+      return { _errors: [`도메인 메트릭 API ${res.status}`] }
+    }
 
     const data = await res.json()
 
+    console.log(`[Metrics] ${domain}:`, {
+      mozDA: data?.mozDA,
+      ahrefsDR: data?.ahrefsDR,
+      ahrefsTraffic: data?.ahrefsTraffic,
+      majesticTF: data?.majesticTF,
+    })
+
     return {
-      mozDA: data?.mozDA || 0,
-      ahrefsDR: data?.ahrefsDR || 0,
-      ahrefsBacklinks: data?.ahrefsBacklinks || 0,
-      ahrefsRefDomains: data?.ahrefsRefDomains || 0,
-      ahrefsTraffic: Math.round(data?.ahrefsTraffic || 0),
-      majesticTF: data?.majesticTF || 0,
-      majesticCF: data?.majesticCF || 0,
+      mozDA: data?.mozDA ?? undefined,
+      mozPA: data?.mozPA ?? undefined,
+      mozRank: data?.mozRank ?? undefined,
+      mozLinks: data?.mozLinks ?? undefined,
+      mozSpam: data?.mozSpam ?? undefined,
+      ahrefsDR: data?.ahrefsDR ?? undefined,
+      ahrefsRank: data?.ahrefsRank ?? undefined,
+      ahrefsBacklinks: data?.ahrefsBacklinks ?? undefined,
+      ahrefsRefDomains: data?.ahrefsRefDomains ?? undefined,
+      ahrefsTraffic: data?.ahrefsTraffic ? Math.round(data.ahrefsTraffic) : undefined,
+      ahrefsTrafficValue: data?.ahrefsTrafficValue
+        ? Math.round(data.ahrefsTrafficValue)
+        : undefined,
+      ahrefsOrganicKeywords: data?.ahrefsOrganicKeywords ?? undefined,
+      majesticTF: data?.majesticTF ?? undefined,
+      majesticCF: data?.majesticCF ?? undefined,
+      majesticLinks: data?.majesticLinks ?? undefined,
+      majesticRefDomains: data?.majesticRefDomains ?? undefined,
+      majesticRefEdu: data?.majesticRefEdu ?? undefined,
+      majesticRefGov: data?.majesticRefGov ?? undefined,
     }
-  } catch (err) {
-    console.error('도메인 메트릭 API 오류:', domain, err)
-    return null
+  } catch (err: any) {
+    console.error(`[Metrics] ${domain} 예외:`, err.message)
+    return { _errors: [`메트릭 예외: ${err.message}`] }
+  }
+}
+
+/**
+ * Wayback Machine: 도메인 최초 아카이브 시점 + 스냅샷 수 → 도메인 연령 계산
+ */
+async function fetchWaybackInfo(domain: string): Promise<Partial<CompetitorData>> {
+  try {
+    // 1. 최초 스냅샷 조회 (가장 오래된 것)
+    const res = await fetch(
+      `https://archive.org/wayback/available?url=${encodeURIComponent(domain)}&timestamp=19960101`,
+      { signal: AbortSignal.timeout(10000) }
+    )
+
+    if (!res.ok) return { _errors: [`wayback ${res.status}`] }
+
+    const data = await res.json()
+    const snapshot = data?.archived_snapshots?.closest
+
+    if (!snapshot) return { waybackFirstSeen: null, waybackSnapshots: 0 }
+
+    // YYYYMMDDHHMMSS → YYYY-MM-DD
+    const ts = snapshot.timestamp || ''
+    const firstSeen =
+      ts.length >= 8 ? `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)}` : null
+
+    // 도메인 연령 계산
+    let ageYears: number | undefined
+    if (firstSeen) {
+      const firstDate = new Date(firstSeen)
+      const now = new Date()
+      ageYears = Math.floor((now.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+    }
+
+    console.log(`[Wayback] ${domain}: ${firstSeen} (${ageYears}년)`)
+
+    return {
+      waybackFirstSeen: firstSeen,
+      domainAgeYears: ageYears,
+    }
+  } catch (err: any) {
+    console.error(`[Wayback] ${domain} 예외:`, err.message)
+    return { _errors: [`wayback 예외: ${err.message}`] }
   }
 }
 
@@ -182,18 +264,27 @@ async function analyzeOneDomain(
   url: string,
   title: string
 ): Promise<CompetitorData> {
-  const [domainMetrics, backlinkProfile] = await Promise.all([
+  const [domainMetrics, backlinkProfile, waybackInfo] = await Promise.all([
     fetchDomainMetrics(domain),
     fetchBacklinkProfile(domain),
+    fetchWaybackInfo(domain),
   ])
+
+  const errors = [
+    ...(domainMetrics._errors || []),
+    ...(backlinkProfile._errors || []),
+    ...(waybackInfo._errors || []),
+  ]
 
   return {
     rank,
     url,
     domain,
     title,
-    ...(domainMetrics || {}),
-    ...(backlinkProfile || {}),
+    ...domainMetrics,
+    ...backlinkProfile,
+    ...waybackInfo,
+    _errors: errors.length > 0 ? errors : undefined,
   }
 }
 
@@ -207,21 +298,33 @@ export async function analyzeCompetitors(
 ): Promise<CompetitorAnalysis> {
   const customerDomain = extractDomain(customerSiteUrl)
 
-  // 1. SERP에서 상위 결과 가져오기
-  const serpResults = await fetchSerpResults(keyword, 5)
+  console.log(`[Competitor] 분석 시작: keyword="${keyword}", customer=${customerDomain}`)
 
-  // 고객 도메인 제외하고 상위 N개 선택
+  // 1. SERP 조회
+  const serpResults = await fetchSerpResults(keyword, 10)
+
+  // 고객 도메인과 정확히 일치하는 것만 제외
   const competitorResults = serpResults
-    .filter(r => !extractDomain(r.url).includes(customerDomain))
+    .filter(r => {
+      const d = extractDomain(r.url)
+      return d && d !== customerDomain
+    })
     .slice(0, topN)
 
-  // 2. 고객 사이트 + 경쟁사 동시 분석
+  console.log(
+    `[Competitor] 경쟁사 ${competitorResults.length}개 선정:`,
+    competitorResults.map(r => extractDomain(r.url))
+  )
+
+  // 2. 고객 + 경쟁사 동시 분석
   const [customerMetrics, ...competitorMetrics] = await Promise.all([
     analyzeOneDomain(customerDomain, 0, customerSiteUrl, '내 사이트'),
     ...competitorResults.map((r, i) =>
       analyzeOneDomain(extractDomain(r.url), i + 1, r.url, r.title)
     ),
   ])
+
+  console.log(`[Competitor] 분석 완료`)
 
   return {
     keyword,
