@@ -31,11 +31,14 @@ export async function GET(request: Request) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // pending_analysis 상태 + 온페이지 상품 주문 조회 (최대 2건씩 처리)
+    // pending_analysis 상태 주문 조회 (최대 2건씩 처리)
+    // 10분 이상 analyzing으로 멈춘 주문도 복구 대상 (크래시 복구)
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+
     const { data: pendingOrders, error: queryError } = await adminClient
       .from('orders')
-      .select('id, user_id, site_url, keywords, created_at, products!inner(name)')
-      .eq('status', 'pending_analysis')
+      .select('id, user_id, site_url, keywords, created_at, products!inner(name), status')
+      .or(`status.eq.pending_analysis,and(status.eq.analyzing,created_at.lt.${tenMinutesAgo})`)
       .limit(2)
 
     if (queryError) {
@@ -47,10 +50,35 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'No pending analysis', processed: 0 })
     }
 
+    // 🔒 락 획득: 픽업한 주문을 원자적으로 analyzing 상태로 변경
+    // .eq('status', order.status) 조건으로 이미 다른 크론이 바꿨으면 매칭 실패 → 0건 반환
+    const lockedOrders: typeof pendingOrders = []
+    for (const order of pendingOrders) {
+      const { data: locked, error: lockError } = await adminClient
+        .from('orders')
+        .update({ status: 'analyzing' })
+        .eq('id', order.id)
+        .eq('status', order.status)
+        .select('id')
+
+      if (lockError || !locked || locked.length === 0) {
+        console.log(`[SEO Analysis] 락 획득 실패 (다른 크론이 처리 중): ${order.id}`)
+        continue
+      }
+      lockedOrders.push(order)
+    }
+
+    if (lockedOrders.length === 0) {
+      return NextResponse.json({
+        message: 'All orders being processed by other crons',
+        processed: 0,
+      })
+    }
+
     let processed = 0
     let failed = 0
 
-    for (const order of pendingOrders) {
+    for (const order of lockedOrders) {
       try {
         const productName = (order.products as any)?.name || ''
         const isOnPageProduct = productName.includes('온페이지')
@@ -102,11 +130,11 @@ export async function GET(request: Request) {
       } catch (err: any) {
         console.error(`[SEO Analysis] 실패: ${order.id}`, err.message)
 
-        // 실패 시 에러 기록 후 pending으로 돌림 (재시도 가능)
+        // 실패 시 에러 기록 후 pending_analysis로 되돌림 (다음 크론에서 재시도)
         await adminClient
           .from('orders')
           .update({
-            status: 'pending',
+            status: 'pending_analysis',
             api_error: `SEO 분석 실패: ${err.message}`,
           })
           .eq('id', order.id)
