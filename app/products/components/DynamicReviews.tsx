@@ -9,7 +9,7 @@ const reviewPool: Record<string, { name: string; role: string; text: string }[]>
     {
       name: '이**',
       role: '정형외과 원장',
-      text: '"{keyword}" 키워드로 백링크 구축 후 4주 만에 구글 1페이지에 진입했습니다. 같은 지역 경쟁 병원보다 먼저 노출되니 신규 환자가 눈에 띄게 늘었어요.',
+      text: 'PBN 백링크 구축 후 4주 만에 주요 키워드가 구글 1페이지에 진입했습니다. 같은 지역 경쟁 병원보다 먼저 노출되니 신규 환자가 눈에 띄게 늘었어요.',
     },
     {
       name: '최**',
@@ -21,7 +21,7 @@ const reviewPool: Record<string, { name: string; role: string; text: string }[]>
     {
       name: '장**',
       role: '쇼핑몰 대표',
-      text: '"{keyword}" 관련 제품 페이지에 백링크를 걸었더니 3주 만에 검색 유입이 2배로 늘었습니다. 경쟁 쇼핑몰보다 먼저 상위에 올라갈 수 있었어요.',
+      text: '제품 페이지에 백링크를 걸었더니 3주 만에 검색 유입이 2배로 늘었습니다. 경쟁 쇼핑몰보다 먼저 상위에 올라갈 수 있었어요.',
     },
     {
       name: '한**',
@@ -33,7 +33,7 @@ const reviewPool: Record<string, { name: string; role: string; text: string }[]>
     {
       name: '김**',
       role: '공인중개사',
-      text: '"{keyword}" 검색에서 우리 사무소가 1페이지에 나오니까 전화 문의가 확 늘었습니다. 주변 중개사들이 어떻게 한 거냐고 물어볼 정도예요.',
+      text: '지역 키워드 검색에서 우리 사무소가 1페이지에 나오니까 전화 문의가 확 늘었습니다. 주변 중개사들이 어떻게 한 거냐고 물어볼 정도예요.',
     },
     {
       name: '박**',
@@ -45,7 +45,7 @@ const reviewPool: Record<string, { name: string; role: string; text: string }[]>
     {
       name: '김**',
       role: '스타트업 대표',
-      text: '"{keyword}" 키워드로 PBN 백링크를 구축했는데, 3주 만에 2페이지에서 1페이지로 올라왔습니다. 같은 키워드를 노리는 경쟁사보다 먼저 올라가서 트래픽이 크게 늘었어요.',
+      text: 'PBN 백링크 구축 후 3주 만에 메인 키워드가 2페이지에서 1페이지로 올라왔습니다. 경쟁사보다 먼저 올라가서 트래픽이 크게 늘었어요.',
     },
     {
       name: '박**',
@@ -89,9 +89,7 @@ function ReviewContent() {
               {review.name} {review.role}
             </span>
           </div>
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            &ldquo;{review.text.replace('{keyword}', keyword || 'SEO 최적화')}&rdquo;
-          </p>
+          <p className="text-sm text-gray-700 dark:text-gray-300">&ldquo;{review.text}&rdquo;</p>
         </div>
       ))}
       <p className="text-xs text-gray-400 dark:text-gray-500 text-center pt-1">
