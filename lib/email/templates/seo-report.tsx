@@ -5,6 +5,7 @@
 
 import * as React from 'react'
 import type { ParsedSeo } from '@/lib/seo-analyzer'
+import type { CompetitorAnalysis } from '@/lib/competitor-analyzer'
 
 interface SeoReportEmailProps {
   customerEmail: string
@@ -14,6 +15,7 @@ interface SeoReportEmailProps {
   score?: number | null
   analysisHtml?: string
   parsedData?: ParsedSeo
+  competitorData?: CompetitorAnalysis | null
 }
 
 function scoreColor(s: number) {
@@ -107,6 +109,7 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
   score,
   analysisHtml,
   parsedData: p,
+  competitorData: comp,
 }) => (
   <html>
     <head>
@@ -193,6 +196,333 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: scoreColor(score) }}>
                 {scoreLabel(score)}
               </p>
+            </div>
+          )}
+
+          {/* ===== 경쟁사 격차 분석 ===== */}
+          {comp && comp.competitors.length > 0 && (
+            <div
+              style={{
+                background: 'white',
+                borderRadius: '10px',
+                padding: '16px',
+                margin: '0 0 16px 0',
+              }}
+            >
+              <h3
+                style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 700, color: '#111827' }}
+              >
+                &ldquo;{comp.keyword}&rdquo; 검색 결과 경쟁사 비교
+              </h3>
+              <p style={{ margin: '0 0 12px 0', fontSize: '11px', color: '#6b7280' }}>
+                현재 이 키워드로 구글 상위에 노출되고 있는 경쟁사와 비교한 결과입니다
+              </p>
+
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead>
+                  <tr style={{ background: '#f9fafb' }}>
+                    <th
+                      style={{
+                        padding: '8px 6px',
+                        textAlign: 'left',
+                        color: '#6b7280',
+                        fontWeight: 600,
+                        borderBottom: '2px solid #e5e7eb',
+                      }}
+                    >
+                      &nbsp;
+                    </th>
+                    <th
+                      style={{
+                        padding: '8px 6px',
+                        textAlign: 'center',
+                        color: '#dc2626',
+                        fontWeight: 700,
+                        borderBottom: '2px solid #e5e7eb',
+                      }}
+                    >
+                      내 사이트
+                    </th>
+                    {comp.competitors.map((c, i) => (
+                      <th
+                        key={i}
+                        style={{
+                          padding: '8px 6px',
+                          textAlign: 'center',
+                          color: '#6b7280',
+                          fontWeight: 600,
+                          borderBottom: '2px solid #e5e7eb',
+                        }}
+                      >
+                        {i + 1}위
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* 도메인 */}
+                  <tr>
+                    <td
+                      style={{
+                        padding: '6px',
+                        color: '#6b7280',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      도메인
+                    </td>
+                    <td
+                      style={{
+                        padding: '6px',
+                        textAlign: 'center',
+                        fontWeight: 600,
+                        color: '#111827',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      {comp.customerDomain.length > 15
+                        ? comp.customerDomain.slice(0, 15) + '...'
+                        : comp.customerDomain}
+                    </td>
+                    {comp.competitors.map((c, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: '6px',
+                          textAlign: 'center',
+                          color: '#374151',
+                          borderBottom: '1px solid #f3f4f6',
+                        }}
+                      >
+                        {c.domain.length > 15 ? c.domain.slice(0, 15) + '...' : c.domain}
+                      </td>
+                    ))}
+                  </tr>
+                  {/* DA */}
+                  <tr>
+                    <td
+                      style={{
+                        padding: '6px',
+                        color: '#6b7280',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      도메인 권위도 (DA)
+                    </td>
+                    <td
+                      style={{
+                        padding: '6px',
+                        textAlign: 'center',
+                        fontWeight: 700,
+                        color:
+                          (comp.customerMetrics?.mozDA || 0) < (comp.competitors[0]?.mozDA || 0)
+                            ? '#dc2626'
+                            : '#16a34a',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      {comp.customerMetrics?.mozDA || 0}
+                    </td>
+                    {comp.competitors.map((c, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: '6px',
+                          textAlign: 'center',
+                          fontWeight: 600,
+                          color: '#16a34a',
+                          borderBottom: '1px solid #f3f4f6',
+                        }}
+                      >
+                        {c.mozDA || 0}
+                      </td>
+                    ))}
+                  </tr>
+                  {/* 백링크 수 */}
+                  <tr>
+                    <td
+                      style={{
+                        padding: '6px',
+                        color: '#6b7280',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      총 백링크
+                    </td>
+                    <td
+                      style={{
+                        padding: '6px',
+                        textAlign: 'center',
+                        fontWeight: 700,
+                        color: '#dc2626',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      {(
+                        comp.customerMetrics?.ahrefsBacklinks ||
+                        comp.customerMetrics?.backlinkTotal ||
+                        0
+                      ).toLocaleString()}
+                    </td>
+                    {comp.competitors.map((c, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: '6px',
+                          textAlign: 'center',
+                          fontWeight: 600,
+                          color: '#111827',
+                          borderBottom: '1px solid #f3f4f6',
+                        }}
+                      >
+                        {(c.ahrefsBacklinks || c.backlinkTotal || 0).toLocaleString()}
+                      </td>
+                    ))}
+                  </tr>
+                  {/* 참조 도메인 */}
+                  <tr>
+                    <td
+                      style={{
+                        padding: '6px',
+                        color: '#6b7280',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      참조 도메인
+                    </td>
+                    <td
+                      style={{
+                        padding: '6px',
+                        textAlign: 'center',
+                        fontWeight: 700,
+                        color: '#dc2626',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      {(
+                        comp.customerMetrics?.ahrefsRefDomains ||
+                        comp.customerMetrics?.referringDomains ||
+                        0
+                      ).toLocaleString()}
+                    </td>
+                    {comp.competitors.map((c, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: '6px',
+                          textAlign: 'center',
+                          fontWeight: 600,
+                          color: '#111827',
+                          borderBottom: '1px solid #f3f4f6',
+                        }}
+                      >
+                        {(c.ahrefsRefDomains || c.referringDomains || 0).toLocaleString()}
+                      </td>
+                    ))}
+                  </tr>
+                  {/* 월간 트래픽 */}
+                  <tr>
+                    <td
+                      style={{
+                        padding: '6px',
+                        color: '#6b7280',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      월간 트래픽
+                    </td>
+                    <td
+                      style={{
+                        padding: '6px',
+                        textAlign: 'center',
+                        fontWeight: 700,
+                        color: '#dc2626',
+                        borderBottom: '1px solid #f3f4f6',
+                      }}
+                    >
+                      {(comp.customerMetrics?.ahrefsTraffic || 0).toLocaleString()}
+                    </td>
+                    {comp.competitors.map((c, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: '6px',
+                          textAlign: 'center',
+                          fontWeight: 600,
+                          color: '#111827',
+                          borderBottom: '1px solid #f3f4f6',
+                        }}
+                      >
+                        {(c.ahrefsTraffic || 0).toLocaleString()}
+                      </td>
+                    ))}
+                  </tr>
+                  {/* DR */}
+                  <tr>
+                    <td style={{ padding: '6px', color: '#6b7280' }}>도메인 레이팅 (DR)</td>
+                    <td
+                      style={{
+                        padding: '6px',
+                        textAlign: 'center',
+                        fontWeight: 700,
+                        color:
+                          (comp.customerMetrics?.ahrefsDR || 0) <
+                          (comp.competitors[0]?.ahrefsDR || 0)
+                            ? '#dc2626'
+                            : '#16a34a',
+                      }}
+                    >
+                      {comp.customerMetrics?.ahrefsDR || 0}
+                    </td>
+                    {comp.competitors.map((c, i) => (
+                      <td
+                        key={i}
+                        style={{
+                          padding: '6px',
+                          textAlign: 'center',
+                          fontWeight: 600,
+                          color: '#16a34a',
+                        }}
+                      >
+                        {c.ahrefsDR || 0}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+
+              {/* 격차 요약 메시지 */}
+              {comp.competitors[0] && (
+                <div
+                  style={{
+                    background: '#fef2f2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '6px',
+                    padding: '12px',
+                    marginTop: '12px',
+                  }}
+                >
+                  <p style={{ margin: 0, fontSize: '12px', color: '#991b1b', fontWeight: 600 }}>
+                    1위 경쟁사 대비 백링크 격차:{' '}
+                    {(() => {
+                      const myBL =
+                        comp.customerMetrics?.ahrefsBacklinks ||
+                        comp.customerMetrics?.backlinkTotal ||
+                        0
+                      const topBL =
+                        comp.competitors[0].ahrefsBacklinks ||
+                        comp.competitors[0].backlinkTotal ||
+                        0
+                      const gap = topBL - myBL
+                      return gap > 0 ? `${gap.toLocaleString()}개 부족` : '선두 유지 중'
+                    })()}
+                  </p>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#6b7280' }}>
+                    경쟁사는 이미 백링크를 꾸준히 구축하고 있습니다. 지금 시작하지 않으면 격차는 더
+                    벌어집니다.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

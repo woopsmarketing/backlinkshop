@@ -113,6 +113,7 @@ export function renderSeoReportEmail(props: {
   score?: number | null
   analysisHtml?: string
   parsedData?: import('@/lib/seo-analyzer').ParsedSeo
+  competitorData?: import('@/lib/competitor-analyzer').CompetitorAnalysis | null
 }) {
   return <SeoReportEmail {...props} />
 }

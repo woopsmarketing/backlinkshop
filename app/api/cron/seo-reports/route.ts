@@ -59,6 +59,7 @@ export async function GET(request: Request) {
           score: number | null
           analysisHtml: string
           parsedData: ParsedSeo
+          competitorData?: import('@/lib/competitor-analyzer').CompetitorAnalysis | null
         }
 
         // 사용자 이메일 조회
@@ -85,6 +86,7 @@ export async function GET(request: Request) {
             score: reportData.score,
             analysisHtml: reportData.analysisHtml,
             parsedData: reportData.parsedData,
+            competitorData: reportData.competitorData || null,
           })
         )
 

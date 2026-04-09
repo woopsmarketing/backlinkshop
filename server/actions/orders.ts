@@ -27,6 +27,7 @@ import {
 import { createGoatPBNCampaign } from '@/lib/api/goat-pbn'
 import { getProductDuration, extractPBNQuantity } from '@/lib/constants/product-config'
 import { fetchAndAnalyze } from '@/lib/seo-analyzer'
+import { analyzeCompetitors, type CompetitorAnalysis } from '@/lib/competitor-analyzer'
 import { markdownToHtml } from '@/lib/markdown-to-html'
 // renderSeoReportEmail은 /api/cron/seo-reports 라우트에서 사용
 
@@ -146,6 +147,7 @@ export async function createOrderAction(
       score: number | null
       analysisHtml: string
       parsedData: import('@/lib/seo-analyzer').ParsedSeo
+      competitorData?: CompetitorAnalysis | null
     } | null = null
 
     if (isOnPageProduct && siteUrl) {
@@ -155,7 +157,19 @@ export async function createOrderAction(
         const { parsed, analysis, score } = await fetchAndAnalyze(siteUrl, keywords)
         const analysisHtml = markdownToHtml(analysis)
 
-        seoAnalysisData = { score, analysisHtml, parsedData: parsed }
+        // 경쟁사 분석 (키워드가 있는 경우만, 실패해도 무시)
+        let competitorData: CompetitorAnalysis | null = null
+        if (keywords) {
+          try {
+            console.log('🔍 경쟁사 분석 시작:', { keywords, siteUrl })
+            competitorData = await analyzeCompetitors(keywords, siteUrl, 3)
+            console.log('✅ 경쟁사 분석 완료:', { competitors: competitorData.competitors.length })
+          } catch (compError: any) {
+            console.error('⚠️ 경쟁사 분석 실패 (무시):', compError.message)
+          }
+        }
+
+        seoAnalysisData = { score, analysisHtml, parsedData: parsed, competitorData }
         initialStatus = 'processing' // 분석 완료했지만 "처리중"으로 표시 (지연 발송 위해)
 
         console.log('✅ 온페이지 SEO 분석 완료 - 지연 발송 예약:', { score, siteUrl })
@@ -188,6 +202,7 @@ export async function createOrderAction(
               score: seoAnalysisData.score,
               analysisHtml: seoAnalysisData.analysisHtml,
               parsedData: seoAnalysisData.parsedData,
+              competitorData: seoAnalysisData.competitorData || null,
             }
           : null,
       })
