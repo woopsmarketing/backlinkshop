@@ -273,7 +273,141 @@ function CompetitorMetricsTable({
           { label: '최초 아카이브', key: 'waybackFirstSeen', format: 'text' },
         ]}
       />
+
+      {/* 5. 온페이지 내부 최적화 */}
+      <OnPageMetricSection comp={comp} />
     </div>
+  )
+}
+
+/**
+ * 온페이지 지표 비교 섹션 (별도 구조: nested onPage 객체 처리)
+ */
+function OnPageMetricSection({
+  comp,
+}: {
+  comp: import('@/lib/competitor-analyzer').CompetitorAnalysis
+}) {
+  const trimDomain = (d: string) => (d.length > 12 ? d.slice(0, 12) + '..' : d)
+
+  const rows: Array<{ label: string; get: (o: any) => string }> = [
+    { label: 'Title 길이', get: o => (o?.titleLength ? `${o.titleLength}자` : '-') },
+    {
+      label: 'Description 길이',
+      get: o => (o?.metaDescriptionLength ? `${o.metaDescriptionLength}자` : '-'),
+    },
+    { label: 'H1 개수', get: o => (o ? `${o.h1Count}개` : '-') },
+    { label: 'H2 개수', get: o => (o ? `${o.h2Count}개` : '-') },
+    { label: '단어 수', get: o => (o?.wordCount ? o.wordCount.toLocaleString() : '-') },
+    {
+      label: '이미지',
+      get: o => (o ? `${o.imgTotal}개 (Alt ${o.imgTotal - o.imgWithoutAlt}/${o.imgTotal})` : '-'),
+    },
+    { label: '내부 링크', get: o => (o ? `${o.internalLinks}개` : '-') },
+    { label: '로딩 속도', get: o => (o?.loadTimeMs ? `${o.loadTimeMs}ms` : '-') },
+    { label: 'HTTPS', get: o => (o?.hasHttps ? '✓' : '✗') },
+    { label: '구조화 데이터', get: o => (o?.hasStructuredData ? '✓' : '✗') },
+    { label: 'OG Tags', get: o => (o?.hasOgTags ? '✓' : '✗') },
+  ]
+
+  return (
+    <>
+      <p
+        style={{
+          margin: '14px 0 4px 0',
+          fontSize: '11px',
+          fontWeight: 700,
+          color: '#1e40af',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+        }}
+      >
+        내부 최적화 (온페이지)
+      </p>
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          fontSize: '11px',
+          background: '#fafafa',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        <thead>
+          <tr style={{ background: '#f1f5f9' }}>
+            <th
+              style={{
+                padding: '6px 8px',
+                textAlign: 'left',
+                color: '#6b7280',
+                fontWeight: 600,
+                width: '38%',
+              }}
+            >
+              지표
+            </th>
+            <th
+              style={{ padding: '6px 4px', textAlign: 'center', color: '#dc2626', fontWeight: 700 }}
+            >
+              내 사이트
+            </th>
+            {comp.competitors.map((c, i) => (
+              <th
+                key={i}
+                style={{
+                  padding: '6px 4px',
+                  textAlign: 'center',
+                  color: '#374151',
+                  fontWeight: 600,
+                  fontSize: '10px',
+                }}
+              >
+                {i + 1}위
+                <br />
+                <span style={{ color: '#9ca3af', fontSize: '9px', fontWeight: 400 }}>
+                  {trimDomain(c.domain)}
+                </span>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.label}>
+              <td style={{ padding: '5px 8px', color: '#6b7280', borderTop: '1px solid #f3f4f6' }}>
+                {row.label}
+              </td>
+              <td
+                style={{
+                  padding: '5px 4px',
+                  textAlign: 'center',
+                  fontWeight: 700,
+                  color: '#111827',
+                  borderTop: '1px solid #f3f4f6',
+                }}
+              >
+                {row.get(comp.customerMetrics?.onPage)}
+              </td>
+              {comp.competitors.map((c, i) => (
+                <td
+                  key={i}
+                  style={{
+                    padding: '5px 4px',
+                    textAlign: 'center',
+                    fontWeight: 600,
+                    color: '#374151',
+                    borderTop: '1px solid #f3f4f6',
+                  }}
+                >
+                  {row.get(c.onPage)}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   )
 }
 

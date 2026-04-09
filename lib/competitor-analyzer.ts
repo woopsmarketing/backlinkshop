@@ -1,7 +1,9 @@
 /**
  * 경쟁사 분석 모듈
- * 키워드로 구글 1~3위 경쟁사를 찾고 도메인/백링크/Wayback 데이터 수집
+ * 키워드로 구글 1~5위 경쟁사를 찾고 도메인/백링크/Wayback/온페이지 데이터 수집
  */
+
+import { parseHtml, type ParsedSeo } from './seo-analyzer'
 
 export interface CompetitorData {
   rank: number
@@ -43,6 +45,25 @@ export interface CompetitorData {
   waybackFirstSeen?: string | null
   waybackSnapshots?: number
   domainAgeYears?: number
+
+  // 온페이지 (내부 최적화 상태)
+  onPage?: {
+    title: string | null
+    titleLength: number
+    metaDescription: string | null
+    metaDescriptionLength: number
+    h1Count: number
+    h2Count: number
+    wordCount: number
+    imgTotal: number
+    imgWithoutAlt: number
+    internalLinks: number
+    externalLinks: number
+    loadTimeMs: number
+    hasHttps: boolean
+    hasStructuredData: boolean
+    hasOgTags: boolean
+  } | null
 
   // 디버그
   _errors?: string[]
@@ -243,6 +264,59 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
 }
 
 /**
+ * 온페이지 SEO 분석 (OpenAI 호출 없이 HTML 파싱만)
+ * 빠른 비교용 요약 데이터 반환
+ */
+async function fetchOnPageSummary(url: string): Promise<Partial<CompetitorData>> {
+  try {
+    let targetUrl = url.trim()
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://' + targetUrl
+    }
+
+    const start = Date.now()
+    const res = await fetch(targetUrl, {
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (compatible; BacklinkShopBot/1.0; +https://www.backlinkshop.co.kr)',
+        Accept: 'text/html',
+      },
+      redirect: 'follow',
+    })
+
+    const loadTime = Date.now() - start
+    const headers = Object.fromEntries(res.headers.entries())
+    const html = await res.text()
+
+    const parsed: ParsedSeo = parseHtml(html, targetUrl, res.url, res.status, loadTime, headers)
+
+    return {
+      onPage: {
+        title: parsed.title,
+        titleLength: parsed.titleLength,
+        metaDescription: parsed.metaDescription,
+        metaDescriptionLength: parsed.metaDescriptionLength,
+        h1Count: parsed.h1.length,
+        h2Count: parsed.h2.length,
+        wordCount: parsed.wordCount,
+        imgTotal: parsed.imgTotal,
+        imgWithoutAlt: parsed.imgWithoutAlt,
+        internalLinks: parsed.internalLinks,
+        externalLinks: parsed.externalLinks,
+        loadTimeMs: parsed.loadTimeMs,
+        hasHttps: parsed.isHttps,
+        hasStructuredData: parsed.hasStructuredData,
+        hasOgTags: parsed.hasOgTitle && parsed.hasOgDescription && parsed.hasOgImage,
+      },
+    }
+  } catch (err: any) {
+    console.error(`[OnPage] ${url} 예외:`, err.message)
+    return { _errors: [`온페이지 예외: ${err.message}`] }
+  }
+}
+
+/**
  * Wayback Machine: 도메인 최초 아카이브 시점 + 스냅샷 수 → 도메인 연령 계산
  */
 async function fetchWaybackInfo(domain: string): Promise<Partial<CompetitorData>> {
@@ -287,7 +361,7 @@ async function fetchWaybackInfo(domain: string): Promise<Partial<CompetitorData>
 
 /**
  * 단일 도메인의 전체 분석 데이터 수집
- * VebAPI 백링크는 RapidAPI(ahrefsBacklinks)와 중복이라 제외 → 타임아웃 방지
+ * 도메인 메트릭 + Wayback + 온페이지 분석 병렬 실행
  */
 async function analyzeOneDomain(
   domain: string,
@@ -295,12 +369,17 @@ async function analyzeOneDomain(
   url: string,
   title: string
 ): Promise<CompetitorData> {
-  const [domainMetrics, waybackInfo] = await Promise.all([
+  const [domainMetrics, waybackInfo, onPageInfo] = await Promise.all([
     fetchDomainMetrics(domain),
     fetchWaybackInfo(domain),
+    fetchOnPageSummary(url),
   ])
 
-  const errors = [...(domainMetrics._errors || []), ...(waybackInfo._errors || [])]
+  const errors = [
+    ...(domainMetrics._errors || []),
+    ...(waybackInfo._errors || []),
+    ...(onPageInfo._errors || []),
+  ]
 
   return {
     rank,
@@ -309,6 +388,7 @@ async function analyzeOneDomain(
     title,
     ...domainMetrics,
     ...waybackInfo,
+    ...onPageInfo,
     _errors: errors.length > 0 ? errors : undefined,
   }
 }
@@ -319,7 +399,7 @@ async function analyzeOneDomain(
 export async function analyzeCompetitors(
   keyword: string,
   customerSiteUrl: string,
-  topN: number = 3
+  topN: number = 5
 ): Promise<CompetitorAnalysis> {
   const customerDomain = extractDomain(customerSiteUrl)
 

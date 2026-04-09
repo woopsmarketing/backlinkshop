@@ -97,7 +97,7 @@ export async function GET(request: Request) {
         const [seoResult, competitorResult] = await Promise.allSettled([
           fetchAndAnalyze(order.site_url, order.keywords || undefined),
           order.keywords
-            ? analyzeCompetitors(order.keywords, order.site_url, 2)
+            ? analyzeCompetitors(order.keywords, order.site_url, 5)
             : Promise.resolve(null),
         ])
 
