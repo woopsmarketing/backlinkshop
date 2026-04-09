@@ -123,7 +123,7 @@ async function fetchBacklinkProfile(domain: string): Promise<Partial<CompetitorD
       `https://vebapi.com/api/seo/backlinkdata?website=${encodeURIComponent(domain)}`,
       {
         headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(10000),
       }
     )
 
@@ -165,7 +165,7 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
           'X-RapidAPI-Key': apiKey,
           'X-RapidAPI-Host': 'domain-metrics-check.p.rapidapi.com',
         },
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(10000),
       }
     )
 
@@ -257,6 +257,7 @@ async function fetchWaybackInfo(domain: string): Promise<Partial<CompetitorData>
 
 /**
  * 단일 도메인의 전체 분석 데이터 수집
+ * VebAPI 백링크는 RapidAPI(ahrefsBacklinks)와 중복이라 제외 → 타임아웃 방지
  */
 async function analyzeOneDomain(
   domain: string,
@@ -264,17 +265,12 @@ async function analyzeOneDomain(
   url: string,
   title: string
 ): Promise<CompetitorData> {
-  const [domainMetrics, backlinkProfile, waybackInfo] = await Promise.all([
+  const [domainMetrics, waybackInfo] = await Promise.all([
     fetchDomainMetrics(domain),
-    fetchBacklinkProfile(domain),
     fetchWaybackInfo(domain),
   ])
 
-  const errors = [
-    ...(domainMetrics._errors || []),
-    ...(backlinkProfile._errors || []),
-    ...(waybackInfo._errors || []),
-  ]
+  const errors = [...(domainMetrics._errors || []), ...(waybackInfo._errors || [])]
 
   return {
     rank,
@@ -282,7 +278,6 @@ async function analyzeOneDomain(
     domain,
     title,
     ...domainMetrics,
-    ...backlinkProfile,
     ...waybackInfo,
     _errors: errors.length > 0 ? errors : undefined,
   }
