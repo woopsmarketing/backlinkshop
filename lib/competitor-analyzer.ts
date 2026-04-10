@@ -89,77 +89,53 @@ function extractDomain(url: string): string {
 }
 
 /**
- * VebAPI SERP 단일 호출
+ * Serper.dev: 키워드로 구글 검색 → 상위 URL 반환
  */
-async function callSerpApi(apiKey: string, keyword: string, locale: string): Promise<any[] | null> {
-  const params = new URLSearchParams({
-    q: keyword,
-    locale,
-    device_type: 'desktop_chrome',
-    page_count: '1',
-  })
+async function fetchSerpResults(
+  keyword: string,
+  count: number = 10
+): Promise<{ url: string; title: string }[]> {
+  const apiKey = process.env.SERPER_API_KEY
+  if (!apiKey) throw new Error('SERPER_API_KEY 환경변수가 설정되지 않았습니다')
 
   try {
-    const res = await fetch(`https://vebapi.com/api/serp/google?${params}`, {
+    const res = await fetch('https://google.serper.dev/search', {
+      method: 'POST',
       headers: {
         'X-API-KEY': apiKey,
         'Content-Type': 'application/json',
       },
-      signal: AbortSignal.timeout(20000),
+      body: JSON.stringify({
+        q: keyword,
+        gl: 'kr',
+        hl: 'ko',
+        num: count,
+      }),
+      signal: AbortSignal.timeout(15000),
     })
 
     if (!res.ok) {
       const body = await res.text().catch(() => '')
-      console.error(`[SERP] ${locale} 실패 ${res.status}:`, body.slice(0, 150))
-      return null
+      console.error(`[SERP] Serper 실패 ${res.status}:`, body.slice(0, 200))
+      return []
     }
 
     const data = await res.json()
-    const organic = data?.results?.results?.[0]?.content?.results?.results?.organic
-    return Array.isArray(organic) ? organic : null
+    const organic = data?.organic || []
+
+    console.log(`[SERP] "${keyword}" → ${organic.length}개 결과`)
+
+    return organic
+      .slice(0, count)
+      .map((item: any) => ({
+        url: item.link || '',
+        title: item.title || '',
+      }))
+      .filter((item: any) => item.url)
   } catch (err: any) {
-    console.error(`[SERP] ${locale} 예외:`, err.message)
-    return null
-  }
-}
-
-/**
- * VebAPI SERP: 키워드로 구글 검색 → 상위 URL 반환
- * 여러 locale을 순차적으로 시도 (ko-kr 실패 시 폴백)
- */
-async function fetchSerpResults(
-  keyword: string,
-  count: number = 5
-): Promise<{ url: string; title: string }[]> {
-  const apiKey = process.env.VEBAPI_KEY
-  if (!apiKey) throw new Error('VEBAPI_KEY 환경변수가 설정되지 않았습니다')
-
-  const locales = ['ko-kr', 'ko-KR', 'en-us']
-  let organic: any[] | null = null
-  let usedLocale = ''
-
-  for (const locale of locales) {
-    organic = await callSerpApi(apiKey, keyword, locale)
-    if (organic && organic.length > 0) {
-      usedLocale = locale
-      break
-    }
-  }
-
-  if (!organic || organic.length === 0) {
-    console.error(`[SERP] 모든 로케일 실패: "${keyword}"`)
+    console.error(`[SERP] Serper 예외:`, err.message)
     return []
   }
-
-  console.log(`[SERP] "${keyword}" (${usedLocale}) → ${organic.length}개 결과`)
-
-  return organic
-    .slice(0, count)
-    .map((item: any) => ({
-      url: item.url || '',
-      title: item.title || '',
-    }))
-    .filter((item: any) => item.url)
 }
 
 /**
