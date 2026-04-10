@@ -30,21 +30,32 @@ export async function GET(request: Request) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // 5분 이상 경과한 + seo_report_data가 있는 + 아직 processing인 주문 조회
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString()
+    // processing 상태 + seo_report_data 있는 + 생성 후 2분 이상 경과한 주문 조회
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000).toISOString()
+
+    // 디버깅: 먼저 processing 상태 주문이 몇 개인지 확인
+    const { count: processingCount } = await adminClient
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'processing')
+      .not('seo_report_data', 'is', null)
+
+    console.log(`[SEO Reports] processing 주문: ${processingCount}건, 기준시각: ${twoMinutesAgo}`)
 
     const { data: pendingOrders, error: queryError } = await adminClient
       .from('orders')
       .select('id, user_id, site_url, keywords, seo_report_data, created_at')
       .eq('status', 'processing')
       .not('seo_report_data', 'is', null)
-      .lt('created_at', fiveMinutesAgo)
-      .limit(5) // 한번에 최대 5건 처리 (타임아웃 방지)
+      .lt('created_at', twoMinutesAgo)
+      .limit(5)
 
     if (queryError) {
-      console.error('SEO 리포트 대기 주문 조회 실패:', queryError)
+      console.error('[SEO Reports] 대기 주문 조회 실패:', queryError)
       return NextResponse.json({ error: 'Query failed' }, { status: 500 })
     }
+
+    console.log(`[SEO Reports] 이메일 발송 대상: ${pendingOrders?.length || 0}건`)
 
     if (!pendingOrders || pendingOrders.length === 0) {
       return NextResponse.json({ message: 'No pending reports', processed: 0 })
@@ -69,10 +80,12 @@ export async function GET(request: Request) {
         const userEmail = authUser?.email
 
         if (!userEmail) {
-          console.error('사용자 이메일 없음:', order.id)
+          console.error('[SEO Reports] 사용자 이메일 없음:', order.id)
           failed++
           continue
         }
+
+        console.log(`[SEO Reports] 이메일 발송 시작: ${order.id} → ${userEmail}`)
 
         // 분석 결과 이메일 발송
         await sendEmail(
