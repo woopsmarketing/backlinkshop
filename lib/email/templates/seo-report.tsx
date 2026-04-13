@@ -479,6 +479,276 @@ function CompetitorGapSummary({
   )
 }
 
+/* ─── 액션 체크리스트 ─── */
+
+interface ActionItem {
+  priority: 1 | 2 | 3
+  title: string
+  reason: string
+}
+
+function buildActionChecklist(p: ParsedSeo | undefined, keyword?: string): ActionItem[] {
+  if (!p) return []
+  const items: ActionItem[] = []
+  const kw = (keyword || '').trim()
+
+  // P1 — 핵심 치명타
+  if (p.statusCode !== 200) {
+    items.push({
+      priority: 1,
+      title: `HTTP 상태코드 수정 (현재 ${p.statusCode})`,
+      reason: '검색엔진이 페이지를 정상 크롤링 할 수 없습니다',
+    })
+  }
+  if (!p.isHttps) {
+    items.push({
+      priority: 1,
+      title: 'HTTPS(SSL 인증서) 적용',
+      reason: '구글은 HTTPS를 랭킹 시그널로 사용합니다',
+    })
+  }
+  if (!p.title || p.titleLength < 20) {
+    items.push({
+      priority: 1,
+      title: `Title 태그 보강 (현재 ${p.titleLength}자)`,
+      reason: `30~60자 권장. ${kw ? `"${kw}" 키워드 포함 필수` : '핵심 키워드 포함 필수'}`,
+    })
+  } else if (kw && p.title && !p.title.toLowerCase().includes(kw.toLowerCase())) {
+    items.push({
+      priority: 1,
+      title: `Title에 "${kw}" 키워드 포함`,
+      reason: '타겟 키워드가 Title에 없으면 검색 노출이 크게 떨어집니다',
+    })
+  }
+  if (!p.metaDescription || p.metaDescriptionLength === 0) {
+    items.push({
+      priority: 1,
+      title: 'Meta Description 작성',
+      reason: '검색 결과 클릭률(CTR)에 직결. 120~160자 권장',
+    })
+  }
+  if (p.h1.length === 0) {
+    items.push({
+      priority: 1,
+      title: 'H1 태그 추가',
+      reason: '페이지 핵심 주제를 검색엔진에 전달하는 가장 중요한 신호',
+    })
+  }
+
+  // P2 — 강하게 권장
+  if (p.metaDescription && p.metaDescriptionLength > 0 && p.metaDescriptionLength < 80) {
+    items.push({
+      priority: 2,
+      title: `Meta Description 확장 (현재 ${p.metaDescriptionLength}자)`,
+      reason: '120~160자로 늘려 검색 결과 노출 정보량 확대',
+    })
+  }
+  if (p.h1.length > 1) {
+    items.push({
+      priority: 2,
+      title: `H1 태그 1개로 축소 (현재 ${p.h1.length}개)`,
+      reason: 'H1 복수 사용은 페이지 주제를 흐립니다',
+    })
+  }
+  if (kw && p.h1.length > 0 && !p.h1.some(h => h.toLowerCase().includes(kw.toLowerCase()))) {
+    items.push({
+      priority: 2,
+      title: `H1에 "${kw}" 키워드 포함`,
+      reason: 'Title-H1-본문의 키워드 일관성이 랭킹에 유리',
+    })
+  }
+  if (!p.canonical) {
+    items.push({
+      priority: 2,
+      title: 'Canonical URL 설정',
+      reason: '중복 콘텐츠 페널티 방지',
+    })
+  }
+  if (!p.hasStructuredData) {
+    items.push({
+      priority: 2,
+      title: 'JSON-LD 구조화 데이터 추가',
+      reason: 'Rich Snippet 노출로 CTR 상승 기대',
+    })
+  }
+  if (!p.hasOgTitle || !p.hasOgDescription || !p.hasOgImage) {
+    items.push({
+      priority: 2,
+      title: 'Open Graph 태그 완성 (og:title, description, image)',
+      reason: 'SNS/메신저 공유 시 미리보기 노출 품질 결정',
+    })
+  }
+  if (p.imgTotal > 0 && p.imgWithoutAlt > 0) {
+    items.push({
+      priority: 2,
+      title: `이미지 Alt 속성 추가 (누락 ${p.imgWithoutAlt}개)`,
+      reason: '접근성 + 이미지 검색 노출 개선',
+    })
+  }
+  if (p.wordCount > 0 && p.wordCount < 300) {
+    items.push({
+      priority: 2,
+      title: `본문 콘텐츠 확장 (현재 ${p.wordCount}단어)`,
+      reason: '300단어 미만은 얇은 콘텐츠로 평가될 수 있음',
+    })
+  }
+
+  // P3 — 권장
+  if (!p.hasGzip) {
+    items.push({
+      priority: 3,
+      title: 'Gzip/Brotli 압축 활성화',
+      reason: '페이지 로딩 속도 개선',
+    })
+  }
+  if (!p.hasHsts) {
+    items.push({
+      priority: 3,
+      title: 'HSTS 헤더 추가',
+      reason: '보안 강화 및 HTTPS 강제 적용',
+    })
+  }
+  if (!p.hasTwitterCard) {
+    items.push({
+      priority: 3,
+      title: 'Twitter Card 메타 태그 추가',
+      reason: '트위터/X 공유 시 미리보기 품질 개선',
+    })
+  }
+  if (!p.hasFavicon) {
+    items.push({
+      priority: 3,
+      title: 'Favicon 추가',
+      reason: '브랜드 인지도 및 검색 결과 시각 노출 개선',
+    })
+  }
+  if (p.loadTimeMs > 3000) {
+    items.push({
+      priority: 3,
+      title: `로딩 속도 개선 (현재 ${p.loadTimeMs}ms)`,
+      reason: 'Core Web Vitals 점수 및 사용자 이탈율 개선',
+    })
+  }
+
+  return items.sort((a, b) => a.priority - b.priority).slice(0, 8)
+}
+
+function ActionChecklist({ p, keyword }: { p?: ParsedSeo; keyword?: string }) {
+  const items = buildActionChecklist(p, keyword)
+  if (items.length === 0) return null
+
+  const priorityMeta = {
+    1: { bg: '#fef2f2', border: '#fecaca', color: '#dc2626', label: '긴급' },
+    2: { bg: '#fffbeb', border: '#fde68a', color: '#d97706', label: '중요' },
+    3: { bg: '#f0fdf4', border: '#bbf7d0', color: '#16a34a', label: '권장' },
+  } as const
+
+  return (
+    <div
+      style={{
+        background: 'white',
+        borderRadius: '10px',
+        padding: '18px',
+        margin: '0 0 16px 0',
+        border: '2px solid #1e40af',
+      }}
+    >
+      <h3
+        style={{
+          margin: '0 0 4px 0',
+          fontSize: '15px',
+          fontWeight: 700,
+          color: '#1e40af',
+        }}
+      >
+        ✅ 지금 바로 실행할 개선 체크리스트
+      </h3>
+      <p
+        style={{
+          margin: '0 0 14px 0',
+          fontSize: '11px',
+          color: '#6b7280',
+        }}
+      >
+        분석 결과를 토대로 우선순위가 높은 액션 {items.length}개를 선별했습니다
+      </p>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <tbody>
+          {items.map((item, i) => {
+            const meta = priorityMeta[item.priority]
+            return (
+              <tr key={i}>
+                <td
+                  style={{
+                    padding: '10px 0',
+                    borderTop: i === 0 ? 'none' : '1px solid #f3f4f6',
+                    verticalAlign: 'top',
+                    width: '30px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '20px',
+                      height: '20px',
+                      border: '2px solid #d1d5db',
+                      borderRadius: '4px',
+                      display: 'inline-block',
+                    }}
+                  />
+                </td>
+                <td
+                  style={{
+                    padding: '10px 8px',
+                    borderTop: i === 0 ? 'none' : '1px solid #f3f4f6',
+                    verticalAlign: 'top',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        background: meta.bg,
+                        color: meta.color,
+                        border: `1px solid ${meta.border}`,
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        padding: '2px 6px',
+                        borderRadius: '3px',
+                        marginRight: '6px',
+                      }}
+                    >
+                      P{item.priority} {meta.label}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: '#111827',
+                      }}
+                    >
+                      {item.title}
+                    </span>
+                  </div>
+                  <p
+                    style={{
+                      margin: '4px 0 0 0',
+                      fontSize: '11px',
+                      color: '#6b7280',
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {item.reason}
+                  </p>
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 /* ─── 메인 테이블 래퍼 (600px 중앙 정렬) ─── */
 function W({ children, bg }: { children: React.ReactNode; bg?: string }) {
   return (
@@ -645,6 +915,9 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               </div>
             </div>
           )}
+
+          {/* ===== 액션 체크리스트 ===== */}
+          <ActionChecklist p={p} keyword={keywords} />
 
           {/* ===== 메인 CTA: 텔레그램 1:1 문의 ===== */}
           <div
