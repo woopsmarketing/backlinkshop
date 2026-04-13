@@ -944,15 +944,26 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
             </div>
           )}
 
-          {/* ===== 경쟁사 TOP5 상세 비교표 (접기 가능) ===== */}
+          {/* ===== 경쟁사 TOP5 상세 비교표 ===== */}
           {comp && comp.competitors.length > 0 && (
-            <Collapsible
-              title={`📊 내 사이트 vs 경쟁사 TOP${comp.competitors.length} 상세 비교`}
-              subtitle="Moz · Ahrefs · Majestic + 온페이지"
-              defaultOpen={false}
+            <div
+              style={{
+                background: 'white',
+                borderRadius: '10px',
+                padding: '16px',
+                margin: '0 0 16px 0',
+              }}
             >
+              <h3
+                style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 700, color: '#111827' }}
+              >
+                📊 내 사이트 vs 경쟁사 TOP{comp.competitors.length} 상세 비교
+              </h3>
+              <p style={{ margin: '0 0 10px 0', fontSize: '11px', color: '#6b7280' }}>
+                Moz · Ahrefs · Majestic + 온페이지 내부 최적화
+              </p>
               <CompetitorMetricsTable comp={comp} />
-            </Collapsible>
+            </div>
           )}
 
           {/* ===== 액션 체크리스트 ===== */}
@@ -991,13 +1002,19 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
             </a>
           </div>
 
-          {/* ===== 파싱 데이터 테이블 (접기 가능) ===== */}
+          {/* ===== 파싱 데이터 테이블 ===== */}
           {p && (
-            <Collapsible
-              title="🔍 내 사이트 47개 항목 상세 진단"
-              subtitle="기본 정보 · 메타 · 제목 · 링크 · 기술 · 소셜"
-              defaultOpen={false}
-            >
+            <>
+              <h3
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  color: '#111827',
+                  margin: '8px 0 12px 0',
+                }}
+              >
+                🔍 내 사이트 47개 항목 상세 진단
+              </h3>
               <SectionTitle>기본 정보</SectionTitle>
               <table className="data-table">
                 <tbody>
@@ -1165,22 +1182,24 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
                   />
                 </tbody>
               </table>
-            </Collapsible>
+            </>
           )}
 
-          {/* ===== AI 분석 결과 (접기 가능) ===== */}
+          {/* ===== AI 분석 결과 ===== */}
           {analysisHtml && (
-            <Collapsible
-              title="🧠 SEO 전문가 진단 의견"
-              subtitle="강점 · 개선 · 경쟁사 비교 · 종합"
-              defaultOpen={true}
-            >
-              <div
-                className="analysis-box"
-                style={{ border: 'none', padding: 0 }}
-                dangerouslySetInnerHTML={{ __html: analysisHtml }}
-              />
-            </Collapsible>
+            <>
+              <h2
+                style={{
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  color: '#111827',
+                  margin: '24px 0 8px 0',
+                }}
+              >
+                🧠 SEO 전문가 진단 의견
+              </h2>
+              <div className="analysis-box" dangerouslySetInnerHTML={{ __html: analysisHtml }} />
+            </>
           )}
 
           {/* ===== 하단 CTA: 텔레그램 집중 ===== */}

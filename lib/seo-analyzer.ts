@@ -506,8 +506,27 @@ ${keywordList.length > 0 ? `**고객 타겟 키워드:** ${keywordList.join(', '
 
 **본문 내용 일부:**
 ${p.textContentSample.slice(0, 500)}
+${
+  competitorContext && competitorContext.competitors.length > 0
+    ? `
 
-아래 형식으로 작성해주세요.
+**━━━ 경쟁사 데이터 (키워드 "${competitorContext.keyword}" 구글 상위) ━━━**
+${
+  competitorContext.customer
+    ? `내 사이트 (${competitorContext.customer.domain}): DA ${competitorContext.customer.mozDA ?? '?'} | DR ${competitorContext.customer.ahrefsDR ?? '?'} | 백링크 ${competitorContext.customer.ahrefsBacklinks?.toLocaleString() ?? '?'} | 참조도메인 ${competitorContext.customer.ahrefsRefDomains?.toLocaleString() ?? '?'} | 월트래픽 ${competitorContext.customer.ahrefsTraffic?.toLocaleString() ?? '?'}`
+    : ''
+}
+${competitorContext.competitors
+  .map(
+    c =>
+      `${c.rank}위 ${c.domain}: DA ${c.mozDA ?? '?'} | DR ${c.ahrefsDR ?? '?'} | 백링크 ${c.ahrefsBacklinks?.toLocaleString() ?? '?'} | 참조도메인 ${c.ahrefsRefDomains?.toLocaleString() ?? '?'} | 월트래픽 ${c.ahrefsTraffic?.toLocaleString() ?? '?'} | Title ${c.titleLength ?? '?'}자 | H1 ${c.h1Count ?? '?'}개 | 단어 ${c.wordCount?.toLocaleString() ?? '?'}개`
+  )
+  .join('\n')}
+`
+    : ''
+}
+
+아래 형식으로 작성해주세요. **모든 ### 섹션을 빠짐없이 포함하세요.**
 
 ## SEO 점수: [${autoScore}점 기준 ±10 조정]점
 
@@ -516,7 +535,19 @@ ${p.textContentSample.slice(0, 500)}
 
 ### 개선이 필요한 부분
 - **[항목명]**: 현재 상태(수치) → 검색 결과에서의 불이익 → 개선 시 기대 효과 (각 3~5문장, 코드 없이)
-
+${
+  competitorContext && competitorContext.competitors.length > 0
+    ? `
+### 경쟁사 비교 분석 (반드시 작성)
+위에 제공된 "경쟁사 데이터" 표를 직접 읽고, 내 사이트가 경쟁사 대비 어디서 얼마나 밀리는지 **구체적인 수치**로 비교하세요. 다음을 반드시 포함하세요:
+- 1위 경쟁사 도메인명을 직접 언급
+- 백링크/참조도메인/DA/DR 중 격차가 가장 큰 지표 1~2개를 골라 "1위 ${competitorContext.competitors[0]?.domain}은 백링크 X개인데 내 사이트는 Y개로 약 N배 차이" 형식으로 서술
+- 온페이지 측면(Title 길이, H1, 단어수)에서 경쟁사가 어떻게 다른지도 한두 줄
+- 마지막에 "이 격차를 메우려면 ~순서로 진행하시면 좋겠습니다" 형식의 우선순위 제안
+- 4~6문장
+`
+    : ''
+}
 ### 종합 의견
 전반적 평가와 핵심 개선 포인트 요약 (3~4문장)`
 
