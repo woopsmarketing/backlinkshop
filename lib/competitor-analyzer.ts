@@ -186,11 +186,12 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
 
   try {
     const res = await fetch(
-      `https://domain-metrics-check.p.rapidapi.com/domain-metrics/${encodeURIComponent(domain)}`,
+      `https://domain-metrics-check.p.rapidapi.com/domain-metrics/${encodeURIComponent(domain)}/`,
       {
         headers: {
-          'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': 'domain-metrics-check.p.rapidapi.com',
+          'Content-Type': 'application/json',
+          'x-rapidapi-key': apiKey,
+          'x-rapidapi-host': 'domain-metrics-check.p.rapidapi.com',
         },
         signal: AbortSignal.timeout(20000),
       }
@@ -203,6 +204,11 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
     }
 
     const data = await res.json()
+
+    if (data?.status === 'error') {
+      console.error(`[Metrics] ${domain} API error:`, data?.message)
+      return { _errors: [`메트릭 API: ${data?.message || 'unknown'}`] }
+    }
 
     console.log(`[Metrics] ${domain}:`, {
       mozDA: data?.mozDA,

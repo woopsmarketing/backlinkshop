@@ -42,19 +42,49 @@ export async function GET(request: Request) {
 
     console.log(`[SEO Reports] processing 주문: ${processingCount}건, 기준시각: ${twoMinutesAgo}`)
 
-    const { data: pendingOrders, error: queryError } = await adminClient
+    // 원자적 클레임: processing → sending_report 로 먼저 잡는 놈이 임자
+    // 중복 크론/재시도가 들어와도 같은 주문을 두 번 집을 수 없음
+    const { data: claimTargets, error: selectError } = await adminClient
       .from('orders')
-      .select('id, user_id, site_url, keywords, seo_report_data, created_at')
+      .select('id')
       .eq('status', 'processing')
       .not('seo_report_data', 'is', null)
       .lt('created_at', twoMinutesAgo)
       .limit(5)
 
-    if (queryError) {
-      console.error('[SEO Reports] 대기 주문 조회 실패:', queryError)
+    if (selectError) {
+      console.error('[SEO Reports] 후보 조회 실패:', selectError)
       return NextResponse.json({ error: 'Query failed' }, { status: 500 })
     }
 
+    let pendingOrders: Array<{
+      id: string
+      user_id: string
+      site_url: string | null
+      keywords: string | null
+      seo_report_data: unknown
+      created_at: string
+    }> = []
+
+    if (claimTargets && claimTargets.length > 0) {
+      const ids = claimTargets.map(o => o.id)
+      const { data: claimed, error: claimError } = await adminClient
+        .from('orders')
+        .update({ status: 'sending_report' })
+        .in('id', ids)
+        .eq('status', 'processing') // 다른 인스턴스가 이미 잡았으면 제외
+        .select('id, user_id, site_url, keywords, seo_report_data, created_at')
+
+      if (claimError) {
+        console.error('[SEO Reports] 클레임 실패:', claimError)
+        return NextResponse.json({ error: 'Claim failed' }, { status: 500 })
+      }
+      pendingOrders = claimed || []
+    }
+
+    const queryError = null as null
+
+    void queryError
     console.log(`[SEO Reports] 이메일 발송 대상: ${pendingOrders?.length || 0}건`)
 
     if (!pendingOrders || pendingOrders.length === 0) {
@@ -116,6 +146,12 @@ export async function GET(request: Request) {
         processed++
       } catch (err) {
         console.error('❌ SEO 리포트 발송 실패:', { orderId: order.id, error: err })
+        // 실패 시 processing 으로 되돌려 다음 크론에서 재시도
+        await adminClient
+          .from('orders')
+          .update({ status: 'processing' })
+          .eq('id', order.id)
+          .eq('status', 'sending_report')
         failed++
       }
     }
