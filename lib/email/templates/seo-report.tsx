@@ -61,6 +61,51 @@ function DataRow({ label, value, ok }: { label: string; value: string; ok?: bool
   )
 }
 
+function Collapsible({
+  title,
+  subtitle,
+  defaultOpen = false,
+  children,
+}: {
+  title: string
+  subtitle?: string
+  defaultOpen?: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <details
+      open={defaultOpen}
+      style={{
+        background: 'white',
+        border: '1px solid #e5e7eb',
+        borderRadius: '10px',
+        margin: '0 0 14px 0',
+        overflow: 'hidden',
+      }}
+    >
+      <summary
+        style={{
+          padding: '14px 16px',
+          cursor: 'pointer',
+          listStyle: 'none',
+          background: '#f9fafb',
+          borderBottom: '1px solid #e5e7eb',
+          userSelect: 'none',
+        }}
+      >
+        <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{title}</span>
+        {subtitle && (
+          <span style={{ marginLeft: '8px', fontSize: '11px', color: '#6b7280' }}>{subtitle}</span>
+        )}
+        <span style={{ float: 'right', fontSize: '11px', color: '#2563eb', fontWeight: 600 }}>
+          ▼ 펼치기/접기
+        </span>
+      </summary>
+      <div style={{ padding: '16px' }}>{children}</div>
+    </details>
+  )
+}
+
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <h3
@@ -756,7 +801,7 @@ function W({ children, bg }: { children: React.ReactNode; bg?: string }) {
       <tbody>
         <tr>
           <td align="center" style={{ padding: '0 16px' }}>
-            <table width="100%" cellPadding={0} cellSpacing={0} style={{ maxWidth: '560px' }}>
+            <table width="100%" cellPadding={0} cellSpacing={0} style={{ maxWidth: '680px' }}>
               <tbody>
                 <tr>
                   <td>{children}</td>
@@ -786,13 +831,21 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
       <style>{`
         body { margin: 0; padding: 0; background: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #333; -webkit-text-size-adjust: 100%; }
         .data-table { width: 100%; border-collapse: collapse; background: white; border-radius: 6px; overflow: hidden; }
-        .analysis-box { background: white; border-radius: 6px; padding: 16px; margin: 16px 0; font-size: 13px; line-height: 1.8; }
-        .analysis-box h2 { font-size: 15px; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px; margin-top: 16px; }
-        .analysis-box h3 { font-size: 14px; color: #1e40af; margin-top: 12px; }
-        .analysis-box strong { color: #111827; }
-        .analysis-box code { background: #f3f4f6; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
-        .analysis-box ul { padding-left: 16px; }
-        .analysis-box li { margin-bottom: 4px; }
+        .analysis-box { background: white; border-radius: 10px; padding: 22px 24px; margin: 0; font-size: 14px; line-height: 1.85; color: #1f2937; border: 1px solid #e5e7eb; }
+        .analysis-box h2 { font-size: 17px; color: #1e3a8a; border-bottom: 2px solid #dbeafe; padding-bottom: 8px; margin: 24px 0 12px 0; font-weight: 800; }
+        .analysis-box h2:first-child { margin-top: 0; }
+        .analysis-box h3 { font-size: 15px; color: #1e40af; margin: 22px 0 10px 0; padding-left: 12px; border-left: 4px solid #2563eb; font-weight: 700; }
+        .analysis-box h3:first-child { margin-top: 4px; }
+        .analysis-box p { margin: 10px 0; }
+        .analysis-box strong { color: #0f172a; font-weight: 700; }
+        .analysis-box em { color: #2563eb; font-style: normal; font-weight: 600; }
+        .analysis-box code { background: #eff6ff; color: #1e40af; padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: 'SF Mono', Consolas, monospace; }
+        .analysis-box ul { padding-left: 20px; margin: 10px 0; }
+        .analysis-box li { margin-bottom: 10px; padding-left: 4px; }
+        .analysis-box li::marker { color: #2563eb; }
+        .analysis-box li strong { display: inline-block; color: #1e40af; margin-right: 4px; }
+        /* 섹션 카드 강조: 잘된 부분 / 개선 / 경쟁사 / 종합 — h3 직후 단락 박스 */
+        .analysis-box h3 + p, .analysis-box h3 + ul { background: #fafbff; border-radius: 6px; padding: 12px 14px; }
         @media only screen and (max-width: 620px) {
           .mobile-full { width: 100% !important; display: block !important; }
         }
@@ -888,32 +941,18 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               </p>
 
               <CompetitorGapSummary comp={comp} />
-
-              {/* 상세 비교표: 내 사이트 vs 경쟁사 TOP5 */}
-              <div style={{ marginTop: '16px' }}>
-                <p
-                  style={{
-                    margin: '0 0 8px 0',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    color: '#111827',
-                  }}
-                >
-                  📊 내 사이트 vs 경쟁사 TOP{comp.competitors.length} 상세 비교
-                </p>
-                <p
-                  style={{
-                    margin: '0 0 10px 0',
-                    fontSize: '10px',
-                    color: '#6b7280',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  Moz, Ahrefs, Majestic 3대 SEO 플랫폼의 핵심 지표 + 온페이지 내부 최적화까지 한눈에
-                </p>
-                <CompetitorMetricsTable comp={comp} />
-              </div>
             </div>
+          )}
+
+          {/* ===== 경쟁사 TOP5 상세 비교표 (접기 가능) ===== */}
+          {comp && comp.competitors.length > 0 && (
+            <Collapsible
+              title={`📊 내 사이트 vs 경쟁사 TOP${comp.competitors.length} 상세 비교`}
+              subtitle="Moz · Ahrefs · Majestic + 온페이지"
+              defaultOpen={false}
+            >
+              <CompetitorMetricsTable comp={comp} />
+            </Collapsible>
           )}
 
           {/* ===== 액션 체크리스트 ===== */}
@@ -952,9 +991,13 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
             </a>
           </div>
 
-          {/* ===== 파싱 데이터 테이블 ===== */}
+          {/* ===== 파싱 데이터 테이블 (접기 가능) ===== */}
           {p && (
-            <>
+            <Collapsible
+              title="🔍 내 사이트 47개 항목 상세 진단"
+              subtitle="기본 정보 · 메타 · 제목 · 링크 · 기술 · 소셜"
+              defaultOpen={false}
+            >
               <SectionTitle>기본 정보</SectionTitle>
               <table className="data-table">
                 <tbody>
@@ -1122,24 +1165,22 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
                   />
                 </tbody>
               </table>
-            </>
+            </Collapsible>
           )}
 
-          {/* ===== AI 분석 결과 ===== */}
+          {/* ===== AI 분석 결과 (접기 가능) ===== */}
           {analysisHtml && (
-            <>
-              <h2
-                style={{
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  color: '#111827',
-                  margin: '24px 0 8px 0',
-                }}
-              >
-                SEO 전문가 진단 의견
-              </h2>
-              <div className="analysis-box" dangerouslySetInnerHTML={{ __html: analysisHtml }} />
-            </>
+            <Collapsible
+              title="🧠 SEO 전문가 진단 의견"
+              subtitle="강점 · 개선 · 경쟁사 비교 · 종합"
+              defaultOpen={true}
+            >
+              <div
+                className="analysis-box"
+                style={{ border: 'none', padding: 0 }}
+                dangerouslySetInnerHTML={{ __html: analysisHtml }}
+              />
+            </Collapsible>
           )}
 
           {/* ===== 하단 CTA: 텔레그램 집중 ===== */}

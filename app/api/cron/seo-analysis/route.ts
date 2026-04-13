@@ -12,7 +12,7 @@
 
 import { NextResponse } from 'next/server'
 import { createAdminSupabaseClient } from '@/server/supabase/admin'
-import { fetchAndAnalyze } from '@/lib/seo-analyzer'
+import { fetchAndParse, runAiAnalysis, type CompetitorContext } from '@/lib/seo-analyzer'
 import { analyzeCompetitors, type CompetitorAnalysis } from '@/lib/competitor-analyzer'
 import { markdownToHtml } from '@/lib/markdown-to-html'
 
@@ -93,24 +93,19 @@ export async function GET(request: Request) {
         console.log(`[SEO Analysis] 시작: ${order.id} - ${order.site_url}`)
         const startTime = Date.now()
 
-        // 1. 온페이지 SEO 분석 + 경쟁사 분석을 병렬 실행
-        const [seoResult, competitorResult] = await Promise.allSettled([
-          fetchAndAnalyze(order.site_url, order.keywords || undefined),
+        // 1. 온페이지 파싱(AI 제외) + 경쟁사 분석 병렬
+        const [parseResult, competitorResult] = await Promise.allSettled([
+          fetchAndParse(order.site_url),
           order.keywords
             ? analyzeCompetitors(order.keywords, order.site_url, 5)
             : Promise.resolve(null),
         ])
 
-        // 온페이지 SEO 결과 처리 (실패 시 throw - 이건 필수)
-        if (seoResult.status === 'rejected') {
-          throw new Error(`SEO 분석 실패: ${seoResult.reason?.message || seoResult.reason}`)
+        if (parseResult.status === 'rejected') {
+          throw new Error(`SEO 파싱 실패: ${parseResult.reason?.message || parseResult.reason}`)
         }
+        const parsed = parseResult.value
 
-        const { parsed, analysis, score } = seoResult.value
-        const analysisHtml = markdownToHtml(analysis)
-        console.log(`[SEO Analysis] SEO 분석 완료 (${Date.now() - startTime}ms, 점수 ${score})`)
-
-        // 경쟁사 분석 결과 처리 (실패해도 무시)
         let competitorData: CompetitorAnalysis | null = null
         if (competitorResult.status === 'fulfilled') {
           competitorData = competitorResult.value
@@ -120,6 +115,47 @@ export async function GET(request: Request) {
         } else {
           console.error(`[SEO Analysis] 경쟁사 분석 실패 (무시):`, competitorResult.reason?.message)
         }
+
+        // 2. AI 분석 (경쟁사 컨텍스트 주입)
+        let competitorContext: CompetitorContext | null = null
+        if (competitorData && competitorData.competitors.length > 0) {
+          const cm = competitorData.customerMetrics
+          competitorContext = {
+            keyword: competitorData.keyword,
+            customer: cm
+              ? {
+                  domain: cm.domain,
+                  mozDA: cm.mozDA,
+                  ahrefsDR: cm.ahrefsDR,
+                  ahrefsBacklinks: cm.ahrefsBacklinks,
+                  ahrefsRefDomains: cm.ahrefsRefDomains,
+                  ahrefsTraffic: cm.ahrefsTraffic,
+                }
+              : undefined,
+            competitors: competitorData.competitors.slice(0, 5).map((c, i) => ({
+              rank: i + 1,
+              domain: c.domain,
+              mozDA: c.mozDA,
+              ahrefsDR: c.ahrefsDR,
+              ahrefsBacklinks: c.ahrefsBacklinks,
+              ahrefsRefDomains: c.ahrefsRefDomains,
+              ahrefsTraffic: c.ahrefsTraffic,
+              titleLength: c.onPage?.titleLength,
+              metaDescriptionLength: c.onPage?.metaDescriptionLength,
+              h1Count: c.onPage?.h1Count,
+              wordCount: c.onPage?.wordCount,
+              hasStructuredData: c.onPage?.hasStructuredData,
+            })),
+          }
+        }
+
+        const { analysis, score } = await runAiAnalysis(
+          parsed,
+          order.keywords || undefined,
+          competitorContext
+        )
+        const analysisHtml = markdownToHtml(analysis)
+        console.log(`[SEO Analysis] SEO 분석 완료 (${Date.now() - startTime}ms, 점수 ${score})`)
 
         // 3. 결과 저장 + status 변경
         await adminClient

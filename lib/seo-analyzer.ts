@@ -310,10 +310,37 @@ export function parseHtml(
   }
 }
 
+export interface CompetitorContext {
+  keyword: string
+  customer?: {
+    domain: string
+    mozDA?: number
+    ahrefsDR?: number
+    ahrefsBacklinks?: number
+    ahrefsRefDomains?: number
+    ahrefsTraffic?: number
+  }
+  competitors: Array<{
+    rank: number
+    domain: string
+    mozDA?: number
+    ahrefsDR?: number
+    ahrefsBacklinks?: number
+    ahrefsRefDomains?: number
+    ahrefsTraffic?: number
+    titleLength?: number
+    metaDescriptionLength?: number
+    h1Count?: number
+    wordCount?: number
+    hasStructuredData?: boolean
+  }>
+}
+
 export async function analyzeSeo(
   apiKey: string,
   p: ParsedSeo,
-  targetKeywords?: string
+  targetKeywords?: string,
+  competitorContext?: CompetitorContext | null
 ): Promise<string> {
   const textSample = p.title || p.metaDescription || ''
   const koreanChars = textSample.match(/[\uac00-\ud7af]/g) || []
@@ -359,6 +386,31 @@ export async function analyzeSeo(
         .map(k => k.trim())
         .filter(Boolean)
     : []
+  // 경쟁사 컨텍스트 블록 (있을 때만)
+  const competitorBlock = (() => {
+    if (!competitorContext || competitorContext.competitors.length === 0) return ''
+    const cc = competitorContext
+    const fmt = (v: number | undefined) =>
+      v === undefined || v === null ? '?' : Math.round(v).toLocaleString()
+    const me = cc.customer
+    const lines: string[] = []
+    lines.push(`\n## 경쟁사 비교 (키워드 "${cc.keyword}" 구글 상위)`)
+    if (me) {
+      lines.push(
+        `- 내 사이트(${me.domain}): DA ${fmt(me.mozDA)} | DR ${fmt(me.ahrefsDR)} | 백링크 ${fmt(me.ahrefsBacklinks)} | 참조도메인 ${fmt(me.ahrefsRefDomains)} | 트래픽 ${fmt(me.ahrefsTraffic)}`
+      )
+    }
+    cc.competitors.slice(0, 5).forEach(c => {
+      lines.push(
+        `- ${c.rank}위(${c.domain}): DA ${fmt(c.mozDA)} | DR ${fmt(c.ahrefsDR)} | 백링크 ${fmt(c.ahrefsBacklinks)} | 참조도메인 ${fmt(c.ahrefsRefDomains)} | 트래픽 ${fmt(c.ahrefsTraffic)} | Title ${c.titleLength ?? '?'}자 | H1 ${c.h1Count ?? '?'}개 | 단어 ${c.wordCount ?? '?'}개`
+      )
+    })
+    lines.push(
+      '\n→ "경쟁사 비교 분석" 섹션을 별도로 작성하여 내 사이트가 경쟁사 대비 어떤 지표에서 밀리는지 구체적 수치와 함께 짚어주세요. 부족한 부분을 메우려면 어떤 우선순위가 필요한지도 함께 안내하세요.'
+    )
+    return lines.join('\n')
+  })()
+
   const keywordInfo =
     keywordList.length > 0
       ? `
@@ -397,6 +449,7 @@ export async function analyzeSeo(
 ## 판정 기준 (${isKorean ? '한글' : '영문'} 사이트)
 HTTPS:${checks.https ? '양호' : '개선'} | 상태코드:${checks.status ? '양호' : '개선'} | 속도:${checks.speed ? '양호' : '개선'} | Title:${checks.title ? '양호' : '개선'} | Desc:${checks.desc ? '양호' : '개선'} | Canonical:${checks.canonical ? '양호' : '개선'} | H1:${checks.h1 ? '양호' : '개선'} | OG:${checks.ogTags ? '양호' : '개선'} | JSON-LD:${checks.jsonLd ? '양호' : '개선'} | Gzip:${checks.gzip ? '양호' : '개선'}
 ${keywordInfo}
+${competitorBlock}
 
 ## 응답 구조 규칙
 
@@ -415,6 +468,17 @@ ${keywordList.length > 0 ? '- 타겟 키워드가 Title/Description/H1/본문에
 ${!hasExternalLinks ? '- 외부 링크가 0개인 점도 언급하세요. 검색 엔진은 관련 권위 사이트로의 자연스러운 링크가 있는 페이지를 더 신뢰합니다.' : ''}
 ${!hasImages ? '- 이미지가 0개인 점도 언급하세요. Google Image 검색을 통한 유입 기회가 없는 상태입니다.' : ''}
 
+${
+  competitorBlock
+    ? `### "경쟁사 비교 분석" (필수)
+- 위에 제공된 경쟁사 데이터를 기반으로, 내 사이트가 경쟁사 대비 **구체적으로 어느 지표에서 얼마나 밀리는지** 수치와 함께 서술
+- "1위 사이트는 백링크가 4,500개인데 내 사이트는 120개로 약 37배 차이가 납니다" 같은 구체적 비교
+- DA/DR/백링크/참조도메인/트래픽 중 격차가 가장 큰 1~2개 지표를 골라 집중 분석
+- 온페이지 측면(Title 길이, H1, 단어수)에서도 경쟁사가 어떻게 다른지 비교
+- 4~6문장. 마지막에 "이 격차를 줄이려면 ~순서로 개선이 필요합니다" 같은 우선순위 제안
+`
+    : ''
+}
 ### "종합 의견"
 - 3~4문장으로 전체를 아우르는 평가
 - "귀하의 사이트는~" 으로 시작
@@ -482,23 +546,15 @@ ${p.textContentSample.slice(0, 500)}
 }
 
 /**
- * URL을 받아 HTML 가져오기 + 파싱 + AI 분석까지 한번에 수행
+ * URL의 HTML을 가져오고 파싱만 수행 (AI 호출 없음)
+ * 경쟁사 분석과 병렬 실행 가능
  */
-export async function fetchAndAnalyze(
-  url: string,
-  keywords?: string
-): Promise<{
-  parsed: ParsedSeo
-  analysis: string
-  score: number | null
-}> {
-  // Normalize URL
+export async function fetchAndParse(url: string): Promise<ParsedSeo> {
   let targetUrl = url.trim()
   if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
     targetUrl = 'https://' + targetUrl
   }
 
-  // Fetch HTML
   const start = Date.now()
   const res = await fetch(targetUrl, {
     signal: AbortSignal.timeout(10000),
@@ -513,18 +569,25 @@ export async function fetchAndAnalyze(
   const headers = Object.fromEntries(res.headers.entries())
   const html = await res.text()
 
-  // Parse
-  const parsed = parseHtml(html, targetUrl, res.url, res.status, loadTime, headers)
+  return parseHtml(html, targetUrl, res.url, res.status, loadTime, headers)
+}
 
-  // Analyze with OpenAI
+/**
+ * 파싱된 SEO 데이터를 받아 AI 분석 수행
+ * 점수 추출 포함
+ */
+export async function runAiAnalysis(
+  parsed: ParsedSeo,
+  keywords?: string,
+  competitorContext?: CompetitorContext | null
+): Promise<{ analysis: string; score: number | null }> {
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY 환경변수가 설정되지 않았습니다')
   }
 
-  const analysis = await analyzeSeo(apiKey, parsed, keywords)
+  const analysis = await analyzeSeo(apiKey, parsed, keywords, competitorContext)
 
-  // Extract score
   let score: number | null = null
   const scoreMatch = analysis.match(/##\s*SEO\s*점수[:\s]*(\d{1,3})\s*점/)
   if (scoreMatch) {
@@ -532,5 +595,21 @@ export async function fetchAndAnalyze(
     if (n >= 0 && n <= 100) score = n
   }
 
+  return { analysis, score }
+}
+
+/**
+ * @deprecated fetchAndParse + runAiAnalysis 조합을 사용하세요
+ */
+export async function fetchAndAnalyze(
+  url: string,
+  keywords?: string
+): Promise<{
+  parsed: ParsedSeo
+  analysis: string
+  score: number | null
+}> {
+  const parsed = await fetchAndParse(url)
+  const { analysis, score } = await runAiAnalysis(parsed, keywords)
   return { parsed, analysis, score }
 }
