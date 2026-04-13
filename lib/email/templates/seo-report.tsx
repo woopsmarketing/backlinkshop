@@ -618,6 +618,31 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               </p>
 
               <CompetitorGapSummary comp={comp} />
+
+              {/* 상세 비교표: 내 사이트 vs 경쟁사 TOP5 */}
+              <div style={{ marginTop: '16px' }}>
+                <p
+                  style={{
+                    margin: '0 0 8px 0',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: '#111827',
+                  }}
+                >
+                  📊 내 사이트 vs 경쟁사 TOP{comp.competitors.length} 상세 비교
+                </p>
+                <p
+                  style={{
+                    margin: '0 0 10px 0',
+                    fontSize: '10px',
+                    color: '#6b7280',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Moz, Ahrefs, Majestic 3대 SEO 플랫폼의 핵심 지표 + 온페이지 내부 최적화까지 한눈에
+                </p>
+                <CompetitorMetricsTable comp={comp} />
+              </div>
             </div>
           )}
 
