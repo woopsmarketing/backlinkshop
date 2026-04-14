@@ -39,12 +39,11 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      // 첫 로그인 처리: 프로필 생성 + 20만 크레딧 지급 (대시보드 경유하지 않아도 동작)
-      await ensureUserInitialized()
+      // 첫 로그인 처리: 프로필 생성 + 20만 크레딧 지급
+      const { isNewUser } = await ensureUserInitialized()
 
       // LP에서 온 경우: 온페이지 SEO 상품 페이지로 리디렉트
       if (from === 'lp') {
-        // 온페이지 SEO 점검 상품 ID 조회
         const serverSupabase = await createServerSupabaseClient()
         const { data: seoProduct } = await serverSupabase
           .from('products')
@@ -58,12 +57,19 @@ export async function GET(request: NextRequest) {
           if (site) {
             redirectUrl.searchParams.set('site', site)
           }
+          if (isNewUser) {
+            redirectUrl.searchParams.set('welcome', '1')
+          }
           return NextResponse.redirect(redirectUrl)
         }
       }
 
-      // 기본: 대시보드로 리디렉트
-      return NextResponse.redirect(new URL('/dashboard', origin))
+      // 기본: 대시보드로 리디렉트 (신규 가입이면 welcome 플래그 부착)
+      const dashboardUrl = new URL('/dashboard', origin)
+      if (isNewUser) {
+        dashboardUrl.searchParams.set('welcome', '1')
+      }
+      return NextResponse.redirect(dashboardUrl)
     }
   }
 

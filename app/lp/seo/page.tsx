@@ -1,13 +1,14 @@
 // v2.0 - Google Ads 전용 LP (풍부한 콘텐츠 + 정책 친화적) (2026-04-07)
 import type { Metadata } from 'next'
 import { LPHeroForm } from './LPHeroForm'
+import { LPHeroCopy } from './LPHeroCopy'
 
 export const dynamic = 'force-static'
 
 export const metadata: Metadata = {
-  title: '무료 SEO 진단 | 내 사이트 검색 순위 확인',
+  title: '무료 SEO 진단 | 백링크샵 - 구글 상위노출 전문',
   description:
-    '구글 검색 순위가 낮은 이유, 10분 안에 무료로 진단해드립니다. 1,247개 기업이 선택한 SEO 전문가의 정밀 분석 보고서를 받아보세요.',
+    '구글 검색 순위가 낮은 진짜 이유, 10분 안에 무료로 확인하세요. 가입만 하면 20만원 상당의 정밀 분석 리포트를 이메일로 보내드립니다.',
   robots: { index: false, follow: false },
 }
 
@@ -32,68 +33,9 @@ export default function LPSeoPage() {
 
         <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* 왼쪽: 텍스트 */}
+            {/* 왼쪽: 텍스트 (ref 쿼리에 따라 동적 변경) */}
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-400/30 text-cyan-400 text-sm font-semibold mb-6">
-                <span className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
-                1,247개 기업이 선택한 SEO 전문가
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight mb-6">
-                지금 당신의 웹사이트,
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
-                  구글에서 몇 페이지인가요?
-                </span>
-              </h1>
-
-              <p className="text-gray-300 text-lg sm:text-xl mb-8 leading-relaxed">
-                검색 순위가 낮은 <strong className="text-white">진짜 이유</strong>를
-                <br className="sm:hidden" /> 10분 안에 무료로 진단해드립니다.
-              </p>
-
-              {/* 핵심 가치 4개 */}
-              <div className="space-y-3 mb-8">
-                {[
-                  { text: '0~100점 종합 SEO 점수 즉시 확인', highlight: '0~100점' },
-                  { text: '기술적 문제점 + 개선 방향 상세 리포트', highlight: '상세 리포트' },
-                  { text: '가입만 하면 20만원 상당 진단 무료', highlight: '20만원 상당' },
-                  { text: '10~20분 내 이메일로 보고서 발송', highlight: '10~20분' },
-                ].map(item => (
-                  <div key={item.text} className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 flex items-center justify-center">
-                      <svg
-                        className="w-3.5 h-3.5 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-white/90">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* 신뢰 배지 */}
-              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
-                <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                  3년 운영
-                </span>
-                <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                  98% 재구매율
-                </span>
-                <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                  구글 패널티 0건
-                </span>
-                <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                  카드 등록 불필요
-                </span>
-              </div>
+              <LPHeroCopy />
             </div>
 
             {/* 오른쪽: URL 입력 폼 + 미리보기 */}
@@ -101,8 +43,16 @@ export default function LPSeoPage() {
               {/* URL 입력 폼 */}
               <LPHeroForm />
 
+              {/* 왜 로그인? 안내 */}
+              <div className="mt-4 rounded-xl bg-cyan-500/10 border border-cyan-400/20 px-4 py-3 text-xs text-cyan-100 leading-relaxed">
+                <strong className="text-white">왜 로그인이 필요한가요?</strong>
+                <br />
+                진단 리포트를 이메일로 안전하게 받아보기 위해 구글 로그인이 필요합니다. 카드
+                등록·결제 없이 20만 크레딧이 자동 지급됩니다.
+              </div>
+
               {/* 리포트 미리보기 */}
-              <div className="mt-6 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5">
+              <div className="mt-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5">
                 <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider">
                   진단 보고서 미리보기
                 </p>
@@ -184,10 +134,10 @@ export default function LPSeoPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-8 text-center">
             {[
-              { num: '1,247', label: '완료 프로젝트', sub: '국내외 기업' },
-              { num: '327%', label: '평균 트래픽 증가', sub: '진단 후 3개월' },
-              { num: '98%', label: '고객 재구매율', sub: '높은 만족도' },
-              { num: '0건', label: '구글 패널티', sub: '3년간 무사고' },
+              { num: '50+', label: '진단 항목', sub: '정밀 분석' },
+              { num: '10분', label: '평균 소요 시간', sub: '이메일 발송' },
+              { num: '20만', label: '무료 크레딧', sub: '가입 즉시 지급' },
+              { num: '0원', label: '카드 등록', sub: '결제 정보 불필요' },
             ].map(item => (
               <div key={item.label}>
                 <p className="text-3xl sm:text-4xl font-extrabold text-white">{item.num}</p>

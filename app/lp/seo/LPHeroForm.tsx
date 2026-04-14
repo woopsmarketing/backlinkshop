@@ -12,6 +12,11 @@ export function LPHeroForm() {
     e.preventDefault()
     setLoading(true)
 
+    // LP 폼 제출 마이크로 전환 발화
+    if (typeof window !== 'undefined' && (window as any).trackLpSubmit) {
+      ;(window as any).trackLpSubmit()
+    }
+
     // 로딩 애니메이션을 1.5초 보여준 후 이동 (분석 준비 느낌)
     setTimeout(() => {
       const encodedUrl = encodeURIComponent(url.trim())

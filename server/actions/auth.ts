@@ -229,12 +229,12 @@ async function handleFirstLogin(userId: string) {
  * 로그인 시 첫 로그인 여부 체크 및 처리
  * 미들웨어나 레이아웃에서 호출
  */
-export async function ensureUserInitialized() {
+export async function ensureUserInitialized(): Promise<{ isNewUser: boolean }> {
   try {
     const envCheck = getSupabaseEnvOrError()
     if (!envCheck.ok) {
       console.error(envCheck.error)
-      return
+      return { isNewUser: false }
     }
 
     const supabase = await createServerSupabaseClient()
@@ -243,7 +243,7 @@ export async function ensureUserInitialized() {
       data: { user },
     } = await supabase.auth.getUser()
 
-    if (!user) return
+    if (!user) return { isNewUser: false }
 
     // profiles 존재 여부 확인
     const { data: profile } = await supabase
@@ -255,8 +255,11 @@ export async function ensureUserInitialized() {
     // profiles 없으면 첫 로그인 처리
     if (!profile) {
       await handleFirstLogin(user.id)
+      return { isNewUser: true }
     }
+    return { isNewUser: false }
   } catch (error) {
     console.error('로그인 초기화 오류:', error)
+    return { isNewUser: false }
   }
 }
