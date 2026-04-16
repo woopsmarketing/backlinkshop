@@ -189,10 +189,114 @@ export async function GET(request: Request) {
       }
     }
 
+    // ── LP 비로그인 요청 처리 ──
+    const { data: lpPending } = await adminClient
+      .from('lp_requests')
+      .select('id, url, keyword, email, status')
+      .or(`status.eq.pending_analysis,and(status.eq.analyzing,created_at.lt.${tenMinutesAgo})`)
+      .limit(1)
+
+    let lpProcessed = 0
+
+    if (lpPending && lpPending.length > 0) {
+      for (const lpReq of lpPending) {
+        // 락 획득
+        const { data: locked } = await adminClient
+          .from('lp_requests')
+          .update({ status: 'analyzing' })
+          .eq('id', lpReq.id)
+          .eq('status', lpReq.status)
+          .select('id')
+
+        if (!locked || locked.length === 0) continue
+
+        try {
+          console.log(`[SEO Analysis] LP 요청 시작: ${lpReq.id} - ${lpReq.url}`)
+          const startTime = Date.now()
+
+          const [parseResult, competitorResult] = await Promise.allSettled([
+            fetchAndParse(lpReq.url),
+            analyzeCompetitors(lpReq.keyword, lpReq.url, 5),
+          ])
+
+          if (parseResult.status === 'rejected') {
+            throw new Error(`SEO 파싱 실패: ${parseResult.reason?.message || parseResult.reason}`)
+          }
+          const parsed = parseResult.value
+
+          let competitorData: CompetitorAnalysis | null = null
+          if (competitorResult.status === 'fulfilled') {
+            competitorData = competitorResult.value
+          }
+
+          let competitorContext: CompetitorContext | null = null
+          if (competitorData && competitorData.competitors.length > 0) {
+            const cm = competitorData.customerMetrics
+            competitorContext = {
+              keyword: competitorData.keyword,
+              customer: cm
+                ? {
+                    domain: cm.domain,
+                    mozDA: cm.mozDA,
+                    ahrefsDR: cm.ahrefsDR,
+                    ahrefsBacklinks: cm.ahrefsBacklinks,
+                    ahrefsRefDomains: cm.ahrefsRefDomains,
+                    ahrefsTraffic: cm.ahrefsTraffic,
+                  }
+                : undefined,
+              competitors: competitorData.competitors.slice(0, 5).map((c, i) => ({
+                rank: i + 1,
+                domain: c.domain,
+                mozDA: c.mozDA,
+                ahrefsDR: c.ahrefsDR,
+                ahrefsBacklinks: c.ahrefsBacklinks,
+                ahrefsRefDomains: c.ahrefsRefDomains,
+                ahrefsTraffic: c.ahrefsTraffic,
+                titleLength: c.onPage?.titleLength,
+                metaDescriptionLength: c.onPage?.metaDescriptionLength,
+                h1Count: c.onPage?.h1Count,
+                wordCount: c.onPage?.wordCount,
+                hasStructuredData: c.onPage?.hasStructuredData,
+              })),
+            }
+          }
+
+          const { analysis, score } = await runAiAnalysis(parsed, lpReq.keyword, competitorContext)
+          const analysisHtml = markdownToHtml(analysis)
+          console.log(`[SEO Analysis] LP 분석 완료 (${Date.now() - startTime}ms, 점수 ${score})`)
+
+          await adminClient
+            .from('lp_requests')
+            .update({
+              status: 'processing',
+              analyzed_at: new Date().toISOString(),
+              seo_report_data: {
+                score,
+                analysisHtml,
+                parsedData: parsed,
+                competitorData,
+              },
+            })
+            .eq('id', lpReq.id)
+
+          lpProcessed++
+        } catch (err: any) {
+          console.error(`[SEO Analysis] LP 실패: ${lpReq.id}`, err.message)
+          await adminClient
+            .from('lp_requests')
+            .update({
+              status: 'pending_analysis',
+            })
+            .eq('id', lpReq.id)
+        }
+      }
+    }
+
     return NextResponse.json({
-      message: `Processed ${processed} analyses`,
+      message: `Processed ${processed} orders + ${lpProcessed} LP requests`,
       processed,
       failed,
+      lpProcessed,
       total: pendingOrders.length,
     })
   } catch (error: any) {
