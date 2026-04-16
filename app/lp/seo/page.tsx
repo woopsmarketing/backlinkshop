@@ -8,7 +8,7 @@ export const dynamic = 'force-static'
 export const metadata: Metadata = {
   title: '무료 SEO 진단 | 백링크샵 - 구글 상위노출 전문',
   description:
-    '구글 검색 순위가 낮은 진짜 이유, 10분 안에 무료로 확인하세요. 가입만 하면 20만원 상당의 정밀 분석 리포트를 이메일로 보내드립니다.',
+    '구글 검색 순위가 낮은 진짜 이유, 10분 안에 무료로 확인하세요. 이메일만 입력하면 경쟁사 비교 분석까지 포함된 정밀 리포트를 보내드립니다.',
   robots: { index: false, follow: false },
 }
 
@@ -47,7 +47,7 @@ export default function LPSeoPage() {
             </div>
 
             {/* 오른쪽: 미리보기 + 차트 */}
-            <div className="space-y-5">
+            <div className="hidden lg:block space-y-5">
               {/* 리포트 미리보기 카드 */}
               <div className="bg-white rounded-2xl shadow-2xl p-5">
                 <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider text-center">
@@ -265,7 +265,7 @@ export default function LPSeoPage() {
       <section className="py-16 sm:py-24 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm mb-2">왜 SEO 진단이 필요한가요?</p>
+            <p className="text-orange-600 font-semibold text-sm mb-2">왜 SEO 진단이 필요한가요?</p>
             <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
               검색 2페이지 이후 사이트는
               <br />
@@ -403,7 +403,7 @@ export default function LPSeoPage() {
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm mb-2">진단 항목</p>
+            <p className="text-orange-600 font-semibold text-sm mb-2">진단 항목</p>
             <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
               50개 이상 항목을 정밀 분석합니다
             </h2>
@@ -464,7 +464,7 @@ export default function LPSeoPage() {
             ].map(item => (
               <div
                 key={item.title}
-                className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 hover:bg-blue-50 transition-colors border border-gray-100"
+                className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 hover:bg-orange-50 transition-colors border border-gray-100"
               >
                 <span className="text-2xl flex-shrink-0" role="img" aria-hidden="true">
                   {item.icon}
@@ -478,25 +478,25 @@ export default function LPSeoPage() {
           </div>
 
           {/* 가격 비교 + CTA */}
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 rounded-2xl p-8 sm:p-10 text-center text-white">
+          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-8 sm:p-10 text-center text-white">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div>
-                <p className="text-sm text-blue-200">일반 SEO 진단 비용</p>
-                <p className="text-2xl font-bold line-through text-blue-200">30~50만원</p>
+                <p className="text-sm text-orange-200">일반 SEO 진단 비용</p>
+                <p className="text-2xl font-bold line-through text-orange-200">30~50만원</p>
               </div>
               <div className="text-3xl">→</div>
               <div>
-                <p className="text-sm text-cyan-200">백링크샵 회원</p>
+                <p className="text-sm text-orange-100">백링크샵</p>
                 <p className="text-3xl font-extrabold">무료</p>
               </div>
             </div>
             <a
               href="#hero-form"
-              className="inline-flex items-center justify-center px-10 py-5 text-xl font-bold rounded-xl bg-white text-blue-600 hover:bg-gray-100 hover:scale-105 shadow-2xl transition-all"
+              className="inline-flex items-center justify-center px-10 py-5 text-xl font-bold rounded-xl bg-white text-orange-600 hover:bg-gray-100 hover:scale-105 shadow-2xl transition-all"
             >
               무료 SEO 진단 받기
             </a>
-            <p className="text-blue-200 text-sm mt-3">이메일만 입력하면 10분 안에 리포트 발송</p>
+            <p className="text-orange-200 text-sm mt-3">이메일만 입력하면 10분 안에 리포트 발송</p>
           </div>
         </div>
       </section>
@@ -505,7 +505,7 @@ export default function LPSeoPage() {
       <section className="py-16 sm:py-24 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm mb-2">진행 과정</p>
+            <p className="text-orange-600 font-semibold text-sm mb-2">진행 과정</p>
             <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">3단계면 충분합니다</h2>
           </div>
 
@@ -531,12 +531,12 @@ export default function LPSeoPage() {
               },
             ].map(item => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
                   <span className="text-2xl font-extrabold text-white">{item.step}</span>
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed mb-3">{item.desc}</p>
-                <span className="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold">
+                <span className="inline-block px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold">
                   소요 시간: {item.time}
                 </span>
               </div>
@@ -545,141 +545,169 @@ export default function LPSeoPage() {
         </div>
       </section>
 
-      {/* ── SECTION 6: 사회적 증거 (성공 사례) ── */}
+      {/* ── SECTION 6: 실제 리포트 미리보기 ── */}
       <section className="py-16 sm:py-24 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm mb-2">실제 성과</p>
+            <p className="text-orange-600 font-semibold text-sm mb-2">리포트 미리보기</p>
             <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
-              진단 후 실행까지, 실제 고객 결과
+              이런 리포트가 이메일로 도착합니다
             </h2>
-            <p className="text-gray-500">
-              무료 진단으로 문제를 파악하고, 전문가 솔루션으로 해결한 사례입니다.
-            </p>
+            <p className="text-gray-500">30~50만원 수준의 SEO 진단 보고서를 무료로 받아보세요.</p>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6 mb-12">
-            {[
-              {
-                type: '쇼핑몰',
-                before: '340',
-                after: '4,200',
-                period: '4주',
-                growth: '+1,135%',
-                keyword: '인테리어 소품',
-              },
-              {
-                type: 'SaaS 서비스',
-                before: '1,200',
-                after: '8,500',
-                period: '6주',
-                growth: '+608%',
-                keyword: '프로젝트 관리',
-              },
-              {
-                type: '로컬 비즈니스',
-                before: '80',
-                after: '1,450',
-                period: '3주',
-                growth: '+1,713%',
-                keyword: '강남 피부과',
-              },
-            ].map(item => (
-              <div
-                key={item.type}
-                className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+          {/* 이메일 리포트 목업 */}
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+              {/* 이메일 헤더 */}
+              <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-bold text-sm">B</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">
+                      온페이지 SEO 점검 결과가 준비되었습니다
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      백링크샵 &lt;report@backlinkshop.co.kr&gt;
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 이메일 본문 */}
+              <div className="px-6 py-6 space-y-6">
+                {/* 종합 점수 */}
+                <div className="text-center">
+                  <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">
+                    종합 SEO 점수
+                  </p>
+                  <p className="text-5xl font-extrabold text-orange-500">
+                    72<span className="text-2xl text-gray-400">/100</span>
+                  </p>
+                  <div className="w-48 mx-auto mt-3 bg-gray-100 rounded-full h-2.5">
+                    <div
+                      className="bg-gradient-to-r from-orange-400 to-red-500 h-2.5 rounded-full"
+                      style={{ width: '72%' }}
+                    />
+                  </div>
+                </div>
+
+                {/* 주요 발견 사항 */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    주요 발견 사항
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      { ok: false, text: '메타 디스크립션이 설정되지 않았습니다' },
+                      { ok: false, text: 'H1 태그가 2개 이상 사용되고 있습니다' },
+                      { ok: true, text: 'SSL 인증서가 정상 적용되어 있습니다' },
+                      { ok: false, text: '이미지 alt 태그 누락 12건' },
+                      { ok: false, text: '페이지 로딩 속도 2.4초 (권장: 1.5초 이하)' },
+                      { ok: true, text: '모바일 반응형 정상 작동' },
+                    ].map(item => (
+                      <div key={item.text} className="flex items-start gap-2 text-sm">
+                        <span
+                          className={`mt-0.5 flex-shrink-0 ${item.ok ? 'text-green-500' : 'text-red-500'}`}
+                        >
+                          {item.ok ? '✓' : '✗'}
+                        </span>
+                        <span className={item.ok ? 'text-gray-500' : 'text-gray-700'}>
+                          {item.text}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 경쟁사 비교 */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    경쟁사 TOP5 비교 분석
+                  </p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="text-center p-3 rounded-lg bg-gray-50">
+                      <p className="text-xs text-gray-400">내 DA</p>
+                      <p className="text-lg font-bold text-red-500">28</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg bg-gray-50">
+                      <p className="text-xs text-gray-400">경쟁사 평균</p>
+                      <p className="text-lg font-bold text-gray-900">52</p>
+                    </div>
+                    <div className="text-center p-3 rounded-lg bg-red-50">
+                      <p className="text-xs text-gray-400">격차</p>
+                      <p className="text-lg font-bold text-red-500">-24</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 우선 개선 항목 */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    우선순위 개선 항목
+                  </p>
+                  <div className="space-y-2">
+                    {[
+                      { n: 1, title: '메타태그 최적화', impact: '높음' },
+                      { n: 2, title: '페이지 속도 개선', impact: '높음' },
+                      { n: 3, title: '백링크 확보 전략', impact: '중간' },
+                    ].map(item => (
+                      <div
+                        key={item.n}
+                        className="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">
+                            {item.n}
+                          </span>
+                          <span className="text-sm text-gray-700">{item.title}</span>
+                        </div>
+                        <span
+                          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                            item.impact === '높음'
+                              ? 'bg-red-50 text-red-600'
+                              : 'bg-orange-50 text-orange-600'
+                          }`}
+                        >
+                          영향도: {item.impact}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 흐릿한 추가 영역 (더 많은 내용이 있다는 암시) */}
+                <div className="relative">
+                  <div className="space-y-2 opacity-30 blur-[1px]">
+                    <div className="h-3 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-200 rounded w-full" />
+                    <div className="h-3 bg-gray-200 rounded w-2/3" />
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* 하단 CTA */}
+            <div className="text-center mt-8">
+              <a
+                href="#hero-form"
+                className="inline-flex items-center justify-center px-10 py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-xl hover:shadow-orange-500/25 hover:scale-105 transition-all"
               >
-                <span className="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold mb-4">
-                  {item.type}
-                </span>
-                <p className="text-xs text-gray-400 mb-1">키워드: {item.keyword}</p>
-                <div className="flex items-end gap-3 mb-4">
-                  <div>
-                    <p className="text-xs text-gray-400">Before</p>
-                    <p className="text-xl font-bold text-gray-300">{item.before}</p>
-                  </div>
-                  <span className="text-gray-300 text-lg pb-1">→</span>
-                  <div>
-                    <p className="text-xs text-gray-400">After ({item.period})</p>
-                    <p className="text-xl font-bold text-blue-600">{item.after}</p>
-                  </div>
-                </div>
-                <div className="px-3 py-2 bg-green-50 rounded-lg text-center">
-                  <span className="text-green-600 font-bold text-lg">{item.growth}</span>
-                  <span className="text-green-600 text-sm ml-1">월 방문자 증가</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* 고객 한마디 */}
-          <div className="bg-gray-50 rounded-2xl p-6 sm:p-8">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-bold text-lg">K</span>
-              </div>
-              <div>
-                <p className="text-gray-700 leading-relaxed">
-                  &ldquo;무료 진단 보고서를 받아보고, 우리 사이트에 이렇게 많은 기술적 문제가
-                  있었는지 처음 알았습니다. 메타태그 하나만 고쳤는데도 순위가 2페이지에서 1페이지로
-                  올라왔어요. 무료라서 반신반의했는데, 보고서 퀄리티에 놀랐습니다.&rdquo;
-                </p>
-                <p className="text-sm text-gray-500 mt-2">K사 마케팅 담당자</p>
-              </div>
+                내 사이트 리포트 무료로 받기
+              </a>
+              <p className="text-gray-400 text-sm mt-3">이메일 입력 후 10분 안에 발송됩니다</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 7: 이런 분들에게 추천합니다 ── */}
-      <section className="py-16 sm:py-24 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm mb-2">대상 고객</p>
-            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900">
-              이런 고민이 있다면, 지금 진단 받으세요
-            </h2>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            {[
-              { q: '구글에 내 사이트를 검색해도 안 나와요', who: '신규 사이트 운영자' },
-              { q: '광고비는 쓰는데 자연 유입이 너무 적어요', who: '마케팅 담당자' },
-              { q: '경쟁사는 상위에 있는데 우리만 밀려요', who: '쇼핑몰 운영자' },
-              { q: 'SEO를 해야 하는 건 아는데 뭘 해야 할지 모르겠어요', who: '스타트업 대표' },
-              { q: '이전 대행사에서 SEO를 했다는데 효과가 없었어요', who: '마케팅 대행사 고객' },
-              { q: '사이트 리뉴얼 후 트래픽이 급감했어요', who: '웹사이트 리뉴얼 기업' },
-            ].map(item => (
-              <div
-                key={item.q}
-                className="flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-100"
-              >
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg
-                    className="w-4 h-4 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-semibold text-gray-900 text-sm">&ldquo;{item.q}&rdquo;</p>
-                  <p className="text-xs text-gray-400 mt-1">{item.who}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION 8: 최종 CTA (FOMO + 즉시성) ── */}
+      {/* ── SECTION 7: 최종 CTA (FOMO + 즉시성) ── */}
       <section className="relative py-16 sm:py-24 px-4 overflow-hidden text-white">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950" />
         <div
