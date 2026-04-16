@@ -36,7 +36,7 @@ export default function LPSeoPage() {
           <LPHeroCopy />
 
           {/* 폼 */}
-          <div className="mt-10">
+          <div id="hero-form" className="mt-10 scroll-mt-8">
             <LPHeroForm />
           </div>
 
@@ -88,9 +88,9 @@ export default function LPSeoPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-8 text-center">
             {[
               { num: '50+', label: '진단 항목', sub: '정밀 분석' },
-              { num: '10분', label: '평균 소요 시간', sub: '이메일 발송' },
-              { num: '20만', label: '무료 크레딧', sub: '가입 즉시 지급' },
-              { num: '0원', label: '카드 등록', sub: '결제 정보 불필요' },
+              { num: '10분', label: '분석 완료', sub: '이메일 발송' },
+              { num: '0원', label: '완전 무료', sub: '카드 등록 불필요' },
+              { num: '1만+', label: '경쟁사 데이터', sub: 'TOP5 비교 포함' },
             ].map(item => (
               <div key={item.label}>
                 <p className="text-3xl sm:text-4xl font-extrabold text-white">{item.num}</p>
@@ -332,12 +332,12 @@ export default function LPSeoPage() {
               </div>
             </div>
             <a
-              href="/login?from=lp"
+              href="#hero-form"
               className="inline-flex items-center justify-center px-10 py-5 text-xl font-bold rounded-xl bg-white text-blue-600 hover:bg-gray-100 hover:scale-105 shadow-2xl transition-all"
             >
               무료 SEO 진단 받기
             </a>
-            <p className="text-blue-200 text-sm mt-3">카드 등록 없이, 가입만 하면 즉시 시작</p>
+            <p className="text-blue-200 text-sm mt-3">이메일만 입력하면 10분 안에 리포트 발송</p>
           </div>
         </div>
       </section>
@@ -354,21 +354,21 @@ export default function LPSeoPage() {
             {[
               {
                 step: '01',
-                title: '무료 가입',
-                desc: '이메일만 입력하면 10초 만에 가입 완료. 20만 크레딧이 즉시 지급됩니다.',
-                time: '10초',
-              },
-              {
-                step: '02',
-                title: 'SEO 진단 신청',
-                desc: '사이트 URL과 핵심 키워드 1개만 입력하세요. AI가 실시간으로 사이트를 분석합니다.',
+                title: '정보 입력',
+                desc: 'URL, 핵심 키워드 1개, 이메일 주소만 입력하세요. 회원가입이나 카드 등록은 필요 없습니다.',
                 time: '30초',
               },
               {
+                step: '02',
+                title: 'AI 정밀 분석',
+                desc: '50개 이상 항목을 AI가 자동으로 분석합니다. 경쟁사 TOP5 데이터까지 비교 분석됩니다.',
+                time: '약 10분',
+              },
+              {
                 step: '03',
-                title: '보고서 수신',
-                desc: '10~20분 내 이메일로 상세 보고서가 발송됩니다. 점수, 문제점, 개선안이 모두 포함됩니다.',
-                time: '10~20분',
+                title: '이메일 리포트 수신',
+                desc: '종합 점수, 문제점, 우선순위별 개선안이 담긴 상세 보고서가 이메일로 발송됩니다.',
+                time: '자동 발송',
               },
             ].map(item => (
               <div key={item.step} className="text-center">
@@ -523,26 +523,29 @@ export default function LPSeoPage() {
       {/* ── SECTION 8: 최종 CTA (FOMO + 즉시성) ── */}
       <section className="py-16 sm:py-24 px-4 bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
         <div className="max-w-2xl mx-auto text-center">
-          <p className="text-cyan-400 font-semibold text-sm mb-3">지금 바로 시작하세요</p>
+          <p className="text-red-400 font-semibold text-sm mb-3">
+            매일 놓치고 있는 고객이 있습니다
+          </p>
           <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
-            무료 SEO 진단,
-            <br />더 이상 미루지 마세요
+            경쟁사는 이미 SEO를 하고 있습니다.
+            <br />
+            당신은요?
           </h2>
           <p className="text-gray-300 mb-8 max-w-lg mx-auto">
-            경쟁사와의 격차는 매일 벌어지고 있습니다.
+            하루가 지날수록 경쟁사와의 격차는 벌어집니다.
             <br />
-            10초 가입으로 지금 바로 내 사이트의 현재 상태를 확인하세요.
+            30초면 내 사이트의 현재 상태를 무료로 확인할 수 있습니다.
           </p>
 
           <a
-            href="/login?from=lp"
+            href="#hero-form"
             className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:shadow-2xl hover:scale-105 transition-all mb-4"
           >
             무료 SEO 진단 시작하기
           </a>
 
           <p className="text-gray-400 text-sm mb-12">
-            가입 후 10초면 진단이 시작됩니다 · 카드 등록 불필요
+            이메일 입력만으로 10분 안에 리포트 발송 · 회원가입 불필요
           </p>
 
           {/* FAQ */}
@@ -550,15 +553,15 @@ export default function LPSeoPage() {
             {[
               {
                 q: '정말 무료인가요?',
-                a: '네, 가입 시 20만 크레딧이 지급되며 SEO 진단은 이 크레딧으로 무료 이용 가능합니다. 카드 등록도 필요 없습니다.',
+                a: '네, 회원가입도 카드 등록도 필요 없습니다. 이메일 주소만 입력하면 무료로 진단 리포트를 받아보실 수 있습니다.',
               },
               {
                 q: '결과는 어떻게 받나요?',
-                a: '가입하신 이메일로 10~20분 내에 0~100점 종합 점수와 함께 상세 개선 보고서가 발송됩니다.',
+                a: '입력하신 이메일로 약 10분 내에 0~100점 종합 점수, 경쟁사 비교, 구체적 개선안이 담긴 리포트가 발송됩니다.',
               },
               {
                 q: '진단 후 꼭 유료 서비스를 써야 하나요?',
-                a: '전혀 아닙니다. 보고서에 포함된 개선안을 직접 적용하셔도 됩니다. 전문가 도움이 필요한 경우에만 추가 서비스를 이용하시면 됩니다.',
+                a: '전혀 아닙니다. 보고서에 포함된 개선안을 직접 적용하셔도 됩니다. 전문가 도움이 필요한 경우에만 1:1 상담을 이용하시면 됩니다.',
               },
               {
                 q: '어떤 사이트든 진단 가능한가요?',
