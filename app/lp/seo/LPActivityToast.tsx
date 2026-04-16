@@ -2,29 +2,42 @@
 
 import { useState, useEffect } from 'react'
 
-const ACTIVITIES = [
-  { city: '서울', time: '방금 전' },
-  { city: '부산', time: '1분 전' },
-  { city: '인천', time: '2분 전' },
-  { city: '대구', time: '3분 전' },
-  { city: '광주', time: '방금 전' },
-  { city: '대전', time: '1분 전' },
-  { city: '수원', time: '2분 전' },
-  { city: '성남', time: '방금 전' },
-  { city: '용인', time: '3분 전' },
-  { city: '고양', time: '1분 전' },
+const KEYWORDS = [
+  '스포츠중계',
+  '베팅사이트',
+  '여성알바',
+  '강남출장',
+  '인테리어 소품',
+  '강남 피부과',
+  '프로젝트 관리 툴',
+  '영어 학원',
+  '다이어트 보조제',
+  '부동산 투자',
+  '반려동물 용품',
+  '웨딩 촬영',
+  '이사 업체',
+  '변호사 상담',
+  '치과 임플란트',
+  '헬스장 PT',
+  '카페 창업',
+  '중고차 매매',
+  '네일 아트',
+  '필라테스',
 ]
 
+const TIMES = ['방금 전', '1분 전', '2분 전', '3분 전']
+
 export function LPActivityToast() {
-  const [current, setCurrent] = useState<(typeof ACTIVITIES)[0] | null>(null)
+  const [current, setCurrent] = useState<{ keyword: string; time: string } | null>(null)
   const [show, setShow] = useState(false)
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
 
     const showNext = () => {
-      const item = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)]
-      setCurrent(item)
+      const keyword = KEYWORDS[Math.floor(Math.random() * KEYWORDS.length)]
+      const time = TIMES[Math.floor(Math.random() * TIMES.length)]
+      setCurrent({ keyword, time })
       setShow(true)
 
       // Hide after 4 seconds
@@ -34,8 +47,8 @@ export function LPActivityToast() {
       timeout = setTimeout(showNext, 15000 + Math.random() * 10000)
     }
 
-    // First one after 8 seconds
-    timeout = setTimeout(showNext, 8000)
+    // First one after 3 seconds
+    timeout = setTimeout(showNext, 3000)
 
     return () => clearTimeout(timeout)
   }, [])
@@ -61,7 +74,7 @@ export function LPActivityToast() {
         </div>
         <div>
           <p className="text-sm text-gray-900 font-medium">
-            {current.city}에서 진단 신청이 접수되었습니다
+            &ldquo;<strong>{current.keyword}</strong>&rdquo; 키워드로 진단 신청됨
           </p>
           <p className="text-xs text-gray-400">{current.time}</p>
         </div>
