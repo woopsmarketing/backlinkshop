@@ -44,19 +44,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 이메일 기준 월 2회 제한 (URL 무관)
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    const { count: emailMonthCount } = await adminClient
+    // 이메일 기준 하루 1회 제한 (URL 무관)
+    const { count: emailDayCount } = await adminClient
       .from('lp_requests')
       .select('*', { count: 'exact', head: true })
       .eq('email', email.trim().toLowerCase())
-      .gte('created_at', thirtyDaysAgo)
+      .gte('created_at', todayStart.toISOString())
 
-    if (emailMonthCount !== null && emailMonthCount >= 2) {
+    if (emailDayCount !== null && emailDayCount >= 1) {
       return NextResponse.json(
         {
           error:
-            '이메일당 월 2회까지 무료 진단이 가능합니다. 추가 진단이 필요하시면 1:1 상담을 이용해주세요.',
+            '같은 이메일로 하루 1회만 무료 진단이 가능합니다. 추가 진단이 필요하시면 1:1 상담을 이용해주세요.',
         },
         { status: 429 }
       )
