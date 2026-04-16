@@ -76,11 +76,11 @@ export function LPHeroForm() {
           </div>
           <h3 className="text-xl font-bold text-white mb-2">진단 요청이 접수되었습니다!</h3>
           <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-            분석이 바로 시작되며, 약 <strong className="text-cyan-400">10분 후</strong>에
+            분석이 바로 시작되며, 약 <strong className="text-orange-400">10분 후</strong>에
             <br />
             <strong className="text-white">{email}</strong> 으로 결과를 보내드립니다.
           </p>
-          <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-sm text-gray-300">
+          <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-400/20 text-sm text-gray-300">
             <p>
               <strong className="text-white">진단 사이트:</strong> {url}
             </p>
@@ -159,7 +159,7 @@ export function LPHeroForm() {
               placeholder="https://example.com"
               required
               disabled={step === 'loading'}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-lg disabled:opacity-50"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
@@ -194,7 +194,7 @@ export function LPHeroForm() {
               placeholder="예: 인테리어 소품"
               required
               disabled={step === 'loading'}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-lg disabled:opacity-50"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
@@ -229,14 +229,14 @@ export function LPHeroForm() {
               placeholder="your@email.com"
               required
               disabled={step === 'loading'}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-lg disabled:opacity-50"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
           <button
             type="submit"
             disabled={step === 'loading'}
-            className="w-full px-8 py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-white hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
+            className="w-full px-8 py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-xl hover:shadow-orange-500/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
           >
             {step === 'loading' ? (
               <>
