@@ -33,107 +33,210 @@ export default function LPSeoPage() {
           aria-hidden="true"
         />
 
-        <div className="relative max-w-3xl mx-auto px-4 py-16 sm:py-24 text-center">
-          {/* 텍스트 */}
-          <LPHeroCopy />
-
-          {/* 폼 */}
-          <div id="hero-form" className="mt-10 scroll-mt-8">
-            <LPHeroForm />
+        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24">
+          {/* 카피 (센터) */}
+          <div className="text-center mb-12">
+            <LPHeroCopy />
           </div>
 
-          {/* 리포트 미리보기 */}
-          <div className="mt-8 max-w-lg mx-auto bg-white rounded-2xl shadow-2xl p-5 sm:p-6">
-            <p className="text-xs text-gray-400 mb-4 font-semibold uppercase tracking-wider text-center">
-              진단 보고서 미리보기
-            </p>
-
-            {/* 종합 점수 */}
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-semibold text-gray-900">종합 SEO 점수</span>
-              <span className="text-lg font-extrabold text-orange-500">72 / 100</span>
-            </div>
-            <div className="w-full bg-gray-100 rounded-full h-2.5 mb-5">
-              <div
-                className="bg-gradient-to-r from-orange-400 to-red-500 h-2.5 rounded-full"
-                style={{ width: '72%' }}
-              />
+          {/* 2컬럼: 폼(왼쪽) + 미리보기(오른쪽) */}
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            {/* 왼쪽: 폼 */}
+            <div id="hero-form" className="scroll-mt-8">
+              <LPHeroForm />
             </div>
 
-            {/* 내 사이트 분석 항목 */}
-            <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-              내 사이트 분석
-            </p>
-            <div className="space-y-2 mb-5">
-              {[
-                { label: '도메인 권위도 (DA)', value: '28', status: 'bad' },
-                { label: '페이지 속도', value: '2.4초', status: 'warn' },
-                { label: '모바일 최적화', value: '양호', status: 'good' },
-                { label: '메타태그 설정', value: '미흡', status: 'bad' },
-                { label: '백링크 수', value: '12개', status: 'bad' },
-              ].map(item => (
-                <div
-                  key={item.label}
-                  className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-gray-50"
-                >
-                  <span className="text-xs text-gray-600">{item.label}</span>
-                  <span
-                    className={`text-xs font-bold ${
-                      item.status === 'bad'
-                        ? 'text-red-500'
-                        : item.status === 'warn'
-                          ? 'text-orange-500'
-                          : 'text-green-500'
-                    }`}
-                  >
-                    {item.value}
-                  </span>
+            {/* 오른쪽: 미리보기 + 차트 */}
+            <div className="space-y-5">
+              {/* 리포트 미리보기 카드 */}
+              <div className="bg-white rounded-2xl shadow-2xl p-5">
+                <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider text-center">
+                  진단 보고서 미리보기
+                </p>
+
+                {/* 종합 점수 */}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-gray-900">종합 SEO 점수</span>
+                  <span className="text-lg font-extrabold text-orange-500">72 / 100</span>
                 </div>
-              ))}
-            </div>
+                <div className="w-full bg-gray-100 rounded-full h-2.5 mb-4">
+                  <div
+                    className="bg-gradient-to-r from-orange-400 to-red-500 h-2.5 rounded-full"
+                    style={{ width: '72%' }}
+                  />
+                </div>
 
-            {/* 경쟁사 비교 */}
-            <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-              경쟁사 TOP5 비교
-            </p>
-            <div className="overflow-hidden rounded-lg border border-gray-100">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="py-2 px-3 text-left text-gray-500 font-semibold">항목</th>
-                    <th className="py-2 px-3 text-right text-gray-500 font-semibold">내 사이트</th>
-                    <th className="py-2 px-3 text-right text-gray-500 font-semibold">
-                      경쟁사 평균
-                    </th>
-                    <th className="py-2 px-3 text-right text-gray-500 font-semibold">격차</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  <tr>
-                    <td className="py-2 px-3 text-gray-700">DA 점수</td>
-                    <td className="py-2 px-3 text-right text-gray-900 font-semibold">28</td>
-                    <td className="py-2 px-3 text-right text-gray-900 font-semibold">52</td>
-                    <td className="py-2 px-3 text-right text-red-500 font-bold">-24</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 px-3 text-gray-700">백링크</td>
-                    <td className="py-2 px-3 text-right text-gray-900 font-semibold">12</td>
-                    <td className="py-2 px-3 text-right text-gray-900 font-semibold">340</td>
-                    <td className="py-2 px-3 text-right text-red-500 font-bold">-328</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 px-3 text-gray-700">월 트래픽</td>
-                    <td className="py-2 px-3 text-right text-gray-900 font-semibold">450</td>
-                    <td className="py-2 px-3 text-right text-gray-900 font-semibold">8,200</td>
-                    <td className="py-2 px-3 text-right text-red-500 font-bold">-7,750</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                {/* 내 사이트 분석 항목 */}
+                <div className="space-y-1.5 mb-4">
+                  {[
+                    { label: '도메인 권위도 (DA)', value: '28', status: 'bad' },
+                    { label: '페이지 속도', value: '2.4초', status: 'warn' },
+                    { label: '모바일 최적화', value: '양호', status: 'good' },
+                    { label: '메타태그 설정', value: '미흡', status: 'bad' },
+                    { label: '백링크 수', value: '12개', status: 'bad' },
+                  ].map(item => (
+                    <div
+                      key={item.label}
+                      className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-gray-50"
+                    >
+                      <span className="text-xs text-gray-600">{item.label}</span>
+                      <span
+                        className={`text-xs font-bold ${
+                          item.status === 'bad'
+                            ? 'text-red-500'
+                            : item.status === 'warn'
+                              ? 'text-orange-500'
+                              : 'text-green-500'
+                        }`}
+                      >
+                        {item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
 
-            <p className="text-xs text-center mt-4 text-red-500 font-semibold">
-              이 격차를 줄이는 방법, 리포트에서 확인하세요
-            </p>
+                {/* 경쟁사 비교 */}
+                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                  경쟁사 TOP5 비교
+                </p>
+                <div className="overflow-hidden rounded-lg border border-gray-100 mb-3">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="py-1.5 px-2 text-left text-gray-500 font-semibold">항목</th>
+                        <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">
+                          내 사이트
+                        </th>
+                        <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">
+                          경쟁사 평균
+                        </th>
+                        <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">격차</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      <tr>
+                        <td className="py-1.5 px-2 text-gray-700">DA</td>
+                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">28</td>
+                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">52</td>
+                        <td className="py-1.5 px-2 text-right text-red-500 font-bold">-24</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1.5 px-2 text-gray-700">백링크</td>
+                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">12</td>
+                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">340</td>
+                        <td className="py-1.5 px-2 text-right text-red-500 font-bold">-328</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1.5 px-2 text-gray-700">트래픽</td>
+                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">450</td>
+                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">
+                          8,200
+                        </td>
+                        <td className="py-1.5 px-2 text-right text-red-500 font-bold">-7,750</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <p className="text-xs text-center text-red-500 font-semibold">
+                  이 격차를 줄이는 방법, 리포트에서 확인하세요
+                </p>
+              </div>
+
+              {/* 순위 변화 차트 카드 */}
+              <div className="bg-white rounded-2xl shadow-2xl p-5">
+                <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider text-center">
+                  SEO 최적화 후 예상 순위 변화
+                </p>
+
+                {/* 순위 라인 차트 (CSS only) */}
+                <div className="relative h-40 mb-3">
+                  {/* Y축 가이드 라인 */}
+                  <div className="absolute inset-0 flex flex-col justify-between">
+                    <div className="border-b border-dashed border-gray-100 flex items-center">
+                      <span className="text-[10px] text-gray-400 w-10 text-right pr-2">1위</span>
+                    </div>
+                    <div className="border-b border-dashed border-gray-100 flex items-center">
+                      <span className="text-[10px] text-gray-400 w-10 text-right pr-2">25위</span>
+                    </div>
+                    <div className="border-b border-dashed border-gray-100 flex items-center">
+                      <span className="text-[10px] text-gray-400 w-10 text-right pr-2">50위</span>
+                    </div>
+                  </div>
+
+                  {/* 차트 영역 */}
+                  <svg
+                    className="absolute left-10 top-0 right-0 bottom-0"
+                    viewBox="0 0 300 140"
+                    preserveAspectRatio="none"
+                  >
+                    {/* 상승 영역 (녹색 그라데이션) */}
+                    <defs>
+                      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0.3" />
+                        <stop offset="100%" stopColor="#22c55e" stopOpacity="0.02" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      d="M0,120 C30,115 60,110 90,100 C120,90 140,85 170,60 C200,35 230,18 260,10 C275,7 290,5 300,4 L300,140 L0,140 Z"
+                      fill="url(#areaGrad)"
+                    />
+                    {/* 라인 */}
+                    <path
+                      d="M0,120 C30,115 60,110 90,100 C120,90 140,85 170,60 C200,35 230,18 260,10 C275,7 290,5 300,4"
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+                    {/* 시작점 (Before) */}
+                    <circle cx="0" cy="120" r="4" fill="#ef4444" />
+                    {/* 끝점 (After) */}
+                    <circle cx="300" cy="4" r="4" fill="#22c55e" />
+                  </svg>
+                </div>
+
+                {/* Before / After 라벨 */}
+                <div className="flex items-center justify-between px-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                    <div>
+                      <p className="text-[10px] text-gray-400">최적화 전</p>
+                      <p className="text-sm font-bold text-red-500">42위</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 mx-4 flex items-center justify-center">
+                    <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-50">
+                      <svg
+                        className="w-3.5 h-3.5 text-green-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 10l7-7m0 0l7 7m-7-7v18"
+                        />
+                      </svg>
+                      <span className="text-xs font-bold text-green-600">+39 순위 상승</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div>
+                      <p className="text-[10px] text-gray-400">4주 후</p>
+                      <p className="text-sm font-bold text-green-500">3위</p>
+                    </div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                  </div>
+                </div>
+
+                <p className="text-[10px] text-gray-400 text-center mt-3">
+                  * 실제 결과는 키워드 경쟁도에 따라 달라질 수 있습니다
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

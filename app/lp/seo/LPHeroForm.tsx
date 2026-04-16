@@ -57,7 +57,7 @@ export function LPHeroForm() {
   // 성공 화면
   if (step === 'success') {
     return (
-      <div className="max-w-lg mx-auto">
+      <div>
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-white/20 shadow-2xl text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center">
             <svg
@@ -111,7 +111,7 @@ export function LPHeroForm() {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div>
       <form onSubmit={handleSubmit}>
         <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl">
           <div className="flex items-center gap-2 mb-6">
