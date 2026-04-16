@@ -77,6 +77,14 @@ export function GoogleTag() {
             });
           };
 
+          // 텔레그램 1:1 상담 클릭 (GA4 이벤트: telegram_click)
+          window.trackTelegramClick = function() {
+            gtag('event', 'telegram_click', {
+              'value': 500,
+              'currency': 'KRW'
+            });
+          };
+
           // 유료 결제 완료 (GA4 이벤트: purchase)
           // - GA4 에서 이미 주요 이벤트로 등록되어 Google Ads 로 자동 import 중
           window.trackPurchase = function(amount) {

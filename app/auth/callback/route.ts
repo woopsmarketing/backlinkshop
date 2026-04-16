@@ -9,6 +9,7 @@ import { cookies } from 'next/headers'
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerSupabaseClient } from '@/server/supabase/client'
 import { ensureUserInitialized } from '@/server/actions/auth'
+// createOrderAction은 Resend 의존성 때문에 동적 import 필요
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
       // 첫 로그인 처리: 프로필 생성 + 20만 크레딧 지급
       const { isNewUser } = await ensureUserInitialized()
 
-      // LP에서 온 경우: 온페이지 SEO 상품 페이지로 리디렉트
+      // LP에서 온 경우: 자동 주문 생성 후 성공 페이지로 리디렉트
       if (from === 'lp') {
         const serverSupabase = await createServerSupabaseClient()
         const { data: seoProduct } = await serverSupabase
@@ -53,13 +54,28 @@ export async function GET(request: NextRequest) {
           .single()
 
         if (seoProduct) {
+          const keyword = searchParams.get('keyword') || ''
+          const siteParam = site || ''
+
+          // 자동 주문 생성 (URL + 키워드가 있으면)
+          if (siteParam && keyword) {
+            const { createOrderAction } = await import('@/server/actions/orders')
+            await createOrderAction(seoProduct.id, 1, undefined, siteParam, keyword)
+
+            // 주문 성공 페이지로 리디렉트
+            const successUrl = new URL('/orders/success', origin)
+            successUrl.searchParams.set('product', encodeURIComponent('온페이지 SEO 점검'))
+            successUrl.searchParams.set('type', 'onpage')
+            if (isNewUser) {
+              successUrl.searchParams.set('welcome', '1')
+            }
+            return NextResponse.redirect(successUrl)
+          }
+
+          // URL/키워드 없으면 상품 페이지로 fallback
           const redirectUrl = new URL(`/products/${seoProduct.id}`, origin)
-          if (site) {
-            redirectUrl.searchParams.set('site', site)
-          }
-          if (isNewUser) {
-            redirectUrl.searchParams.set('welcome', '1')
-          }
+          if (site) redirectUrl.searchParams.set('site', site)
+          if (isNewUser) redirectUrl.searchParams.set('welcome', '1')
           return NextResponse.redirect(redirectUrl)
         }
       }

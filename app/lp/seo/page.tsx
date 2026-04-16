@@ -31,101 +31,54 @@ export default function LPSeoPage() {
           aria-hidden="true"
         />
 
-        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* 왼쪽: 텍스트 (ref 쿼리에 따라 동적 변경) */}
-            <div>
-              <LPHeroCopy />
-            </div>
+        <div className="relative max-w-3xl mx-auto px-4 py-16 sm:py-24 text-center">
+          {/* 텍스트 */}
+          <LPHeroCopy />
 
-            {/* 오른쪽: URL 입력 폼 + 미리보기 */}
-            <div>
-              {/* URL 입력 폼 */}
-              <LPHeroForm />
+          {/* 폼 */}
+          <div className="mt-10">
+            <LPHeroForm />
+          </div>
 
-              {/* 왜 로그인? 안내 */}
-              <div className="mt-4 rounded-xl bg-cyan-500/10 border border-cyan-400/20 px-4 py-3 text-xs text-cyan-100 leading-relaxed">
-                <strong className="text-white">왜 로그인이 필요한가요?</strong>
-                <br />
-                진단 리포트를 이메일로 안전하게 받아보기 위해 구글 로그인이 필요합니다. 카드
-                등록·결제 없이 20만 크레딧이 자동 지급됩니다.
+          {/* 리포트 미리보기 */}
+          <div className="mt-8 max-w-lg mx-auto bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5">
+            <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider">
+              진단 보고서 미리보기
+            </p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-300">종합 SEO 점수</span>
+                <span className="text-sm font-bold text-cyan-400">72 / 100</span>
               </div>
-
-              {/* 리포트 미리보기 */}
-              <div className="mt-4 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-5">
-                <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider">
-                  진단 보고서 미리보기
-                </p>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">종합 SEO 점수</span>
-                    <span className="text-sm font-bold text-cyan-400">72 / 100</span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-2">
-                    <div
-                      className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full"
-                      style={{ width: '72%' }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
-                      <span className="text-gray-400">메타태그</span>
-                      <span className="text-yellow-400 font-semibold">주의</span>
-                    </div>
-                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
-                      <span className="text-gray-400">페이지 속도</span>
-                      <span className="text-red-400 font-semibold">개선 필요</span>
-                    </div>
-                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
-                      <span className="text-gray-400">모바일 최적화</span>
-                      <span className="text-green-400 font-semibold">양호</span>
-                    </div>
-                    <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
-                      <span className="text-gray-400">콘텐츠 품질</span>
-                      <span className="text-yellow-400 font-semibold">주의</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 text-center pt-1">
-                    * 실제 보고서에는 50개 이상 항목이 포함됩니다
-                  </p>
+              <div className="w-full bg-white/10 rounded-full h-2">
+                <div
+                  className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full"
+                  style={{ width: '72%' }}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
+                  <span className="text-gray-400">메타태그</span>
+                  <span className="text-yellow-400 font-semibold">주의</span>
+                </div>
+                <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
+                  <span className="text-gray-400">페이지 속도</span>
+                  <span className="text-red-400 font-semibold">개선 필요</span>
+                </div>
+                <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
+                  <span className="text-gray-400">모바일 최적화</span>
+                  <span className="text-green-400 font-semibold">양호</span>
+                </div>
+                <div className="flex items-center justify-between bg-white/5 rounded-lg p-2">
+                  <span className="text-gray-400">콘텐츠 품질</span>
+                  <span className="text-yellow-400 font-semibold">주의</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── 텔레그램 상담 CTA 배너 ── */}
-      <section className="relative py-14 md:py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400" />
-        <div className="relative max-w-5xl mx-auto px-4 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 mb-4">
-            <div className="text-white">
-              <p className="text-sm font-medium opacity-80">일반 SEO 진단 비용</p>
-              <p className="text-3xl md:text-4xl font-extrabold line-through decoration-white/50">
-                30~50만원
+              <p className="text-xs text-gray-500 text-center pt-1">
+                * 실제 보고서에는 50개 이상 항목이 포함됩니다
               </p>
             </div>
-            <span className="text-white text-3xl" aria-hidden="true">
-              &rarr;
-            </span>
-            <div className="text-white">
-              <p className="text-sm font-medium opacity-80">백링크샵 회원</p>
-              <p className="text-3xl md:text-4xl font-extrabold">무료</p>
-            </div>
           </div>
-          <a
-            href="https://t.me/goat82"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-3 mt-4 px-10 py-4 bg-white text-blue-600 text-lg font-bold rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
-          >
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
-            </svg>
-            무료 SEO 상담 받기
-          </a>
-          <p className="text-white/80 text-sm mt-3">카드 등록 없이, 가입만 하면 즉시 시작</p>
         </div>
       </section>
 
