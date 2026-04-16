@@ -87,12 +87,10 @@ export async function GET(request: Request) {
     void queryError
     console.log(`[SEO Reports] 이메일 발송 대상: ${pendingOrders?.length || 0}건`)
 
-    if (!pendingOrders || pendingOrders.length === 0) {
-      return NextResponse.json({ message: 'No pending reports', processed: 0 })
-    }
-
     let processed = 0
     let failed = 0
+
+    // orders가 없어도 LP 요청 처리를 위해 계속 진행
 
     for (const order of pendingOrders) {
       try {

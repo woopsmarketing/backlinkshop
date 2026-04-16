@@ -46,14 +46,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Query failed' }, { status: 500 })
     }
 
-    if (!pendingOrders || pendingOrders.length === 0) {
-      return NextResponse.json({ message: 'No pending analysis', processed: 0 })
-    }
-
     // 🔒 락 획득: 픽업한 주문을 원자적으로 analyzing 상태로 변경
     // .eq('status', order.status) 조건으로 이미 다른 크론이 바꿨으면 매칭 실패 → 0건 반환
-    const lockedOrders: typeof pendingOrders = []
-    for (const order of pendingOrders) {
+    const lockedOrders: NonNullable<typeof pendingOrders> = []
+    for (const order of pendingOrders || []) {
       const { data: locked, error: lockError } = await adminClient
         .from('orders')
         .update({ status: 'analyzing' })
@@ -66,13 +62,6 @@ export async function GET(request: Request) {
         continue
       }
       lockedOrders.push(order)
-    }
-
-    if (lockedOrders.length === 0) {
-      return NextResponse.json({
-        message: 'All orders being processed by other crons',
-        processed: 0,
-      })
     }
 
     let processed = 0
