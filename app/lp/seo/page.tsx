@@ -16,18 +16,20 @@ export default function LPSeoPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* ── SECTION 1: Hero ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 text-white">
-        {/* 배경 블롭 */}
+      <section className="relative overflow-hidden text-white">
+        {/* 배경 그라데이션: 상단 따뜻한 오렌지 → 하단 진한 네이비 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-950/80 via-slate-900 to-slate-950" />
+        {/* 좌우 비대칭 빛 효과 */}
         <div
-          className="absolute top-20 left-10 w-96 h-96 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-25 animate-blob"
+          className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-orange-500 rounded-full filter blur-[120px] opacity-40"
           aria-hidden="true"
         />
         <div
-          className="absolute top-40 right-10 w-96 h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"
+          className="absolute top-1/3 -right-20 w-[400px] h-[400px] bg-amber-600 rounded-full filter blur-[100px] opacity-30"
           aria-hidden="true"
         />
         <div
-          className="absolute bottom-20 left-1/2 w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"
+          className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-red-900 rounded-full filter blur-[120px] opacity-35"
           aria-hidden="true"
         />
 
@@ -575,8 +577,13 @@ export default function LPSeoPage() {
       </section>
 
       {/* ── SECTION 8: 최종 CTA (FOMO + 즉시성) ── */}
-      <section className="py-16 sm:py-24 px-4 bg-gradient-to-br from-gray-950 via-slate-900 to-gray-950 text-white">
-        <div className="max-w-2xl mx-auto text-center">
+      <section className="relative py-16 sm:py-24 px-4 overflow-hidden text-white">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950" />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-orange-600 rounded-full filter blur-[150px] opacity-20"
+          aria-hidden="true"
+        />
+        <div className="relative max-w-2xl mx-auto text-center">
           <p className="text-red-400 font-semibold text-sm mb-3">
             매일 놓치고 있는 고객이 있습니다
           </p>
