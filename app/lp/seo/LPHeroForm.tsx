@@ -114,11 +114,24 @@ export function LPHeroForm() {
     <div>
       <form onSubmit={handleSubmit}>
         <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl">
-          <div className="flex items-center gap-2 mb-6">
-            <div className="w-3 h-3 rounded-full bg-red-400" />
-            <div className="w-3 h-3 rounded-full bg-yellow-400" />
-            <div className="w-3 h-3 rounded-full bg-green-400" />
-            <span className="text-xs text-gray-500 ml-2">SEO 진단 도구</span>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-400" />
+              <div className="w-3 h-3 rounded-full bg-yellow-400" />
+              <div className="w-3 h-3 rounded-full bg-green-400" />
+              <span className="text-xs text-gray-500 ml-2">SEO 진단 도구</span>
+            </div>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              30초면 끝
+            </span>
           </div>
 
           {/* 에러 메시지 */}

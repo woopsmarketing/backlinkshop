@@ -2,6 +2,8 @@
 import type { Metadata } from 'next'
 import { LPHeroForm } from './LPHeroForm'
 import { LPHeroCopy } from './LPHeroCopy'
+import { LPStickyCTA } from './LPStickyCTA'
+import { LPActivityToast } from './LPActivityToast'
 
 export const dynamic = 'force-static'
 
@@ -768,6 +770,10 @@ export default function LPSeoPage() {
           </div>
         </div>
       </section>
+
+      {/* ── 행동 유도 장치 ── */}
+      <LPStickyCTA />
+      <LPActivityToast />
 
       {/* ── 하단 푸터 ── */}
       <footer className="py-8 px-4 bg-gray-900 text-center">
