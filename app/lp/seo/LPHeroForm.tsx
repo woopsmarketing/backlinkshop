@@ -113,17 +113,17 @@ export function LPHeroForm() {
   return (
     <div className="max-w-lg mx-auto">
       <form onSubmit={handleSubmit}>
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-white/20 shadow-2xl">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl">
           <div className="flex items-center gap-2 mb-6">
             <div className="w-3 h-3 rounded-full bg-red-400" />
             <div className="w-3 h-3 rounded-full bg-yellow-400" />
             <div className="w-3 h-3 rounded-full bg-green-400" />
-            <span className="text-xs text-gray-400 ml-2">SEO 진단 도구</span>
+            <span className="text-xs text-gray-500 ml-2">SEO 진단 도구</span>
           </div>
 
           {/* 에러 메시지 */}
           {step === 'error' && errorMsg && (
-            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-400/20 text-sm text-red-300">
+            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
               {errorMsg}
             </div>
           )}
@@ -131,7 +131,7 @@ export function LPHeroForm() {
           {/* URL 입력 */}
           <label
             htmlFor="site-url"
-            className="block text-left text-sm text-gray-300 mb-2 font-semibold"
+            className="block text-left text-sm text-gray-700 mb-2 font-semibold"
           >
             진단할 사이트 URL
           </label>
@@ -159,14 +159,14 @@ export function LPHeroForm() {
               placeholder="https://example.com"
               required
               disabled={step === 'loading'}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
           {/* 키워드 입력 */}
           <label
             htmlFor="keyword"
-            className="block text-left text-sm text-gray-300 mb-2 font-semibold"
+            className="block text-left text-sm text-gray-700 mb-2 font-semibold"
           >
             핵심 키워드 1개
           </label>
@@ -194,14 +194,14 @@ export function LPHeroForm() {
               placeholder="예: 인테리어 소품"
               required
               disabled={step === 'loading'}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
           {/* 이메일 입력 */}
           <label
             htmlFor="email"
-            className="block text-left text-sm text-gray-300 mb-2 font-semibold"
+            className="block text-left text-sm text-gray-700 mb-2 font-semibold"
           >
             리포트 받을 이메일
           </label>
@@ -229,7 +229,7 @@ export function LPHeroForm() {
               placeholder="your@email.com"
               required
               disabled={step === 'loading'}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
+              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
@@ -258,22 +258,22 @@ export function LPHeroForm() {
             )}
           </button>
 
-          <p className="text-center text-xs text-gray-400 mt-3">
+          <p className="text-center text-xs text-gray-500 mt-3">
             신청 후 바로 분석이 진행되며, 약 10분 후에 이메일로 결과를 보내드립니다
           </p>
 
           {/* 구분선 */}
           <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10" />
+              <div className="w-full border-t border-gray-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-transparent text-gray-500">또는</span>
+              <span className="px-3 bg-white text-gray-400">또는</span>
             </div>
           </div>
 
           {/* 텔레그램 1:1 문의 */}
-          <p className="text-center text-xs text-gray-400 mb-3">
+          <p className="text-center text-xs text-gray-500 mb-3">
             구글 상위노출에 필요한 모든 서비스를 제공합니다
           </p>
           <a
@@ -281,7 +281,7 @@ export function LPHeroForm() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleTelegramClick}
-            className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-[#2AABEE]/20 hover:bg-[#2AABEE]/30 border border-[#2AABEE]/40 rounded-xl font-semibold text-white transition-all"
+            className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-emerald-500/25 transition-all"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
