@@ -56,6 +56,8 @@ export interface ParsedSeo {
   duplicateDescription: boolean
   ogImageUrl: string | null
   textContentSample: string
+  crawlBlocked?: boolean
+  crawlBlockReason?: string
 }
 
 // --- Helper functions ---
@@ -411,6 +413,14 @@ export async function analyzeSeo(
     return lines.join('\n')
   })()
 
+  const crawlBlockInfo = p.crawlBlocked
+    ? `
+## ⚠️ 크롤링 제한 안내
+${p.crawlBlockReason}
+아래 분석 결과는 차단 페이지를 기반으로 한 것이므로 실제 사이트 콘텐츠와 다를 수 있습니다.
+→ 리포트 최상단에 이 사실을 명확히 안내하고, 분석 가능한 항목(HTTPS, 로딩속도, 도메인 정보 등)만 평가하세요. 콘텐츠 관련 항목(Title, H1, 키워드 등)은 "크롤링 차단으로 확인 불가"로 표시하세요.`
+    : ''
+
   const keywordInfo =
     keywordList.length > 0
       ? `
@@ -448,6 +458,7 @@ export async function analyzeSeo(
 
 ## 판정 기준 (${isKorean ? '한글' : '영문'} 사이트)
 HTTPS:${checks.https ? '양호' : '개선'} | 상태코드:${checks.status ? '양호' : '개선'} | 속도:${checks.speed ? '양호' : '개선'} | Title:${checks.title ? '양호' : '개선'} | Desc:${checks.desc ? '양호' : '개선'} | Canonical:${checks.canonical ? '양호' : '개선'} | H1:${checks.h1 ? '양호' : '개선'} | OG:${checks.ogTags ? '양호' : '개선'} | JSON-LD:${checks.jsonLd ? '양호' : '개선'} | Gzip:${checks.gzip ? '양호' : '개선'}
+${crawlBlockInfo}
 ${keywordInfo}
 ${competitorBlock}
 
@@ -591,14 +602,30 @@ export async function fetchAndParse(url: string): Promise<ParsedSeo> {
     signal: AbortSignal.timeout(10000),
     headers: {
       'User-Agent':
-        'Mozilla/5.0 (compatible; BacklinkShopBot/1.0; +https://www.backlinkshop.co.kr)',
-      Accept: 'text/html',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+      'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     },
     redirect: 'follow',
   })
   const loadTime = Date.now() - start
   const headers = Object.fromEntries(res.headers.entries())
   const html = await res.text()
+
+  // 403/5xx 차단 감지: Cloudflare 등 봇 차단 페이지인 경우 안내 포함
+  if (res.status === 403 || res.status === 503) {
+    const isCloudflare = html.includes('Cloudflare') || html.includes('cf-browser-verification')
+    const parsed = parseHtml(html, targetUrl, res.url, res.status, loadTime, headers)
+    if (isCloudflare) {
+      parsed.crawlBlocked = true
+      parsed.crawlBlockReason =
+        'Cloudflare 보안 설정으로 인해 봇 접근이 차단되어 일부 항목을 분석할 수 없었습니다. 실제 사이트 콘텐츠와 다를 수 있습니다.'
+    } else {
+      parsed.crawlBlocked = true
+      parsed.crawlBlockReason = `서버가 ${res.status} 응답을 반환하여 일부 항목을 분석할 수 없었습니다.`
+    }
+    return parsed
+  }
 
   return parseHtml(html, targetUrl, res.url, res.status, loadTime, headers)
 }
