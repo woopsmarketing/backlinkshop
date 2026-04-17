@@ -27,7 +27,11 @@ export async function POST(request: NextRequest) {
 
     const adminClient = createAdminSupabaseClient()
 
-    // IP 기반 하루 3회 제한
+    // 관리자 이메일은 제한 없이 통과
+    const ADMIN_EMAILS = ['vnfm0580@gmail.com']
+    const isAdmin = ADMIN_EMAILS.includes(email.trim().toLowerCase())
+
+    // IP 기반 하루 3회 제한 (관리자 제외)
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
 
@@ -37,7 +41,7 @@ export async function POST(request: NextRequest) {
       .eq('ip_address', ip)
       .gte('created_at', todayStart.toISOString())
 
-    if (count !== null && count >= 3) {
+    if (!isAdmin && count !== null && count >= 3) {
       return NextResponse.json(
         { error: '하루 최대 3회까지 신청 가능합니다. 내일 다시 시도해주세요.' },
         { status: 429 }
@@ -51,7 +55,7 @@ export async function POST(request: NextRequest) {
       .eq('email', email.trim().toLowerCase())
       .gte('created_at', todayStart.toISOString())
 
-    if (emailDayCount !== null && emailDayCount >= 1) {
+    if (!isAdmin && emailDayCount !== null && emailDayCount >= 1) {
       return NextResponse.json(
         {
           error:
@@ -70,7 +74,7 @@ export async function POST(request: NextRequest) {
       .eq('url', url.trim())
       .gte('created_at', oneDayAgo)
 
-    if (dupCount !== null && dupCount > 0) {
+    if (!isAdmin && dupCount !== null && dupCount > 0) {
       return NextResponse.json(
         { error: '같은 URL에 대한 진단이 이미 진행 중입니다. 이메일을 확인해주세요.' },
         { status: 409 }
