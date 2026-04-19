@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const adminClient = createAdminSupabaseClient()
 
     // 관리자 이메일은 제한 없이 통과
-    const ADMIN_EMAILS = ['vnfm0580@gmail.com']
+    const ADMIN_EMAILS = ['vnfm0580@gmail.com', 'thugwoops@naver.com']
     const isAdmin = ADMIN_EMAILS.includes(email.trim().toLowerCase())
 
     // IP 기반 하루 3회 제한 (관리자 제외)
