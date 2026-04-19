@@ -15,8 +15,7 @@ import { createAdminSupabaseClient } from '@/server/supabase/admin'
 import { fetchAndParse, runAiAnalysis, type CompetitorContext } from '@/lib/seo-analyzer'
 import { analyzeCompetitors, type CompetitorAnalysis } from '@/lib/competitor-analyzer'
 import { markdownToHtml } from '@/lib/markdown-to-html'
-import { sendEmail } from '@/lib/email/send-email'
-import { renderLpAnalysisFailedEmail } from '@/lib/email/render'
+// sendEmail, renderLpAnalysisFailedEmail은 Resend 의존성 때문에 동적 import
 
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
@@ -39,7 +38,9 @@ export async function GET(request: Request) {
 
     const { data: pendingOrders, error: queryError } = await adminClient
       .from('orders')
-      .select('id, user_id, site_url, keywords, created_at, products!inner(name), status')
+      .select(
+        'id, user_id, site_url, keywords, created_at, products!inner(name), status, api_error'
+      )
       .or(`status.eq.pending_analysis,and(status.eq.analyzing,created_at.lt.${tenMinutesAgo})`)
       .limit(1)
 
@@ -167,14 +168,26 @@ export async function GET(request: Request) {
       } catch (err: any) {
         console.error(`[SEO Analysis] 실패: ${order.id}`, err.message)
 
-        // 실패 시 에러 기록 후 pending_analysis로 되돌림 (다음 크론에서 재시도)
-        await adminClient
-          .from('orders')
-          .update({
-            status: 'pending_analysis',
-            api_error: `SEO 분석 실패: ${err.message}`,
-          })
-          .eq('id', order.id)
+        // 이전에 이미 실패한 적 있으면 (api_error에 기록 있으면) 2회째 → failed
+        const hadPreviousError = !!(order as any).api_error
+        if (hadPreviousError) {
+          await adminClient
+            .from('orders')
+            .update({
+              status: 'failed',
+              api_error: `SEO 분석 2회 실패: ${err.message}`,
+            })
+            .eq('id', order.id)
+          console.error(`[SEO Analysis] 주문 2회 실패로 failed 처리: ${order.id}`)
+        } else {
+          await adminClient
+            .from('orders')
+            .update({
+              status: 'pending_analysis',
+              api_error: `SEO 분석 실패: ${err.message}`,
+            })
+            .eq('id', order.id)
+        }
 
         failed++
       }
@@ -211,6 +224,8 @@ export async function GET(request: Request) {
 
           // 실패 안내 이메일 발송
           try {
+            const { sendEmail } = await import('@/lib/email/send-email')
+            const { renderLpAnalysisFailedEmail } = await import('@/lib/email/render')
             await sendEmail(
               lpReq.email,
               'SEO 진단 요청을 처리할 수 없었습니다 - 백링크샵',
@@ -319,6 +334,8 @@ export async function GET(request: Request) {
 
             // 실패 안내 이메일 발송
             try {
+              const { sendEmail } = await import('@/lib/email/send-email')
+              const { renderLpAnalysisFailedEmail } = await import('@/lib/email/render')
               await sendEmail(
                 lpReq.email,
                 'SEO 진단 요청을 처리할 수 없었습니다 - 백링크샵',

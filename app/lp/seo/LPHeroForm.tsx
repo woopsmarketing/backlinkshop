@@ -58,10 +58,10 @@ export function LPHeroForm() {
   if (step === 'success') {
     return (
       <div>
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-white/20 shadow-2xl text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-green-400"
+              className="w-8 h-8 text-green-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -74,18 +74,18 @@ export function LPHeroForm() {
               />
             </svg>
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">진단 요청이 접수되었습니다!</h3>
-          <p className="text-gray-300 text-sm mb-4 leading-relaxed">
-            분석이 바로 시작되며, 약 <strong className="text-orange-400">10분 후</strong>에
+          <h3 className="text-xl font-bold text-gray-900 mb-2">진단 요청이 접수되었습니다!</h3>
+          <p className="text-gray-500 text-sm mb-4 leading-relaxed">
+            분석이 바로 시작되며, 약 <strong className="text-orange-500">10분 후</strong>에
             <br />
-            <strong className="text-white">{email}</strong> 으로 결과를 보내드립니다.
+            <strong className="text-gray-900">{email}</strong> 으로 결과를 보내드립니다.
           </p>
-          <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-400/20 text-sm text-gray-300">
+          <div className="p-3 rounded-xl bg-orange-50 border border-orange-200 text-sm text-gray-600">
             <p>
-              <strong className="text-white">진단 사이트:</strong> {url}
+              <strong className="text-gray-900">진단 사이트:</strong> {url}
             </p>
             <p className="mt-1">
-              <strong className="text-white">핵심 키워드:</strong> {keyword}
+              <strong className="text-gray-900">핵심 키워드:</strong> {keyword}
             </p>
           </div>
 
@@ -98,7 +98,7 @@ export function LPHeroForm() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleTelegramClick}
-            className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-[#2AABEE]/20 hover:bg-[#2AABEE]/30 border border-[#2AABEE]/40 rounded-xl font-semibold text-white transition-all"
+            className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-emerald-500/25 transition-all"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
