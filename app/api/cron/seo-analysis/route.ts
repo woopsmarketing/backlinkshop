@@ -85,27 +85,20 @@ export async function GET(request: Request) {
         console.log(`[SEO Analysis] 시작: ${order.id} - ${order.site_url}`)
         const startTime = Date.now()
 
-        // 1. 온페이지 파싱(AI 제외) + 경쟁사 분석 병렬
-        const [parseResult, competitorResult] = await Promise.allSettled([
-          fetchAndParse(order.site_url),
-          order.keywords
-            ? analyzeCompetitors(order.keywords, order.site_url, 5)
-            : Promise.resolve(null),
-        ])
+        // 1단계: 고객 URL 먼저 체크 (실패하면 경쟁사 분석 안 함)
+        const parsed = await fetchAndParse(order.site_url)
 
-        if (parseResult.status === 'rejected') {
-          throw new Error(`SEO 파싱 실패: ${parseResult.reason?.message || parseResult.reason}`)
-        }
-        const parsed = parseResult.value
-
+        // 2단계: 고객 URL 성공 시에만 경쟁사 분석 진행
         let competitorData: CompetitorAnalysis | null = null
-        if (competitorResult.status === 'fulfilled') {
-          competitorData = competitorResult.value
-          console.log(
-            `[SEO Analysis] 경쟁사 분석 완료: ${competitorData?.competitors.length || 0}개`
-          )
-        } else {
-          console.error(`[SEO Analysis] 경쟁사 분석 실패 (무시):`, competitorResult.reason?.message)
+        if (order.keywords) {
+          try {
+            competitorData = await analyzeCompetitors(order.keywords, order.site_url, 5)
+            console.log(
+              `[SEO Analysis] 경쟁사 분석 완료: ${competitorData?.competitors.length || 0}개`
+            )
+          } catch (compErr: any) {
+            console.error(`[SEO Analysis] 경쟁사 분석 실패 (무시):`, compErr.message)
+          }
         }
 
         // 2. AI 분석 (경쟁사 컨텍스트 주입)
@@ -253,19 +246,15 @@ export async function GET(request: Request) {
           )
           const startTime = Date.now()
 
-          const [parseResult, competitorResult] = await Promise.allSettled([
-            fetchAndParse(normalizedUrl),
-            analyzeCompetitors(lpReq.keyword, normalizedUrl, 5),
-          ])
+          // 1단계: 고객 URL 먼저 체크 (실패하면 경쟁사 분석 안 함)
+          const parsed = await fetchAndParse(normalizedUrl)
 
-          if (parseResult.status === 'rejected') {
-            throw new Error(`SEO 파싱 실패: ${parseResult.reason?.message || parseResult.reason}`)
-          }
-          const parsed = parseResult.value
-
+          // 2단계: 고객 URL 성공 시에만 경쟁사 분석 진행
           let competitorData: CompetitorAnalysis | null = null
-          if (competitorResult.status === 'fulfilled') {
-            competitorData = competitorResult.value
+          try {
+            competitorData = await analyzeCompetitors(lpReq.keyword, normalizedUrl, 5)
+          } catch (compErr: any) {
+            console.error(`[SEO Analysis] 경쟁사 분석 실패 (무시):`, compErr.message)
           }
 
           let competitorContext: CompetitorContext | null = null
