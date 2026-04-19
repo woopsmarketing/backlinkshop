@@ -203,7 +203,7 @@ export async function GET(request: Request) {
         const prevData = lpReq.seo_report_data as any
         const retryCount = (prevData?._retryCount || 0) + 1
 
-        if (retryCount > 3) {
+        if (retryCount > 2) {
           console.error(`[SEO Analysis] LP 재시도 초과 (${retryCount}회): ${lpReq.id}`)
           await adminClient.from('lp_requests').update({ status: 'failed' }).eq('id', lpReq.id)
           continue
@@ -215,7 +215,7 @@ export async function GET(request: Request) {
           normalizedUrl = normalizedUrl.replace(/^(https?):([^/])/, '$1://$2')
 
           console.log(
-            `[SEO Analysis] LP 요청 시작 (시도 ${retryCount}/3): ${lpReq.id} - ${normalizedUrl}`
+            `[SEO Analysis] LP 요청 시작 (시도 ${retryCount}/2): ${lpReq.id} - ${normalizedUrl}`
           )
           const startTime = Date.now()
 
@@ -286,9 +286,9 @@ export async function GET(request: Request) {
 
           lpProcessed++
         } catch (err: any) {
-          console.error(`[SEO Analysis] LP 실패 (시도 ${retryCount}/3): ${lpReq.id}`, err.message)
+          console.error(`[SEO Analysis] LP 실패 (시도 ${retryCount}/2): ${lpReq.id}`, err.message)
 
-          if (retryCount >= 3) {
+          if (retryCount >= 2) {
             // 3회 실패 → failed 상태로 변경 (더 이상 재시도 안 함)
             await adminClient
               .from('lp_requests')

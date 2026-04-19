@@ -13,6 +13,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '모든 필드를 입력해주세요' }, { status: 400 })
     }
 
+    // URL 정규화: 프로토콜/슬래시 제거 → 도메인+패스만 추출 → https:// 붙이기
+    const normalizeUrl = (raw: string): string => {
+      let cleaned = raw.trim()
+      // 프로토콜 제거 (https://, http://, https:, http:, // 등)
+      cleaned = cleaned.replace(/^(?:https?:?\/?\/?)/, '')
+      // 앞뒤 슬래시 정리
+      cleaned = cleaned.replace(/^\/+/, '')
+      if (!cleaned) return ''
+      return 'https://' + cleaned
+    }
+
     // 이메일 형식 검증
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email.trim())) {
@@ -71,7 +82,7 @@ export async function POST(request: NextRequest) {
       .from('lp_requests')
       .select('*', { count: 'exact', head: true })
       .eq('email', email.trim().toLowerCase())
-      .eq('url', url.trim())
+      .eq('url', normalizeUrl(url))
       .gte('created_at', oneDayAgo)
 
     if (!isAdmin && dupCount !== null && dupCount > 0) {
@@ -81,9 +92,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // URL 정규화 적용
+    const cleanUrl = normalizeUrl(url)
+    if (!cleanUrl || cleanUrl === 'https://') {
+      return NextResponse.json({ error: '올바른 URL을 입력해주세요' }, { status: 400 })
+    }
+
     // DB 저장
     const { error: insertError } = await adminClient.from('lp_requests').insert({
-      url: url.trim(),
+      url: cleanUrl,
       keyword: keyword.trim(),
       email: email.trim().toLowerCase(),
       ip_address: ip,
