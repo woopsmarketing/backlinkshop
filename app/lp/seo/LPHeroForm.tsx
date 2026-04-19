@@ -166,10 +166,10 @@ export function LPHeroForm() {
             </div>
             <input
               id="site-url"
-              type="url"
+              type="text"
               value={url}
               onChange={e => setUrl(e.target.value)}
-              placeholder="https://example.com"
+              placeholder="example.com"
               required
               disabled={step === 'loading'}
               className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
