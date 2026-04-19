@@ -181,7 +181,7 @@ export async function GET(request: Request) {
     // ── LP 비로그인 요청 처리 ──
     const { data: lpPending } = await adminClient
       .from('lp_requests')
-      .select('id, url, keyword, email, status')
+      .select('id, url, keyword, email, status, seo_report_data')
       .or(`status.eq.pending_analysis,and(status.eq.analyzing,created_at.lt.${tenMinutesAgo})`)
       .limit(1)
 
@@ -199,13 +199,29 @@ export async function GET(request: Request) {
 
         if (!locked || locked.length === 0) continue
 
+        // 재시도 횟수 확인 (3회 초과 시 failed 처리)
+        const prevData = lpReq.seo_report_data as any
+        const retryCount = (prevData?._retryCount || 0) + 1
+
+        if (retryCount > 3) {
+          console.error(`[SEO Analysis] LP 재시도 초과 (${retryCount}회): ${lpReq.id}`)
+          await adminClient.from('lp_requests').update({ status: 'failed' }).eq('id', lpReq.id)
+          continue
+        }
+
         try {
-          console.log(`[SEO Analysis] LP 요청 시작: ${lpReq.id} - ${lpReq.url}`)
+          // URL 정규화: https:example.com → https://example.com
+          let normalizedUrl = lpReq.url.trim()
+          normalizedUrl = normalizedUrl.replace(/^(https?):([^/])/, '$1://$2')
+
+          console.log(
+            `[SEO Analysis] LP 요청 시작 (시도 ${retryCount}/3): ${lpReq.id} - ${normalizedUrl}`
+          )
           const startTime = Date.now()
 
           const [parseResult, competitorResult] = await Promise.allSettled([
-            fetchAndParse(lpReq.url),
-            analyzeCompetitors(lpReq.keyword, lpReq.url, 5),
+            fetchAndParse(normalizedUrl),
+            analyzeCompetitors(lpReq.keyword, normalizedUrl, 5),
           ])
 
           if (parseResult.status === 'rejected') {
@@ -270,13 +286,27 @@ export async function GET(request: Request) {
 
           lpProcessed++
         } catch (err: any) {
-          console.error(`[SEO Analysis] LP 실패: ${lpReq.id}`, err.message)
-          await adminClient
-            .from('lp_requests')
-            .update({
-              status: 'pending_analysis',
-            })
-            .eq('id', lpReq.id)
+          console.error(`[SEO Analysis] LP 실패 (시도 ${retryCount}/3): ${lpReq.id}`, err.message)
+
+          if (retryCount >= 3) {
+            // 3회 실패 → failed 상태로 변경 (더 이상 재시도 안 함)
+            await adminClient
+              .from('lp_requests')
+              .update({
+                status: 'failed',
+                seo_report_data: { _retryCount: retryCount, _lastError: err.message },
+              })
+              .eq('id', lpReq.id)
+          } else {
+            // 재시도 카운트 기록 후 pending_analysis로 되돌림
+            await adminClient
+              .from('lp_requests')
+              .update({
+                status: 'pending_analysis',
+                seo_report_data: { _retryCount: retryCount, _lastError: err.message },
+              })
+              .eq('id', lpReq.id)
+          }
         }
       }
     }
