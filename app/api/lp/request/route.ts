@@ -98,6 +98,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '올바른 URL을 입력해주세요' }, { status: 400 })
     }
 
+    // 도메인 형식 검증: 최소 "xxx.xx" 형태인지 확인
+    const domainPart = cleanUrl.replace('https://', '').split('/')[0]
+    if (!/^[a-zA-Z0-9가-힣][a-zA-Z0-9가-힣.-]*\.[a-zA-Z가-힣]{2,}$/.test(domainPart)) {
+      return NextResponse.json(
+        { error: '도메인 형식이 올바르지 않습니다. 예: example.com' },
+        { status: 400 }
+      )
+    }
+
+    // 공백 포함 검증
+    if (/\s/.test(cleanUrl)) {
+      return NextResponse.json(
+        { error: 'URL에 공백이 포함되어 있습니다. 확인 후 다시 입력해주세요.' },
+        { status: 400 }
+      )
+    }
+
     // DB 저장
     const { error: insertError } = await adminClient.from('lp_requests').insert({
       url: cleanUrl,

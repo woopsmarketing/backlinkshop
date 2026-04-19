@@ -15,6 +15,8 @@ import { createAdminSupabaseClient } from '@/server/supabase/admin'
 import { fetchAndParse, runAiAnalysis, type CompetitorContext } from '@/lib/seo-analyzer'
 import { analyzeCompetitors, type CompetitorAnalysis } from '@/lib/competitor-analyzer'
 import { markdownToHtml } from '@/lib/markdown-to-html'
+import { sendEmail } from '@/lib/email/send-email'
+import { renderLpAnalysisFailedEmail } from '@/lib/email/render'
 
 export const maxDuration = 60
 export const dynamic = 'force-dynamic'
@@ -206,6 +208,23 @@ export async function GET(request: Request) {
         if (retryCount > 2) {
           console.error(`[SEO Analysis] LP 재시도 초과 (${retryCount}회): ${lpReq.id}`)
           await adminClient.from('lp_requests').update({ status: 'failed' }).eq('id', lpReq.id)
+
+          // 실패 안내 이메일 발송
+          try {
+            await sendEmail(
+              lpReq.email,
+              'SEO 진단 요청을 처리할 수 없었습니다 - 백링크샵',
+              renderLpAnalysisFailedEmail({
+                email: lpReq.email,
+                url: lpReq.url,
+                keyword: lpReq.keyword,
+              })
+            )
+            console.log(`[SEO Analysis] LP 실패 안내 이메일 발송: ${lpReq.email}`)
+          } catch (emailErr: any) {
+            console.error(`[SEO Analysis] LP 실패 안내 이메일 발송 실패:`, emailErr.message)
+          }
+
           continue
         }
 
@@ -289,7 +308,7 @@ export async function GET(request: Request) {
           console.error(`[SEO Analysis] LP 실패 (시도 ${retryCount}/2): ${lpReq.id}`, err.message)
 
           if (retryCount >= 2) {
-            // 3회 실패 → failed 상태로 변경 (더 이상 재시도 안 함)
+            // 2회 실패 → failed 상태로 변경 (더 이상 재시도 안 함)
             await adminClient
               .from('lp_requests')
               .update({
@@ -297,6 +316,21 @@ export async function GET(request: Request) {
                 seo_report_data: { _retryCount: retryCount, _lastError: err.message },
               })
               .eq('id', lpReq.id)
+
+            // 실패 안내 이메일 발송
+            try {
+              await sendEmail(
+                lpReq.email,
+                'SEO 진단 요청을 처리할 수 없었습니다 - 백링크샵',
+                renderLpAnalysisFailedEmail({
+                  email: lpReq.email,
+                  url: lpReq.url,
+                  keyword: lpReq.keyword,
+                })
+              )
+            } catch (emailErr: any) {
+              console.error(`[SEO Analysis] LP 실패 안내 이메일 발송 실패:`, emailErr.message)
+            }
           } else {
             // 재시도 카운트 기록 후 pending_analysis로 되돌림
             await adminClient

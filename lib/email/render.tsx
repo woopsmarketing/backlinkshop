@@ -12,6 +12,7 @@ import { TopupApprovedEmail } from './templates/topup-approved'
 import { UserRegisteredAdminEmail } from './templates/user-registered-admin'
 import { AnnouncementEmail } from './templates/announcement'
 import { SeoReportEmail } from './templates/seo-report'
+import { LpAnalysisFailedEmail } from './templates/lp-analysis-failed'
 
 /**
  * 주문 생성 - 고객 이메일 렌더링
@@ -123,4 +124,12 @@ export function renderSeoReportEmail(props: {
  */
 export function renderAnnouncementEmail(props: { customerEmail: string }) {
   return <AnnouncementEmail {...props} />
+}
+
+export function renderLpAnalysisFailedEmail(props: {
+  email: string
+  url: string
+  keyword: string
+}) {
+  return <LpAnalysisFailedEmail {...props} />
 }
