@@ -4,6 +4,9 @@
  */
 
 import { parseHtml, type ParsedSeo } from './seo-analyzer'
+import { createAdminSupabaseClient } from '@/server/supabase/admin'
+
+const CACHE_TTL_DAYS = 7 // 캐시 유효기간 7일
 
 export interface CompetitorData {
   rank: number
@@ -184,6 +187,26 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
   const apiKey = process.env.RAPIDAPI_KEY
   if (!apiKey) return { _errors: ['RAPIDAPI_KEY 없음'] }
 
+  // 캐시 확인
+  try {
+    const adminClient = createAdminSupabaseClient()
+    const cacheExpiry = new Date(Date.now() - CACHE_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString()
+
+    const { data: cached } = await adminClient
+      .from('domain_metrics_cache')
+      .select('metrics, fetched_at')
+      .eq('domain', domain.toLowerCase())
+      .gte('fetched_at', cacheExpiry)
+      .single()
+
+    if (cached?.metrics) {
+      console.log(`[Metrics] ${domain}: 캐시 사용 (${cached.fetched_at})`)
+      return cached.metrics as Partial<CompetitorData>
+    }
+  } catch {
+    // 캐시 테이블 없거나 조회 실패 → API 호출로 진행
+  }
+
   try {
     const res = await fetch(
       `https://domain-metrics-check.p.rapidapi.com/domain-metrics/${encodeURIComponent(domain)}/`,
@@ -210,14 +233,7 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
       return { _errors: [`메트릭 API: ${data?.message || 'unknown'}`] }
     }
 
-    console.log(`[Metrics] ${domain}:`, {
-      mozDA: data?.mozDA,
-      ahrefsDR: data?.ahrefsDR,
-      ahrefsTraffic: data?.ahrefsTraffic,
-      majesticTF: data?.majesticTF,
-    })
-
-    return {
+    const metrics: Partial<CompetitorData> = {
       mozDA: data?.mozDA ?? undefined,
       mozPA: data?.mozPA ?? undefined,
       mozRank: data?.mozRank ?? undefined,
@@ -239,6 +255,30 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
       majesticRefEdu: data?.majesticRefEdu ?? undefined,
       majesticRefGov: data?.majesticRefGov ?? undefined,
     }
+
+    console.log(`[Metrics] ${domain}: API 호출 완료`, {
+      mozDA: metrics.mozDA,
+      ahrefsDR: metrics.ahrefsDR,
+      ahrefsTraffic: metrics.ahrefsTraffic,
+    })
+
+    // 캐시 저장 (upsert)
+    try {
+      const adminClient = createAdminSupabaseClient()
+      await adminClient.from('domain_metrics_cache').upsert(
+        {
+          domain: domain.toLowerCase(),
+          metrics,
+          fetched_at: new Date().toISOString(),
+        },
+        { onConflict: 'domain' }
+      )
+      console.log(`[Metrics] ${domain}: 캐시 저장 완료`)
+    } catch (cacheErr: any) {
+      console.error(`[Metrics] ${domain}: 캐시 저장 실패 (무시):`, cacheErr.message)
+    }
+
+    return metrics
   } catch (err: any) {
     console.error(`[Metrics] ${domain} 예외:`, err.message)
     return { _errors: [`메트릭 예외: ${err.message}`] }
