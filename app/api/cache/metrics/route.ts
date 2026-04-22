@@ -101,3 +101,35 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
+/**
+ * POST: 다른 프로젝트에서 분석한 결과를 캐시에 저장
+ * Body: { domain: string, metrics: object }
+ */
+export async function POST(request: NextRequest) {
+  const apiKey = request.headers.get('x-api-key')
+  if (!apiKey || apiKey !== process.env.CACHE_API_KEY) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const { domain, metrics } = body
+
+    if (!domain || !metrics || typeof metrics !== 'object') {
+      return NextResponse.json({ error: 'domain and metrics required' }, { status: 400 })
+    }
+
+    const adminClient = createAdminSupabaseClient()
+    await adminClient
+      .from('domain_metrics_cache')
+      .upsert(
+        { domain: domain.toLowerCase().trim(), metrics, fetched_at: new Date().toISOString() },
+        { onConflict: 'domain' }
+      )
+
+    return NextResponse.json({ success: true, domain: domain.toLowerCase().trim() })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}

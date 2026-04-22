@@ -72,3 +72,31 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
+export async function POST(request: NextRequest) {
+  const apiKey = request.headers.get('x-api-key')
+  if (!apiKey || apiKey !== process.env.CACHE_API_KEY) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const { keyword, results } = body
+
+    if (!keyword || !Array.isArray(results)) {
+      return NextResponse.json({ error: 'keyword and results[] required' }, { status: 400 })
+    }
+
+    const adminClient = createAdminSupabaseClient()
+    await adminClient
+      .from('serp_cache')
+      .upsert(
+        { keyword: keyword.toLowerCase().trim(), results, fetched_at: new Date().toISOString() },
+        { onConflict: 'keyword' }
+      )
+
+    return NextResponse.json({ success: true, keyword: keyword.toLowerCase().trim() })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
