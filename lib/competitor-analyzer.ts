@@ -101,6 +101,26 @@ async function fetchSerpResults(
   const apiKey = process.env.SERPER_API_KEY
   if (!apiKey) throw new Error('SERPER_API_KEY 환경변수가 설정되지 않았습니다')
 
+  // 캐시 확인 (24시간)
+  try {
+    const adminClient = createAdminSupabaseClient()
+    const cacheExpiry = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+
+    const { data: cached } = await adminClient
+      .from('serp_cache')
+      .select('results, fetched_at')
+      .eq('keyword', keyword.toLowerCase().trim())
+      .gte('fetched_at', cacheExpiry)
+      .single()
+
+    if (cached?.results) {
+      console.log(`[SERP] "${keyword}": 캐시 사용 (${cached.fetched_at})`)
+      return cached.results as { url: string; title: string }[]
+    }
+  } catch {
+    // 캐시 테이블 없거나 조회 실패 → API 호출로 진행
+  }
+
   try {
     const res = await fetch('https://google.serper.dev/search', {
       method: 'POST',
@@ -126,15 +146,33 @@ async function fetchSerpResults(
     const data = await res.json()
     const organic = data?.organic || []
 
-    console.log(`[SERP] "${keyword}" → ${organic.length}개 결과`)
-
-    return organic
+    const results = organic
       .slice(0, count)
       .map((item: any) => ({
         url: item.link || '',
         title: item.title || '',
       }))
       .filter((item: any) => item.url)
+
+    console.log(`[SERP] "${keyword}": API 호출 완료 → ${results.length}개 결과`)
+
+    // 캐시 저장 (upsert)
+    try {
+      const adminClient = createAdminSupabaseClient()
+      await adminClient.from('serp_cache').upsert(
+        {
+          keyword: keyword.toLowerCase().trim(),
+          results,
+          fetched_at: new Date().toISOString(),
+        },
+        { onConflict: 'keyword' }
+      )
+      console.log(`[SERP] "${keyword}": 캐시 저장 완료`)
+    } catch (cacheErr: any) {
+      console.error(`[SERP] "${keyword}": 캐시 저장 실패 (무시):`, cacheErr.message)
+    }
+
+    return results
   } catch (err: any) {
     console.error(`[SERP] Serper 예외:`, err.message)
     return []
