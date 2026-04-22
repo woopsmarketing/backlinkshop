@@ -189,6 +189,28 @@ async function fetchBacklinkProfile(domain: string): Promise<Partial<CompetitorD
   const apiKey = process.env.VEBAPI_KEY
   if (!apiKey) return { _errors: ['VEBAPI_KEY 없음'] }
 
+  // 캐시 확인
+  try {
+    const adminClient = createAdminSupabaseClient()
+    const cacheExpiry = new Date(
+      Date.now() - METRICS_CACHE_TTL_DAYS * 24 * 60 * 60 * 1000
+    ).toISOString()
+
+    const { data: cached } = await adminClient
+      .from('backlink_cache')
+      .select('metrics, fetched_at')
+      .eq('domain', domain.toLowerCase())
+      .gte('fetched_at', cacheExpiry)
+      .single()
+
+    if (cached?.metrics) {
+      console.log(`[Backlink] ${domain}: 캐시 사용 (${cached.fetched_at})`)
+      return cached.metrics as Partial<CompetitorData>
+    }
+  } catch {
+    // 캐시 테이블 없거나 조회 실패 → API 호출로 진행
+  }
+
   try {
     const res = await fetch(
       `https://vebapi.com/api/seo/backlinkdata?website=${encodeURIComponent(domain)}`,
@@ -207,14 +229,32 @@ async function fetchBacklinkProfile(domain: string): Promise<Partial<CompetitorD
     const data = await res.json()
     const counts = data?.counts
 
-    console.log(`[Backlink] ${domain}:`, JSON.stringify(counts?.backlinks))
-
-    return {
+    const metrics: Partial<CompetitorData> = {
       backlinkTotal: counts?.backlinks?.total || 0,
       backlinkDoFollow: counts?.backlinks?.doFollow || 0,
       referringDomains: counts?.domains?.total || 0,
       referringDoFollow: counts?.domains?.doFollow || 0,
     }
+
+    console.log(`[Backlink] ${domain}: API 호출 완료`, JSON.stringify(counts?.backlinks))
+
+    // 캐시 저장 (upsert)
+    try {
+      const adminClient = createAdminSupabaseClient()
+      await adminClient.from('backlink_cache').upsert(
+        {
+          domain: domain.toLowerCase(),
+          metrics,
+          fetched_at: new Date().toISOString(),
+        },
+        { onConflict: 'domain' }
+      )
+      console.log(`[Backlink] ${domain}: 캐시 저장 완료`)
+    } catch (cacheErr: any) {
+      console.error(`[Backlink] ${domain}: 캐시 저장 실패 (무시):`, cacheErr.message)
+    }
+
+    return metrics
   } catch (err: any) {
     console.error(`[Backlink] ${domain} 예외:`, err.message)
     return { _errors: [`백링크 예외: ${err.message}`] }
