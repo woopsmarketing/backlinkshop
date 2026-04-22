@@ -6,7 +6,8 @@
 import { parseHtml, type ParsedSeo } from './seo-analyzer'
 import { createAdminSupabaseClient } from '@/server/supabase/admin'
 
-const CACHE_TTL_DAYS = 7 // 캐시 유효기간 7일
+const METRICS_CACHE_TTL_DAYS = 30 // 도메인 메트릭 캐시 유효기간 30일
+const SERP_CACHE_TTL_DAYS = 14 // 검색 결과 캐시 유효기간 14일
 
 export interface CompetitorData {
   rank: number
@@ -104,7 +105,9 @@ async function fetchSerpResults(
   // 캐시 확인 (24시간)
   try {
     const adminClient = createAdminSupabaseClient()
-    const cacheExpiry = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const cacheExpiry = new Date(
+      Date.now() - SERP_CACHE_TTL_DAYS * 24 * 60 * 60 * 1000
+    ).toISOString()
 
     const { data: cached } = await adminClient
       .from('serp_cache')
@@ -228,7 +231,9 @@ async function fetchDomainMetrics(domain: string): Promise<Partial<CompetitorDat
   // 캐시 확인
   try {
     const adminClient = createAdminSupabaseClient()
-    const cacheExpiry = new Date(Date.now() - CACHE_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString()
+    const cacheExpiry = new Date(
+      Date.now() - METRICS_CACHE_TTL_DAYS * 24 * 60 * 60 * 1000
+    ).toISOString()
 
     const { data: cached } = await adminClient
       .from('domain_metrics_cache')
