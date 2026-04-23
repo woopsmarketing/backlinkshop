@@ -19,14 +19,19 @@ export async function GET(request: NextRequest) {
   const adminClient = createAdminSupabaseClient()
   const cacheExpiry = new Date(Date.now() - CACHE_TTL_DAYS * 24 * 60 * 60 * 1000).toISOString()
 
-  const { data: cached } = await adminClient
+  const { data: cached, error: cacheError } = await adminClient
     .from('backlink_cache')
     .select('metrics, fetched_at')
     .eq('domain', domain)
     .gte('fetched_at', cacheExpiry)
     .single()
 
+  if (cacheError) {
+    console.log(`[Cache/Backlink] 캐시 조회 실패 (${domain}):`, cacheError.message)
+  }
+
   if (cached?.metrics) {
+    console.log(`[Cache/Backlink] 캐시 히트: ${domain}`)
     return NextResponse.json({
       source: 'cache',
       domain,
@@ -35,6 +40,7 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  console.log(`[Cache/Backlink] 캐시 미스: ${domain} → VebAPI 호출`)
   const vebApiKey = process.env.VEBAPI_KEY
   if (!vebApiKey) {
     return NextResponse.json({ error: 'VEBAPI_KEY not configured' }, { status: 500 })
