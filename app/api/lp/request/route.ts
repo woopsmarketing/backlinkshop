@@ -129,6 +129,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '요청 처리 중 오류가 발생했습니다' }, { status: 500 })
     }
 
+    // 관리자 알림 이메일 (fire-and-forget)
+    try {
+      const { sendEmail } = await import('@/lib/email/send-email')
+      const { renderLpAdminNotifyEmail } = await import('@/lib/email/render')
+      const ADMIN_NOTIFY_EMAIL = 'vnfm0580@gmail.com'
+      await sendEmail(
+        ADMIN_NOTIFY_EMAIL,
+        `[LP 신청] ${cleanUrl} - ${keyword.trim()}`,
+        renderLpAdminNotifyEmail({
+          url: cleanUrl,
+          keyword: keyword.trim(),
+          email: email.trim().toLowerCase(),
+          ip,
+          timestamp: new Date().toISOString(),
+        })
+      )
+    } catch (emailErr) {
+      console.error('[LP Request] 관리자 알림 이메일 실패 (무시):', emailErr)
+    }
+
     return NextResponse.json({ success: true, message: '진단 요청이 접수되었습니다' })
   } catch (error) {
     console.error('[LP Request] 오류:', error)

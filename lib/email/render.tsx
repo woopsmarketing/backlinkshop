@@ -13,6 +13,7 @@ import { UserRegisteredAdminEmail } from './templates/user-registered-admin'
 import { AnnouncementEmail } from './templates/announcement'
 import { SeoReportEmail } from './templates/seo-report'
 import { LpAnalysisFailedEmail } from './templates/lp-analysis-failed'
+import { LpAdminNotifyEmail } from './templates/lp-admin-notify'
 
 /**
  * 주문 생성 - 고객 이메일 렌더링
@@ -132,4 +133,14 @@ export function renderLpAnalysisFailedEmail(props: {
   keyword: string
 }) {
   return <LpAnalysisFailedEmail {...props} />
+}
+
+export function renderLpAdminNotifyEmail(props: {
+  url: string
+  keyword: string
+  email: string
+  ip: string
+  timestamp: string
+}) {
+  return <LpAdminNotifyEmail {...props} />
 }
