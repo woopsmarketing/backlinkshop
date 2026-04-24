@@ -1,19 +1,24 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { toDomainSlug } from '@/lib/domain'
+
+type Step = 'form' | 'loading' | 'redirecting' | 'error'
 
 export function LPHeroForm() {
+  const router = useRouter()
   const [url, setUrl] = useState('')
   const [keyword, setKeyword] = useState('')
   const [email, setEmail] = useState('')
-  const [step, setStep] = useState<'form' | 'loading' | 'success' | 'error'>('form')
+  const [step, setStep] = useState<Step>('form')
   const [errorMsg, setErrorMsg] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!url.trim() || !keyword.trim() || !email.trim()) return
 
-    // LP 폼 제출 전환 발화
+    // LP 폼 제출 전환 발화 (부전환)
     if (typeof window !== 'undefined' && (window as any).trackLpSubmit) {
       ;(window as any).trackLpSubmit()
     }
@@ -41,7 +46,19 @@ export function LPHeroForm() {
         ;(window as any).trackFreeOrder()
       }
 
-      setStep('success')
+      // 응답에 redirectUrl이 있으면 그대로, 없으면 도메인에서 직접 slug 생성
+      const fallbackSlug = toDomainSlug(url.trim())
+      const redirectUrl: string =
+        data.redirectUrl || (fallbackSlug ? `/analyze/${encodeURIComponent(fallbackSlug)}` : '')
+
+      if (!redirectUrl) {
+        setErrorMsg('결과 페이지 주소를 만들지 못했습니다. 페이지를 새로고침해주세요.')
+        setStep('error')
+        return
+      }
+
+      setStep('redirecting')
+      router.push(redirectUrl)
     } catch {
       setErrorMsg('네트워크 오류가 발생했습니다. 다시 시도해주세요.')
       setStep('error')
@@ -54,61 +71,7 @@ export function LPHeroForm() {
     }
   }
 
-  // 성공 화면
-  if (step === 'success') {
-    return (
-      <div>
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-            <svg
-              className="w-8 h-8 text-green-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">진단 요청이 접수되었습니다!</h3>
-          <p className="text-gray-500 text-sm mb-4 leading-relaxed">
-            분석이 바로 시작되며, 약 <strong className="text-orange-500">10분 후</strong>에
-            <br />
-            <strong className="text-gray-900">{email}</strong> 으로 결과를 보내드립니다.
-          </p>
-          <div className="p-3 rounded-xl bg-orange-50 border border-orange-200 text-sm text-gray-600">
-            <p>
-              <strong className="text-gray-900">진단 사이트:</strong> {url}
-            </p>
-            <p className="mt-1">
-              <strong className="text-gray-900">핵심 키워드:</strong> {keyword}
-            </p>
-          </div>
-
-          {/* 텔레그램 상담 */}
-          <p className="text-gray-400 text-xs mt-6 mb-3">
-            구글 상위노출에 필요한 모든 서비스를 제공합니다
-          </p>
-          <a
-            href="https://t.me/goat82"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={handleTelegramClick}
-            className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-emerald-500/25 transition-all"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
-            </svg>
-            1:1 전문가 상담 신청
-          </a>
-        </div>
-      </div>
-    )
-  }
+  const busy = step === 'loading' || step === 'redirecting'
 
   return (
     <div>
@@ -171,7 +134,7 @@ export function LPHeroForm() {
               onChange={e => setUrl(e.target.value)}
               placeholder="example.com"
               required
-              disabled={step === 'loading'}
+              disabled={busy}
               className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
@@ -206,7 +169,7 @@ export function LPHeroForm() {
               onChange={e => setKeyword(e.target.value)}
               placeholder="예: 인테리어 소품"
               required
-              disabled={step === 'loading'}
+              disabled={busy}
               className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
@@ -241,20 +204,20 @@ export function LPHeroForm() {
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              disabled={step === 'loading'}
+              disabled={busy}
               className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
             />
           </div>
 
           <button
             type="submit"
-            disabled={step === 'loading'}
+            disabled={busy}
             className="w-full px-8 py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-xl hover:shadow-orange-500/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
           >
-            {step === 'loading' ? (
+            {busy ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                분석 요청 중...
+                {step === 'redirecting' ? '결과 페이지로 이동 중...' : '분석 요청 중...'}
               </>
             ) : (
               <>
@@ -272,7 +235,7 @@ export function LPHeroForm() {
           </button>
 
           <p className="text-center text-xs text-gray-500 mt-3">
-            신청 후 바로 분석이 진행되며, 약 10분 후에 이메일로 결과를 보내드립니다
+            제출 즉시 결과 페이지로 이동합니다 · 분석 결과는 이메일로도 전송됩니다
           </p>
 
           {/* 구분선 */}

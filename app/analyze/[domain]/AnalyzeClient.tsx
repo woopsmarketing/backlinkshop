@@ -1,0 +1,144 @@
+'use client'
+
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { AnalyzePendingPoller } from './AnalyzePendingPoller'
+import { AnalyzeResultView } from './AnalyzeResultView'
+import { AnalyzeStickyCTA } from './AnalyzeStickyCTA'
+import { AnalyzeFailedView } from './AnalyzeFailedView'
+import { AnalyzeNotFoundView } from './AnalyzeNotFoundView'
+
+export type AnalyzeStatus =
+  | 'pending_analysis'
+  | 'analyzing'
+  | 'processing'
+  | 'sending_report'
+  | 'completed'
+  | 'failed'
+  | 'none'
+
+export type AnalyzeReport = {
+  score?: number | null
+  analysisHtml?: string
+  parsedData?: Record<string, unknown>
+  competitorData?: Record<string, unknown> | null
+} | null
+
+export type AnalyzeInitialState = {
+  status: AnalyzeStatus
+  domain: string
+  url: string | null
+  keyword: string | null
+  requestedAt: string | null
+  analyzedAt: string | null
+  completedAt: string | null
+  report: AnalyzeReport
+}
+
+type StatusResponse = {
+  status: AnalyzeStatus
+  hasReport: boolean
+  domain: string
+  url?: string
+  keyword?: string
+  requestedAt?: string
+  analyzedAt?: string
+  completedAt?: string
+  report?: AnalyzeReport
+}
+
+const PENDING_STATUSES: AnalyzeStatus[] = ['pending_analysis', 'analyzing']
+const POLL_INTERVAL_MS = 2000
+const MAX_POLL_ATTEMPTS = 600 // 약 20분
+
+export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
+  const [state, setState] = useState<AnalyzeInitialState>(initial)
+  const attemptsRef = useRef(0)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const fetchStatus = useCallback(async (domain: string) => {
+    const res = await fetch(`/api/lp/status?domain=${encodeURIComponent(domain)}`, {
+      cache: 'no-store',
+    })
+    if (!res.ok) return null
+    return (await res.json()) as StatusResponse
+  }, [])
+
+  const shouldPoll = PENDING_STATUSES.includes(state.status)
+
+  useEffect(() => {
+    if (!shouldPoll) return
+
+    let cancelled = false
+
+    const tick = async () => {
+      if (cancelled) return
+      attemptsRef.current += 1
+      if (attemptsRef.current > MAX_POLL_ATTEMPTS) return
+
+      if (typeof document !== 'undefined' && document.hidden) {
+        timerRef.current = setTimeout(tick, POLL_INTERVAL_MS)
+        return
+      }
+
+      const data = await fetchStatus(state.domain)
+      if (cancelled) return
+
+      if (data && data.status !== 'none') {
+        setState(prev => ({
+          ...prev,
+          status: data.status,
+          url: data.url ?? prev.url,
+          keyword: data.keyword ?? prev.keyword,
+          requestedAt: data.requestedAt ?? prev.requestedAt,
+          analyzedAt: data.analyzedAt ?? prev.analyzedAt,
+          completedAt: data.completedAt ?? prev.completedAt,
+          report: data.hasReport ? (data.report ?? prev.report) : prev.report,
+        }))
+        if (!PENDING_STATUSES.includes(data.status)) return
+      }
+
+      timerRef.current = setTimeout(tick, POLL_INTERVAL_MS)
+    }
+
+    timerRef.current = setTimeout(tick, POLL_INTERVAL_MS)
+    return () => {
+      cancelled = true
+      if (timerRef.current) clearTimeout(timerRef.current)
+    }
+  }, [shouldPoll, state.domain, fetchStatus])
+
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 pb-32 sm:pb-10">
+        {state.status === 'none' && <AnalyzeNotFoundView domain={state.domain} />}
+
+        {(state.status === 'pending_analysis' || state.status === 'analyzing') && (
+          <AnalyzePendingPoller
+            domain={state.domain}
+            url={state.url}
+            keyword={state.keyword}
+            status={state.status}
+          />
+        )}
+
+        {(state.status === 'processing' ||
+          state.status === 'sending_report' ||
+          state.status === 'completed') && (
+          <AnalyzeResultView
+            domain={state.domain}
+            url={state.url}
+            keyword={state.keyword}
+            report={state.report}
+            analyzedAt={state.analyzedAt}
+          />
+        )}
+
+        {state.status === 'failed' && (
+          <AnalyzeFailedView domain={state.domain} url={state.url} keyword={state.keyword} />
+        )}
+      </div>
+
+      {state.status !== 'none' && <AnalyzeStickyCTA />}
+    </main>
+  )
+}
