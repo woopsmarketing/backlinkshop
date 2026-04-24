@@ -71,13 +71,11 @@ export async function getLedgerStats(userId: string) {
 
   // 충전(+)과 사용(-) 합계 계산
   const totalCharged = data
-    .filter((item) => item.amount > 0)
+    .filter(item => item.amount > 0)
     .reduce((sum, item) => sum + item.amount, 0)
 
   const totalSpent = Math.abs(
-    data
-      .filter((item) => item.amount < 0)
-      .reduce((sum, item) => sum + item.amount, 0)
+    data.filter(item => item.amount < 0).reduce((sum, item) => sum + item.amount, 0)
   )
 
   return { totalCharged, totalSpent }

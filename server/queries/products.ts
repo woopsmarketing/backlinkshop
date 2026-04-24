@@ -40,11 +40,7 @@ export async function getActiveProducts(category?: string) {
 export async function getProductById(productId: string) {
   const supabase = await createServerSupabaseClient()
 
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', productId)
-    .single()
+  const { data, error } = await supabase.from('products').select('*').eq('id', productId).single()
 
   if (error) {
     console.error('상품 상세 조회 실패:', error)
@@ -53,4 +49,3 @@ export async function getProductById(productId: string) {
 
   return data
 }
-

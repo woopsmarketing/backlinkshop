@@ -85,11 +85,9 @@ export default function AdminCouponTable({ coupons }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {coupons.map((coupon) => (
+              {coupons.map(coupon => (
                 <tr key={coupon.code} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
-                    {coupon.code}
-                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">{coupon.code}</td>
                   <td className="py-3 px-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     {formatCredits(Number(coupon.amount))} 크레딧
                   </td>
@@ -120,4 +118,3 @@ export default function AdminCouponTable({ coupons }: Props) {
     </div>
   )
 }
-

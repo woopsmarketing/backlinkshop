@@ -30,9 +30,7 @@ const reasonMap: Record<string, string> = {
 export default function LedgerTable({ ledger }: Props) {
   if (ledger.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-        아직 내역이 없습니다
-      </div>
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">아직 내역이 없습니다</div>
     )
   }
 
@@ -53,7 +51,7 @@ export default function LedgerTable({ ledger }: Props) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-          {ledger.map((item) => (
+          {ledger.map(item => (
             <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
               <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                 {formatDate(item.created_at)}

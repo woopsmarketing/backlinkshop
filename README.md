@@ -5,6 +5,7 @@
 ## 🚀 주요 기능
 
 ### 사용자 기능
+
 - ✅ 회원가입 시 무료 300 크레딧 제공
 - ✅ 쿠폰 등록으로 추가 크레딧 획득
 - ✅ 크레딧 기반 상품 구매 시스템
@@ -12,6 +13,7 @@
 - ✅ 엑셀 보고서 다운로드
 
 ### 관리자 기능
+
 - ✅ 충전 요청 승인/거절
 - ✅ 주문 상태 관리 (processing/completed/failed)
 - ✅ 자동 환불 처리
@@ -33,7 +35,8 @@
 ## 📦 설치 및 실행
 
 ### 사전 요구사항
-- Node.js 18+ 
+
+- Node.js 18+
 - npm 또는 yarn
 - Supabase 계정
 
@@ -68,6 +71,7 @@ npm run start
 ## 🗄️ 데이터베이스 스키마
 
 ### 주요 테이블
+
 - `profiles` - 사용자 프로필 및 권한
 - `credit_balances` - 크레딧 잔액 (캐시)
 - `credit_ledger` - 크레딧 거래 내역 (원장)
@@ -77,6 +81,7 @@ npm run start
 - `topup_requests` - 충전 요청
 
 ### 보안
+
 - ✅ Row Level Security (RLS) 전체 적용
 - ✅ Role 기반 접근 제어 (user/admin)
 - ✅ 서버 사이드 검증
@@ -118,7 +123,7 @@ npm run test:e2e
   /admin/products        # 관리자: 상품 관리
   /admin/coupons         # 관리자: 쿠폰 관리
   /components            # 공통 컴포넌트
-  
+
 /server
   /actions               # Server Actions
   /supabase              # Supabase 헬퍼

@@ -9,11 +9,13 @@
 ## 1. 시스템 목표와 원칙
 
 ### 목표
+
 - 유저가 크레딧을 충전하고 상품을 구매하는 "단순 커머스" 완성
 - 결제 없이도 운영자가 수동충전으로 유료 운영 가능
 - 7일 MVP에 맞게 최소 기능으로 설계
 
 ### 핵심 원칙 (변경 금지)
+
 1. **크레딧은 "돈"이라서 원장(ledger)으로만 증감 기록**
 2. **잔액(balance)은 빠른 조회용 캐시. 진실은 ledger**
 3. **클라이언트에서 크레딧/승인 업데이트 금지 (서버에서만)**
@@ -23,14 +25,14 @@
 
 ## 2. 기술 구성 (Vercel MVP)
 
-| 레이어 | 기술 |
-|--------|------|
-| **Frontend** | Next.js App Router |
-| **UI** | Tailwind CSS + shadcn/ui |
-| **Auth/DB** | Supabase (Auth + Postgres) |
-| **Server** | Next.js Route Handler / Server Actions |
-| **Job** | DB 상태머신 + 서버 지연 처리 (초기) |
-| **로그** | campaign_runs 테이블에 JSON 저장 |
+| 레이어       | 기술                                   |
+| ------------ | -------------------------------------- |
+| **Frontend** | Next.js App Router                     |
+| **UI**       | Tailwind CSS + shadcn/ui               |
+| **Auth/DB**  | Supabase (Auth + Postgres)             |
+| **Server**   | Next.js Route Handler / Server Actions |
+| **Job**      | DB 상태머신 + 서버 지연 처리 (초기)    |
+| **로그**     | campaign_runs 테이블에 JSON 저장       |
 
 ---
 
@@ -69,6 +71,7 @@
 ## 4. 데이터베이스 설계
 
 ### 4.1 profiles (권한 관리)
+
 - Supabase Auth의 `auth.users`와 1:1 매핑
 - `role`: `'user'` | `'admin'`
 
@@ -81,6 +84,7 @@ create table profiles (
 ```
 
 ### 4.2 credit_balances (잔액 캐시)
+
 - 빠른 조회용 캐시
 - 진실은 `credit_ledger`
 
@@ -93,6 +97,7 @@ create table credit_balances (
 ```
 
 ### 4.3 credit_ledger (크레딧 원장 - 진실)
+
 - 모든 크레딧 증감은 여기에만 기록
 - `amount`: 양수(충전) / 음수(차감)
 - `reason`: 충전/차감 사유
@@ -112,6 +117,7 @@ create index on credit_ledger(user_id, created_at desc);
 ```
 
 ### 4.4 products (상품)
+
 ```sql
 create table products (
   id uuid primary key default gen_random_uuid(),
@@ -129,6 +135,7 @@ create index on products(category, status);
 ```
 
 ### 4.5 orders (주문)
+
 ```sql
 create table orders (
   id uuid primary key default gen_random_uuid(),
@@ -147,6 +154,7 @@ create index on orders(status, created_at desc);
 ```
 
 ### 4.6 coupons (쿠폰/무료체험)
+
 ```sql
 create table coupons (
   code text primary key,
@@ -168,6 +176,7 @@ create table coupon_redemptions (
 ```
 
 ### 4.7 topup_requests (수동 충전 요청)
+
 ```sql
 create table topup_requests (
   id uuid primary key default gen_random_uuid(),
@@ -189,12 +198,14 @@ create index on topup_requests(status, created_at desc);
 ## 5. RLS (Row Level Security) 정책
 
 ### 원칙
+
 - **유저는 자기 데이터만 접근** (`orders`, `credit_ledger`, `topup_requests`, `coupon_redemptions`, `credit_balances`)
 - **products는 모든 유저가 읽기 가능** (status='active'만)
 - **coupons는 서버에서만 검증** (직접 조회 차단)
 - **admin 페이지는 서버에서 `profiles.role='admin'` 검사 후 접근**
 
 ### 구현 팁
+
 - RLS를 "매우 타이트"하게 설정
 - 서버는 **유저 세션 기반**으로 처리 (Service Role 지양)
 - admin 전용 로직은 별도 분리
@@ -204,9 +215,11 @@ create index on topup_requests(status, created_at desc);
 ## 6. 핵심 비즈니스 로직
 
 ### 6.1 크레딧 가감 함수 (서버 전용)
+
 **입력**: `user_id`, `amount` (+/-), `reason`, `ref_type`, `ref_id`
 
 **동작**:
+
 1. `credit_ledger`에 insert
 2. `credit_balances` update (`balance = balance + amount`)
 3. `balance < 0`이면 rollback (차감 실패)
@@ -214,6 +227,7 @@ create index on topup_requests(status, created_at desc);
 **추천**: Postgres 함수로 구현
 
 ### 6.2 상품 구매 흐름
+
 1. `product` 조회 (가격, 재고 확인)
 2. `total_price` 계산 (가격 × 수량)
 3. `apply_credit_delta(user_id, -total_price, 'product_purchase', 'order', order_id)`
@@ -221,9 +235,11 @@ create index on topup_requests(status, created_at desc);
 5. admin이 수동 처리 → `status=processing` → 완료 시 `status=completed`
 
 ### 6.3 쿠폰 사용 흐름
+
 **화면**: `/credits` 에서 코드 입력
 
 **서버 검증**:
+
 1. 쿠폰 존재 & 만료 안 됨
 2. `used_count < max_uses`
 3. `coupon_redemptions`에 중복 체크 (`user_id`, `code`)
@@ -231,10 +247,13 @@ create index on topup_requests(status, created_at desc);
 5. 크레딧 지급 (`reason='coupon'`, `ref=code`)
 
 ### 6.4 수동 충전 흐름
+
 **유저**:
+
 - "충전 요청" 생성 (`package_id`, `amount`, `note`)
 
 **Admin 승인**:
+
 1. `topup_requests.status='requested'` 확인
 2. 승인 시:
    - 크레딧 지급 (`reason='manual_topup'`, `ref=topup_request_id`)
@@ -245,6 +264,7 @@ create index on topup_requests(status, created_at desc);
 ## 7. API / Server Actions 설계
 
 ### 7.1 유저 액션
+
 - `GET /server/queries/getBalance`
 - `POST /server/mutations/redeemCoupon(code)`
 - `GET /server/queries/getProducts(category?)`
@@ -253,6 +273,7 @@ create index on topup_requests(status, created_at desc);
 - `POST /server/mutations/createTopupRequest(package_id)`
 
 ### 7.2 Admin 액션
+
 - `GET /server/queries/adminListTopupRequests(status)`
 - `POST /server/mutations/adminApproveTopup(request_id)`
 - `POST /server/mutations/adminRejectTopup(request_id)`
@@ -269,6 +290,7 @@ create index on topup_requests(status, created_at desc);
 ## 8. 화면 설계 (Next.js App Router)
 
 ### 로그인
+
 - Supabase Auth 이메일 로그인 (매직링크 or 패스워드)
 - 첫 로그인 시:
   - `profiles` row 생성 (`role=user`)
@@ -276,22 +298,26 @@ create index on topup_requests(status, created_at desc);
   - (선택) `signup_bonus +300` 자동 지급
 
 ### `/dashboard`
+
 - 현재 잔액 (크게 표시)
 - 최근 주문 요약 (개수)
 - CTA: "상품 보기", "크레딧 충전"
 
 ### `/credits`
+
 - 현재 잔액
 - 쿠폰 입력 폼
 - 충전 패키지 카드 + "충전 요청" 버튼
 - 최근 원장 내역 테이블 (`credit_ledger`)
 
 ### `/products`
+
 - 상품 카드 그리드
 - 카테고리 필터
 - 각 카드: 이름, 가격(크레딧), 설명, "구매하기" 버튼
 
 ### `/products/[id]`
+
 - 상품 상세 정보
 - 수량 선택
 - 총 가격 표시
@@ -299,24 +325,29 @@ create index on topup_requests(status, created_at desc);
 - "구매하기" 버튼
 
 ### `/orders`
+
 - 내 주문 내역 테이블
 - 상태 필터 (pending, processing, completed)
 - 각 row: 상품명, 수량, 가격, 상태, 날짜
 
 ### `/admin/topups`
+
 - `requested` 리스트
 - Approve/Reject 버튼
 - 필터 (`status`)
 
 ### `/admin/coupons`
+
 - 쿠폰 생성 폼
 - 쿠폰 리스트
 
 ### `/admin/products`
+
 - 상품 생성 폼
 - 상품 리스트 (수정/활성화/비활성화)
 
 ### `/admin/orders`
+
 - 모든 주문 리스트
 - 상태 변경 (pending → processing → completed)
 - 필터 (상태, 날짜)
@@ -326,11 +357,13 @@ create index on topup_requests(status, created_at desc);
 ## 9. 주문 처리 흐름
 
 ### MVP 버전 (수동 처리)
+
 1. 유저가 주문 생성 → `status=pending`
 2. Admin이 주문 확인 → `status=processing` 변경
 3. Admin이 작업 완료 → `status=completed` 변경
 
 ### 2주차부터 (자동화 옵션)
+
 - 특정 상품은 즉시 처리 (status=completed)
 - 이메일 알림 연동
 - Worker로 자동 처리
@@ -340,10 +373,12 @@ create index on topup_requests(status, created_at desc);
 ## 10. 배포/도메인 이전 전략
 
 ### Vercel MVP 운영
+
 - 도메인은 처음부터 "최종 도메인"에 연결 (권장)
 - 나중에 VPS로 옮길 때: DNS A/AAAA만 VPS로 변경하면 끝
 
 ### 도메인 변경이 필요한 경우
+
 - 구 도메인(Vercel) → 301 리디렉션 → 신 도메인(VPS)
 - 중요 페이지(`/dashboard` 등)는 301보다 "안내 페이지"가 안전 (세션 꼬임 방지)
 
@@ -423,22 +458,22 @@ Cursor에서 반복 호출할 것들
 
 멈출 일이 없도록 순서 고정
 
-| # | 티켓 | 설명 |
-|---|------|------|
-| 1 | Next.js 초기 셋업 | App Router, Tailwind, shadcn |
-| 2 | Supabase 프로젝트 연결 | auth 로그인 구현 |
-| 3 | DB 마이그레이션 1차 | Profiles, Balances, Ledger, Products, Orders |
-| 4 | RLS 1차 | 유저 자기 데이터만 + Products 읽기 |
-| 5 | credits 화면 | 잔액/원장 표시 |
-| 6 | 쿠폰 테이블 + redeem 로직 | 쿠폰 사용 기능 |
-| 7 | 상품 목록/상세 | Products CRUD |
-| 8 | 주문 생성 로직 | 차감 + order row + 상태 관리 |
-| 9 | 내 주문 내역 | 주문 리스트 |
-| 10 | topup_request 생성 | 유저 충전 요청 |
-| 11 | admin 승인 페이지 | 충전/주문 승인 + role 가드 |
-| 12 | admin 상품 관리 | 상품 생성/수정/비활성화 |
-| 13 | 랜딩 페이지 | 가격표 + 무료 크레딧 안내 |
-| 14 | E2E 1개 플로우 | 전체 시나리오 테스트 |
+| #   | 티켓                      | 설명                                         |
+| --- | ------------------------- | -------------------------------------------- |
+| 1   | Next.js 초기 셋업         | App Router, Tailwind, shadcn                 |
+| 2   | Supabase 프로젝트 연결    | auth 로그인 구현                             |
+| 3   | DB 마이그레이션 1차       | Profiles, Balances, Ledger, Products, Orders |
+| 4   | RLS 1차                   | 유저 자기 데이터만 + Products 읽기           |
+| 5   | credits 화면              | 잔액/원장 표시                               |
+| 6   | 쿠폰 테이블 + redeem 로직 | 쿠폰 사용 기능                               |
+| 7   | 상품 목록/상세            | Products CRUD                                |
+| 8   | 주문 생성 로직            | 차감 + order row + 상태 관리                 |
+| 9   | 내 주문 내역              | 주문 리스트                                  |
+| 10  | topup_request 생성        | 유저 충전 요청                               |
+| 11  | admin 승인 페이지         | 충전/주문 승인 + role 가드                   |
+| 12  | admin 상품 관리           | 상품 생성/수정/비활성화                      |
+| 13  | 랜딩 페이지               | 가격표 + 무료 크레딧 안내                    |
+| 14  | E2E 1개 플로우            | 전체 시나리오 테스트                         |
 
 ---
 
@@ -458,6 +493,7 @@ Cursor에서 반복 호출할 것들
 ## 15. 제약사항 / 기술 부채 (나중에 해결)
 
 ### 1주차에서 제외되는 것들
+
 - 실제 결제 연동 (PortOne/Stripe)
 - 실제 Worker/Queue (Celery, BullMQ 등)
 - 이메일 발송
@@ -466,6 +502,7 @@ Cursor에서 반복 호출할 것들
 - 다국어 지원
 
 ### 2주차 이후 추가 예정
+
 - 결제 연동 (자동 충전)
 - Worker로 Job 실행
 - 이메일 알림 (충전 승인, 캠페인 완료)

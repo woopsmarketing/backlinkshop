@@ -11,7 +11,7 @@ import { createServerSupabaseClient } from '../supabase/client'
  */
 export async function getCurrentUser() {
   const supabase = await createServerSupabaseClient()
-  
+
   const {
     data: { user },
     error,
@@ -30,11 +30,11 @@ export async function getCurrentUser() {
  */
 export async function requireAuth() {
   const user = await getCurrentUser()
-  
+
   if (!user) {
     throw new Error('Authentication required')
   }
-  
+
   return user
 }
 
@@ -44,13 +44,13 @@ export async function requireAuth() {
  */
 export async function isAdmin(): Promise<boolean> {
   const user = await getCurrentUser()
-  
+
   if (!user) {
     return false
   }
 
   const supabase = await createServerSupabaseClient()
-  
+
   const { data, error } = await supabase
     .from('profiles')
     .select('role')
@@ -70,10 +70,10 @@ export async function isAdmin(): Promise<boolean> {
  */
 export async function requireAdmin() {
   const admin = await isAdmin()
-  
+
   if (!admin) {
     throw new Error('Admin access required')
   }
-  
+
   return true
 }

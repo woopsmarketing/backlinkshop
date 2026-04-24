@@ -86,7 +86,7 @@ export default function AdminProductTable({ products }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {products.map((product) => (
+              {products.map(product => (
                 <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="py-3 px-4 text-sm text-gray-900 dark:text-white">
                     {product.name}
@@ -129,4 +129,3 @@ export default function AdminProductTable({ products }: Props) {
     </div>
   )
 }
-

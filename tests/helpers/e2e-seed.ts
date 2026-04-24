@@ -32,7 +32,9 @@ function getEnv() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('환경변수가 누락되었습니다: NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY')
+    throw new Error(
+      '환경변수가 누락되었습니다: NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY'
+    )
   }
 
   return { supabaseUrl, serviceRoleKey }
@@ -236,4 +238,3 @@ export async function teardownTopupApprovalSeed(seed: TopupApprovalSeedData) {
   await admin.auth.admin.deleteUser(seed.userId)
   await admin.auth.admin.deleteUser(seed.adminId)
 }
-

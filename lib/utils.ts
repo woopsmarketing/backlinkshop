@@ -2,8 +2,8 @@
  * 프로젝트 전역 유틸 함수
  */
 
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 /**
  * Tailwind CSS 클래스 병합 (shadcn/ui 표준)
@@ -17,7 +17,7 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatDate(date: string | Date): string {
   const d = typeof date === 'string' ? new Date(date) : date
-  
+
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -52,10 +52,10 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message
   }
-  
+
   if (typeof error === 'string') {
     return error
   }
-  
+
   return '알 수 없는 오류가 발생했습니다'
 }

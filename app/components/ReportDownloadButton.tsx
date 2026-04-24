@@ -49,4 +49,3 @@ export default function ReportDownloadButton({ orderId, label = '다운로드' }
     </div>
   )
 }
-

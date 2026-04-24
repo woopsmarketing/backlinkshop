@@ -15,7 +15,7 @@ export default function CouponForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!code.trim()) {
       setMessage({ type: 'error', text: '쿠폰 코드를 입력하세요' })
       return
@@ -61,7 +61,7 @@ export default function CouponForm() {
           <input
             type="text"
             value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onChange={e => setCode(e.target.value.toUpperCase())}
             placeholder="쿠폰 코드 입력"
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white uppercase"
             disabled={loading}

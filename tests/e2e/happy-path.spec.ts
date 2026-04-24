@@ -4,7 +4,12 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { setupE2ESeed, teardownE2ESeed, hasOrderForProduct, type E2ESeedData } from '../helpers/e2e-seed'
+import {
+  setupE2ESeed,
+  teardownE2ESeed,
+  hasOrderForProduct,
+  type E2ESeedData,
+} from '../helpers/e2e-seed'
 
 let seed: E2ESeedData
 
@@ -47,7 +52,9 @@ test.describe('Happy Path: 로그인 → 쿠폰 → 구매 → 주문 확인', (
     await expect(page.getByText(seed.productName).first()).toBeVisible()
     await page.fill('input[type="number"]', '1')
     await Promise.all([
-      page.waitForResponse((res) => res.request().method() === 'POST' && res.url().includes('/products/')),
+      page.waitForResponse(
+        res => res.request().method() === 'POST' && res.url().includes('/products/')
+      ),
       page.getByRole('button', { name: '구매하기' }).click(),
     ])
     await page.waitForTimeout(1000)
@@ -62,7 +69,10 @@ test.describe('Happy Path: 로그인 → 쿠폰 → 구매 → 주문 확인', (
     ]
 
     for (const message of possibleErrors) {
-      const visible = await page.getByText(message).isVisible().catch(() => false)
+      const visible = await page
+        .getByText(message)
+        .isVisible()
+        .catch(() => false)
       if (visible) {
         throw new Error(`주문 오류: ${message}`)
       }
@@ -87,4 +97,3 @@ test.describe('Happy Path: 로그인 → 쿠폰 → 구매 → 주문 확인', (
     await expect(page.getByText('500 크레딧')).toBeVisible()
   })
 })
-

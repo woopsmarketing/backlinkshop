@@ -72,7 +72,7 @@ export default function AdminCouponForm() {
           <input
             type="text"
             value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onChange={e => setCode(e.target.value.toUpperCase())}
             required
             placeholder="WELCOME500"
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white uppercase"
@@ -86,7 +86,7 @@ export default function AdminCouponForm() {
           <input
             type="date"
             value={expiresAt}
-            onChange={(e) => setExpiresAt(e.target.value)}
+            onChange={e => setExpiresAt(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           />
         </div>
@@ -101,7 +101,7 @@ export default function AdminCouponForm() {
             type="number"
             min={1}
             value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
+            onChange={e => setAmount(Number(e.target.value))}
             required
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           />
@@ -115,7 +115,7 @@ export default function AdminCouponForm() {
             type="number"
             min={1}
             value={maxUses}
-            onChange={(e) => setMaxUses(Number(e.target.value))}
+            onChange={e => setMaxUses(Number(e.target.value))}
             required
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           />
@@ -132,4 +132,3 @@ export default function AdminCouponForm() {
     </form>
   )
 }
-
