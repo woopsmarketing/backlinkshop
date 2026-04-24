@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "seed:products": "node scripts/seed-products.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "prepare": "husky"
@@ -40,7 +42,8 @@
     "prettier": "^3.8.1",
     "supabase": "^2.75.4",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.9"
   },
   "browserslist": [
     "last 2 Chrome versions",
