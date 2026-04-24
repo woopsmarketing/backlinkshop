@@ -16,11 +16,20 @@ export type AnalyzeStatus =
   | 'failed'
   | 'none'
 
+import type { CompetitorMetrics } from '@/lib/lp-metrics'
+
+export type AnalyzeCompetitorAnalysis = {
+  keyword?: string
+  customerDomain?: string
+  customerMetrics?: CompetitorMetrics | null
+  competitors?: CompetitorMetrics[]
+}
+
 export type AnalyzeReport = {
   score?: number | null
   analysisHtml?: string
   parsedData?: Record<string, unknown>
-  competitorData?: Record<string, unknown> | null
+  competitorData?: AnalyzeCompetitorAnalysis | null
 } | null
 
 export type AnalyzeInitialState = {
@@ -109,7 +118,7 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
 
   return (
     <main className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:py-10 pb-32 sm:pb-10">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10 pb-32 sm:pb-10">
         {state.status === 'none' && <AnalyzeNotFoundView domain={state.domain} />}
 
         {(state.status === 'pending_analysis' || state.status === 'analyzing') && (
