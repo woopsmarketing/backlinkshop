@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  calculateCompetitorAverage,
   formatMetricValue,
   trimDomainLabel,
   type CompetitorMetrics,
@@ -129,6 +130,7 @@ export function AnalyzeCompetitorTable({ comp, myDomainLabel }: Props) {
   if (!comp || !comp.competitors || comp.competitors.length === 0) return null
   const competitors = comp.competitors.slice(0, 5)
   const me = comp.customerMetrics ?? null
+  const average = calculateCompetitorAverage(competitors)
 
   return (
     <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
@@ -137,17 +139,18 @@ export function AnalyzeCompetitorTable({ comp, myDomainLabel }: Props) {
           경쟁사 비교{comp.keyword ? ` — "${comp.keyword}"` : ''}
         </h2>
         <p className="mt-0.5 text-xs text-slate-500">
-          구글 검색 상위 {competitors.length}개 도메인과 내 사이트 전면 비교
+          구글 검색 상위 {competitors.length}개 도메인 · 우측 평균 컬럼으로 한눈에 비교
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-7">
         {SECTIONS.map(section => (
           <SectionTable
             key={section.title}
             section={section}
             me={me}
             competitors={competitors}
+            average={average}
             myDomainLabel={myDomainLabel}
           />
         ))}
@@ -160,11 +163,13 @@ function SectionTable({
   section,
   me,
   competitors,
+  average,
   myDomainLabel,
 }: {
   section: Section
   me: CompetitorMetrics | null
   competitors: CompetitorMetrics[]
+  average: CompetitorMetrics | null
   myDomainLabel: string
 }) {
   return (
@@ -176,13 +181,13 @@ function SectionTable({
         <p className="mb-3 text-[11px] text-slate-500">{section.description}</p>
       )}
       <div className="-mx-2 overflow-x-auto">
-        <table className="min-w-full border-collapse text-sm">
+        <table className="min-w-full border-collapse overflow-hidden rounded-xl text-sm">
           <thead>
             <tr className="bg-slate-50">
-              <th className="sticky left-0 z-10 bg-slate-50 px-3 py-2 text-left text-xs font-semibold text-slate-500">
+              <th className="sticky left-0 z-10 bg-slate-50 px-3 py-2.5 text-left text-xs font-semibold text-slate-500">
                 지표
               </th>
-              <th className="min-w-[90px] px-3 py-2 text-center text-xs font-bold text-rose-600">
+              <th className="min-w-[92px] px-3 py-2.5 text-center text-xs font-bold text-rose-600">
                 {trimDomainLabel(myDomainLabel, 14)}
                 <br />
                 <span className="text-[10px] font-normal text-rose-400">내 사이트</span>
@@ -190,46 +195,57 @@ function SectionTable({
               {competitors.map((c, i) => (
                 <th
                   key={i}
-                  className="min-w-[90px] px-3 py-2 text-center text-xs font-semibold text-slate-600"
+                  className="min-w-[92px] px-3 py-2.5 text-center text-xs font-semibold text-slate-600"
                 >
                   {trimDomainLabel(c.domain, 14)}
                   <br />
                   <span className="text-[10px] font-normal text-slate-400">{i + 1}위</span>
                 </th>
               ))}
+              <th className="min-w-[92px] bg-indigo-50 px-3 py-2.5 text-center text-xs font-bold text-indigo-700">
+                평균
+                <br />
+                <span className="text-[10px] font-normal text-indigo-500">
+                  상위 {competitors.length}개
+                </span>
+              </th>
             </tr>
           </thead>
           <tbody>
-            {section.rows.map(row => {
+            {section.rows.map((row, rowIdx) => {
               const myCell = getCellValue(row, me)
+              const avgCell = getCellValue(row, average)
               const myNumber = asNumber(getRaw(row, me))
+              const avgNumber = asNumber(getRaw(row, average))
+              const isMeBelowAverage =
+                myNumber !== null && avgNumber !== null && myNumber < avgNumber
+              const zebra = rowIdx % 2 === 0 ? '' : 'bg-slate-50/40'
               return (
-                <tr key={row.label} className="border-t border-slate-100">
-                  <td className="sticky left-0 z-10 bg-white px-3 py-2 text-xs text-slate-600">
+                <tr key={row.label} className={`border-t border-slate-100 ${zebra}`}>
+                  <td className="sticky left-0 z-10 bg-inherit px-3 py-2 text-xs text-slate-600">
                     {row.label}
                   </td>
                   <td
                     className={`px-3 py-2 text-center text-xs font-bold ${
-                      isMeBehindTop(row, me, competitors[0]) ? 'text-rose-600' : 'text-slate-900'
+                      isMeBelowAverage ? 'text-rose-600' : 'text-slate-900'
                     }`}
                   >
                     {myCell}
                   </td>
                   {competitors.map((c, i) => {
                     const cellValue = getCellValue(row, c)
-                    const cellNum = asNumber(getRaw(row, c))
-                    const isTopBetter = myNumber !== null && cellNum !== null && cellNum > myNumber
                     return (
                       <td
                         key={i}
-                        className={`px-3 py-2 text-center text-xs font-semibold ${
-                          isTopBetter ? 'text-indigo-700' : 'text-slate-700'
-                        }`}
+                        className="px-3 py-2 text-center text-xs font-semibold text-slate-700"
                       >
                         {cellValue}
                       </td>
                     )
                   })}
+                  <td className="bg-indigo-50/60 px-3 py-2 text-center text-xs font-bold text-indigo-700">
+                    {avgCell}
+                  </td>
                 </tr>
               )
             })}
@@ -261,16 +277,4 @@ function asNumber(raw: unknown): number | null {
   if (raw === null || raw === undefined) return null
   const n = Number(raw)
   return Number.isFinite(n) ? n : null
-}
-
-function isMeBehindTop(
-  row: Row,
-  me: CompetitorMetrics | null,
-  top: CompetitorMetrics | undefined
-): boolean {
-  if (!top) return false
-  const mine = asNumber(getRaw(row, me))
-  const upper = asNumber(getRaw(row, top ?? null))
-  if (mine === null || upper === null) return false
-  return upper > mine && upper > 0
 }

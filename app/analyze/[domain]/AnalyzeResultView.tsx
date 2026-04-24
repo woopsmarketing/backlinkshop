@@ -6,7 +6,12 @@ import { AnalyzeTelegramCTA } from './AnalyzeTelegramCTA'
 import { AnalyzeKpiCards } from './AnalyzeKpiCards'
 import { AnalyzeCompetitorTable } from './AnalyzeCompetitorTable'
 import { AnalyzeGapCard } from './AnalyzeGapCard'
-import { buildMetrics, type CompetitorMetrics, type ParsedFields } from '@/lib/lp-metrics'
+import {
+  buildMetrics,
+  calculateCompetitorAverage,
+  type CompetitorMetrics,
+  type ParsedFields,
+} from '@/lib/lp-metrics'
 
 type Props = {
   domain: string
@@ -27,9 +32,15 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
   )
 
   const customerMetrics: CompetitorMetrics | null = competitor?.customerMetrics ?? null
-  const hasCompetitor = Boolean(
-    competitor && competitor.competitors && competitor.competitors.length > 0
+  const competitorList = useMemo(
+    () => (competitor?.competitors ?? []).slice(0, 5),
+    [competitor?.competitors]
   )
+  const competitorAverage = useMemo(
+    () => calculateCompetitorAverage(competitorList),
+    [competitorList]
+  )
+  const hasCompetitor = competitorList.length > 0
 
   return (
     <div className="space-y-6">
@@ -59,7 +70,12 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         )}
       </header>
 
-      <AnalyzeKpiCards metrics={customerMetrics} score={score} />
+      <AnalyzeKpiCards
+        metrics={customerMetrics}
+        average={competitorAverage}
+        score={score}
+        competitorCount={competitorList.length}
+      />
 
       <AnalyzeGapCard comp={competitor} />
 
