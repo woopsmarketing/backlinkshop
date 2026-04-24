@@ -211,6 +211,12 @@ export type KpiCard = {
   hint?: string
   raw: number | null
   level: MetricLevel
+  /**
+   * 상위 경쟁사 평균 대비 내 값의 비율 (%).
+   * - 100 = 평균과 동일, 200 = 평균의 2배, 50 = 평균의 절반
+   * - 평균 데이터가 없거나 평균이 0 이면 null
+   */
+  vsAverage: number | null
 }
 
 type KpiSpec = {
@@ -304,8 +310,12 @@ function scoreLevel(raw: number | null, [good, warn]: [number, number]): MetricL
  *
  * - 값이 없는 항목은 생략 (카드 자체를 렌더하지 않음)
  * - KPI_SPECS 순서를 유지 → UI 상단 카드 배치 순서와 일치
+ * - `average` 제공 시 각 카드에 `vsAverage` (평균 대비 %) 계산
  */
-export function buildKpiCards(metrics: CompetitorMetrics | null | undefined): KpiCard[] {
+export function buildKpiCards(
+  metrics: CompetitorMetrics | null | undefined,
+  average?: CompetitorMetrics | null
+): KpiCard[] {
   if (!metrics) return []
   const out: KpiCard[] = []
   for (const spec of KPI_SPECS) {
@@ -313,6 +323,18 @@ export function buildKpiCards(metrics: CompetitorMetrics | null | undefined): Kp
     if (picked === undefined || picked === null) continue
     const num = typeof picked === 'number' ? picked : Number(picked)
     if (!Number.isFinite(num)) continue
+
+    let vsAverage: number | null = null
+    if (average) {
+      const avgPicked = spec.pick(average)
+      if (avgPicked !== undefined && avgPicked !== null) {
+        const avgNum = Number(avgPicked)
+        if (Number.isFinite(avgNum) && avgNum > 0) {
+          vsAverage = Math.round((num / avgNum) * 100)
+        }
+      }
+    }
+
     out.push({
       key: spec.key,
       label: spec.label,
@@ -320,9 +342,62 @@ export function buildKpiCards(metrics: CompetitorMetrics | null | undefined): Kp
       hint: spec.hint,
       raw: num,
       level: scoreLevel(num, spec.levels),
+      vsAverage,
     })
   }
   return out
+}
+
+/**
+ * 경쟁사 배열의 수치 필드를 평균화해 단일 CompetitorMetrics 로 반환한다.
+ *
+ * - 필드별로 유효한(숫자·유한) 값만 평균 집계
+ * - 빈 배열 / 전부 결측이면 null 반환
+ * - 소수점은 반올림 (정수 기반 지표가 많아 가독성 우선)
+ */
+const AVG_NUMERIC_FIELDS: (keyof CompetitorMetrics)[] = [
+  'mozDA',
+  'mozPA',
+  'mozLinks',
+  'mozSpam',
+  'ahrefsDR',
+  'ahrefsBacklinks',
+  'ahrefsRefDomains',
+  'ahrefsTraffic',
+  'ahrefsTrafficValue',
+  'ahrefsOrganicKeywords',
+  'majesticTF',
+  'majesticCF',
+  'majesticLinks',
+  'majesticRefEdu',
+  'majesticRefGov',
+  'backlinkTotal',
+  'backlinkDoFollow',
+  'referringDomains',
+  'referringDoFollow',
+  'domainAgeYears',
+  'waybackSnapshots',
+]
+
+export function calculateCompetitorAverage(
+  competitors: CompetitorMetrics[] | null | undefined
+): CompetitorMetrics | null {
+  if (!competitors || competitors.length === 0) return null
+  const avg: Record<string, number> = {}
+  let hasAny = false
+  for (const field of AVG_NUMERIC_FIELDS) {
+    const vals: number[] = []
+    for (const c of competitors) {
+      const v = c[field]
+      if (typeof v === 'number' && Number.isFinite(v)) vals.push(v)
+    }
+    if (vals.length === 0) continue
+    const sum = vals.reduce((a, b) => a + b, 0)
+    avg[field] = Math.round(sum / vals.length)
+    hasAny = true
+  }
+  if (!hasAny) return null
+  return avg as CompetitorMetrics
 }
 
 /* ───────────────────────── 경쟁사 격차 ───────────────────────── */
@@ -331,10 +406,12 @@ export type CompetitorGap = {
   key: string
   label: string
   myValue: number
-  topValue: number
+  /** 비교 기준 값 (상위 N 경쟁사 평균) */
+  avgValue: number
+  /** avgValue - myValue. 양수면 내가 뒤처짐. */
   gap: number
-  /** 내 값이 TOP 대비 차지하는 비율 (%). top === 0 이면 null. */
-  percentOfTop: number | null
+  /** 내 값이 평균 대비 차지하는 비율 (%). 평균 === 0 이면 null. 상한 없음. */
+  percentOfAvg: number | null
   isBehind: boolean
   suffix?: string
 }
@@ -375,33 +452,36 @@ const GAP_SPECS: Array<{
 ]
 
 /**
- * 내 사이트 vs 1위 경쟁사 핵심 지표 격차를 계산한다.
+ * 내 사이트 vs 상위 경쟁사 평균 핵심 지표 격차를 계산한다.
  *
+ * - 경쟁사 배열의 평균을 기준으로 비교 (1위 단일 비교보다 안정적)
  * - 둘 다 값이 있는 지표만 반환 (한쪽만 있으면 비교 불가)
  * - 내가 뒤처진(`isBehind: true`) 항목만 화면에 표시하는 것이 기본 전략
  */
 export function calculateCompetitorGap(
   me: CompetitorMetrics | null | undefined,
-  top: CompetitorMetrics | null | undefined
+  competitors: CompetitorMetrics[] | null | undefined
 ): CompetitorGap[] {
-  if (!me || !top) return []
+  if (!me || !competitors || competitors.length === 0) return []
+  const avg = calculateCompetitorAverage(competitors)
+  if (!avg) return []
   const out: CompetitorGap[] = []
   for (const spec of GAP_SPECS) {
     const mineRaw = spec.pick(me)
-    const topRaw = spec.pick(top)
+    const avgRaw = spec.pick(avg)
     if (mineRaw === undefined || mineRaw === null) continue
-    if (topRaw === undefined || topRaw === null) continue
+    if (avgRaw === undefined || avgRaw === null) continue
     const mine = Number(mineRaw)
-    const upper = Number(topRaw)
+    const upper = Number(avgRaw)
     if (!Number.isFinite(mine) || !Number.isFinite(upper)) continue
     const gap = upper - mine
     out.push({
       key: spec.key,
       label: spec.label,
       myValue: mine,
-      topValue: upper,
+      avgValue: upper,
       gap,
-      percentOfTop: upper === 0 ? null : Math.min(100, Math.round((mine / upper) * 100)),
+      percentOfAvg: upper === 0 ? null : Math.round((mine / upper) * 100),
       isBehind: gap > 0,
       suffix: spec.suffix,
     })

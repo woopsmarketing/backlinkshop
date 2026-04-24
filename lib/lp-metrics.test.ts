@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildKpiCards,
   buildMetrics,
+  calculateCompetitorAverage,
   calculateCompetitorGap,
   formatMetricValue,
   isVisibleReport,
@@ -258,6 +259,73 @@ describe('buildKpiCards', () => {
     })
     expect(cards.map(c => c.key)).toEqual(['mozDA'])
   })
+
+  it('average 미전달 시 vsAverage 는 null', () => {
+    const [card] = buildKpiCards({ ahrefsDR: 30 })
+    expect(card.vsAverage).toBeNull()
+  })
+
+  it('average 전달 시 vsAverage 를 % 로 계산한다', () => {
+    const cards = buildKpiCards(
+      { ahrefsDR: 30, mozDA: 10, ahrefsBacklinks: 500 },
+      { ahrefsDR: 60, mozDA: 20, ahrefsBacklinks: 200 }
+    )
+    expect(cards.find(c => c.key === 'ahrefsDR')?.vsAverage).toBe(50)
+    expect(cards.find(c => c.key === 'mozDA')?.vsAverage).toBe(50)
+    expect(cards.find(c => c.key === 'backlinks')?.vsAverage).toBe(250)
+  })
+
+  it('평균이 0 이면 vsAverage 는 null', () => {
+    const [card] = buildKpiCards({ ahrefsDR: 30 }, { ahrefsDR: 0 })
+    expect(card.vsAverage).toBeNull()
+  })
+})
+
+describe('calculateCompetitorAverage', () => {
+  it('빈 배열·null·undefined 는 null 반환', () => {
+    expect(calculateCompetitorAverage(null)).toBeNull()
+    expect(calculateCompetitorAverage(undefined)).toBeNull()
+    expect(calculateCompetitorAverage([])).toBeNull()
+  })
+
+  it('필드별로 유효 값만 평균 집계한다', () => {
+    const avg = calculateCompetitorAverage([
+      { mozDA: 40, ahrefsBacklinks: 100 },
+      { mozDA: 60, ahrefsBacklinks: 300 },
+      { mozDA: 80, ahrefsBacklinks: 500 },
+    ])!
+    expect(avg.mozDA).toBe(60)
+    expect(avg.ahrefsBacklinks).toBe(300)
+  })
+
+  it('결측 값은 평균에서 제외한다', () => {
+    const avg = calculateCompetitorAverage([
+      { mozDA: 50 },
+      { ahrefsBacklinks: 100 },
+      { mozDA: 100, ahrefsBacklinks: 300 },
+    ])!
+    expect(avg.mozDA).toBe(75) // (50+100)/2
+    expect(avg.ahrefsBacklinks).toBe(200) // (100+300)/2
+  })
+
+  it('모든 수치 필드가 비어있으면 null', () => {
+    expect(calculateCompetitorAverage([{ domain: 'a.com' }, { domain: 'b.com' }])).toBeNull()
+  })
+
+  it('NaN·Infinity 는 무시한다', () => {
+    const avg = calculateCompetitorAverage([
+      { mozDA: Number.NaN },
+      { mozDA: Number.POSITIVE_INFINITY },
+      { mozDA: 40 },
+    ])!
+    expect(avg.mozDA).toBe(40)
+  })
+
+  it('반올림으로 정수 평균 생성', () => {
+    const avg = calculateCompetitorAverage([{ mozDA: 10 }, { mozDA: 11 }])!
+    // (10+11)/2 = 10.5 → 반올림 11
+    expect(avg.mozDA).toBe(11)
+  })
 })
 
 describe('calculateCompetitorGap', () => {
@@ -268,56 +336,84 @@ describe('calculateCompetitorGap', () => {
     ahrefsRefDomains: 20,
     ahrefsTraffic: 500,
   }
-  const top = {
-    mozDA: 55,
-    ahrefsDR: 60,
-    ahrefsBacklinks: 10000,
-    ahrefsRefDomains: 500,
-    ahrefsTraffic: 20000,
-  }
+  const competitors = [
+    {
+      mozDA: 60,
+      ahrefsDR: 70,
+      ahrefsBacklinks: 20000,
+      ahrefsRefDomains: 800,
+      ahrefsTraffic: 30000,
+    },
+    {
+      mozDA: 50,
+      ahrefsDR: 60,
+      ahrefsBacklinks: 10000,
+      ahrefsRefDomains: 500,
+      ahrefsTraffic: 20000,
+    },
+    { mozDA: 40, ahrefsDR: 50, ahrefsBacklinks: 5000, ahrefsRefDomains: 300, ahrefsTraffic: 10000 },
+    { mozDA: 30, ahrefsDR: 40, ahrefsBacklinks: 3000, ahrefsRefDomains: 200, ahrefsTraffic: 5000 },
+    { mozDA: 20, ahrefsDR: 30, ahrefsBacklinks: 2000, ahrefsRefDomains: 100, ahrefsTraffic: 2000 },
+  ]
 
-  it('me 또는 top 이 비어있으면 빈 배열', () => {
-    expect(calculateCompetitorGap(null, top)).toEqual([])
+  it('me 또는 competitors 가 비어있으면 빈 배열', () => {
+    expect(calculateCompetitorGap(null, competitors)).toEqual([])
     expect(calculateCompetitorGap(me, null)).toEqual([])
+    expect(calculateCompetitorGap(me, [])).toEqual([])
   })
 
-  it('뒤처진 항목은 isBehind true, 격차·비율 계산', () => {
-    const gaps = calculateCompetitorGap(me, top)
+  it('평균 대비 격차·비율을 계산한다', () => {
+    // avg mozDA = (60+50+40+30+20)/5 = 40
+    const gaps = calculateCompetitorGap(me, competitors)
+    const da = gaps.find(g => g.key === 'mozDA')!
+    expect(da.avgValue).toBe(40)
+    expect(da.myValue).toBe(20)
+    expect(da.gap).toBe(20)
+    expect(da.isBehind).toBe(true)
+    expect(da.percentOfAvg).toBe(50) // 20/40 * 100
+  })
+
+  it('백링크 평균 대비 격차', () => {
+    // avg ahrefsBacklinks = (20000+10000+5000+3000+2000)/5 = 8000
+    const gaps = calculateCompetitorGap(me, competitors)
     const bl = gaps.find(g => g.key === 'backlinks')!
-    expect(bl.gap).toBe(9900)
-    expect(bl.isBehind).toBe(true)
-    expect(bl.percentOfTop).toBe(1)
+    expect(bl.avgValue).toBe(8000)
+    expect(bl.gap).toBe(7900)
+    expect(bl.percentOfAvg).toBe(1) // 100/8000 ≈ 1
   })
 
   it('앞서는 항목은 isBehind false, gap 은 음수', () => {
     const aheadMe = { mozDA: 70 }
-    const aheadTop = { mozDA: 50 }
-    const [g] = calculateCompetitorGap(aheadMe, aheadTop)
-    expect(g.gap).toBe(-20)
+    const [g] = calculateCompetitorGap(aheadMe, [{ mozDA: 50 }, { mozDA: 40 }])
+    // avg = 45, gap = 45 - 70 = -25
+    expect(g.gap).toBe(-25)
     expect(g.isBehind).toBe(false)
   })
 
-  it('top 값이 0 이면 percentOfTop 은 null', () => {
-    const [g] = calculateCompetitorGap({ mozDA: 10 }, { mozDA: 0 })
-    expect(g.percentOfTop).toBe(null)
+  it('percentOfAvg 는 100 을 넘을 수 있다 (평균보다 앞선 경우)', () => {
+    const [g] = calculateCompetitorGap({ mozDA: 80 }, [{ mozDA: 50 }, { mozDA: 30 }])
+    // avg = 40, 80/40 * 100 = 200
+    expect(g.percentOfAvg).toBe(200)
   })
 
-  it('한쪽 필드가 비어있으면 해당 지표는 생략', () => {
-    const gaps = calculateCompetitorGap({ mozDA: 10 }, { ahrefsDR: 50 })
+  it('평균이 0 이면 percentOfAvg 는 null', () => {
+    const [g] = calculateCompetitorGap({ mozDA: 10 }, [{ mozDA: 0 }, { mozDA: 0 }])
+    expect(g.percentOfAvg).toBeNull()
+  })
+
+  it('한쪽만 값이 있으면 해당 지표 생략', () => {
+    const gaps = calculateCompetitorGap({ mozDA: 10 }, [{ ahrefsDR: 50 }])
     expect(gaps).toEqual([])
   })
 
-  it('VebAPI fallback 도 인식한다', () => {
-    const gaps = calculateCompetitorGap(
-      { backlinkTotal: 50, referringDomains: 5 },
-      { backlinkTotal: 500, referringDomains: 100 }
-    )
+  it('VebAPI fallback 도 평균화한다', () => {
+    const gaps = calculateCompetitorGap({ backlinkTotal: 50, referringDomains: 5 }, [
+      { backlinkTotal: 500, referringDomains: 100 },
+      { backlinkTotal: 1000, referringDomains: 200 },
+    ])
+    const bl = gaps.find(g => g.key === 'backlinks')!
+    expect(bl.avgValue).toBe(750)
     expect(gaps.map(g => g.key).sort()).toEqual(['backlinks', 'refDomains'])
-  })
-
-  it('percentOfTop 은 상한 100 으로 클램프된다', () => {
-    const [g] = calculateCompetitorGap({ mozDA: 80 }, { mozDA: 50 })
-    expect(g.percentOfTop).toBe(100)
   })
 })
 
