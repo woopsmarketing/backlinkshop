@@ -6,9 +6,10 @@ import { AnalyzeTelegramCTA } from './AnalyzeTelegramCTA'
 import { AnalyzeKpiCards } from './AnalyzeKpiCards'
 import { AnalyzeCompetitorTable } from './AnalyzeCompetitorTable'
 import { AnalyzeGapCard } from './AnalyzeGapCard'
+import { AnalyzeOnPageDetail } from './AnalyzeOnPageDetail'
 import {
-  buildMetrics,
   calculateCompetitorAverage,
+  partitionCompetitors,
   type CompetitorMetrics,
   type ParsedFields,
 } from '@/lib/lp-metrics'
@@ -26,8 +27,8 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
   const analysisHtml = typeof report?.analysisHtml === 'string' ? report.analysisHtml : ''
   const competitor: AnalyzeCompetitorAnalysis | null = report?.competitorData ?? null
 
-  const onPageMetrics = useMemo(
-    () => buildMetrics((report?.parsedData ?? {}) as ParsedFields),
+  const parsed = useMemo(
+    () => (report?.parsedData ?? null) as ParsedFields | null,
     [report?.parsedData]
   )
 
@@ -36,9 +37,13 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
     () => (competitor?.competitors ?? []).slice(0, 5),
     [competitor?.competitors]
   )
-  const competitorAverage = useMemo(
-    () => calculateCompetitorAverage(competitorList),
+  const { regular: regularCompetitors } = useMemo(
+    () => partitionCompetitors(competitorList),
     [competitorList]
+  )
+  const competitorAverage = useMemo(
+    () => calculateCompetitorAverage(regularCompetitors),
+    [regularCompetitors]
   )
   const hasCompetitor = competitorList.length > 0
 
@@ -74,7 +79,7 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         metrics={customerMetrics}
         average={competitorAverage}
         score={score}
-        competitorCount={competitorList.length}
+        competitorCount={regularCompetitors.length}
       />
 
       <AnalyzeGapCard comp={competitor} />
@@ -99,36 +104,7 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         <AnalyzeTelegramCTA label="텔레그램 1:1 상담 시작" subLabel="평균 응답 5~15분" />
       </section>
 
-      {onPageMetrics.length > 0 && (
-        <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
-          <h2 className="mb-1 text-base font-bold text-slate-900 sm:text-lg">
-            온페이지 최적화 ({onPageMetrics.length}개 항목)
-          </h2>
-          <p className="mb-4 text-xs text-slate-500">
-            크롤러가 페이지를 이해하는 데 쓰는 내부 신호
-          </p>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {onPageMetrics.map(m => (
-              <li
-                key={m.label}
-                className={`rounded-xl border p-3 ${
-                  m.level === 'good'
-                    ? 'border-emerald-200 bg-emerald-50'
-                    : m.level === 'warn'
-                      ? 'border-amber-200 bg-amber-50'
-                      : m.level === 'bad'
-                        ? 'border-rose-200 bg-rose-50'
-                        : 'border-slate-200 bg-slate-50'
-                }`}
-              >
-                <p className="mb-1 text-xs font-medium text-slate-500">{m.label}</p>
-                <p className="text-sm font-bold text-slate-900">{m.value}</p>
-                {m.hint && <p className="mt-1 text-[11px] text-slate-500">{m.hint}</p>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <AnalyzeOnPageDetail parsed={parsed} />
 
       {analysisHtml && (
         <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">

@@ -2,7 +2,9 @@
 
 import {
   calculateCompetitorAverage,
+  detectPlatform,
   formatMetricValue,
+  partitionCompetitors,
   trimDomainLabel,
   type CompetitorMetrics,
   type MetricFormat,
@@ -130,7 +132,10 @@ export function AnalyzeCompetitorTable({ comp, myDomainLabel }: Props) {
   if (!comp || !comp.competitors || comp.competitors.length === 0) return null
   const competitors = comp.competitors.slice(0, 5)
   const me = comp.customerMetrics ?? null
-  const average = calculateCompetitorAverage(competitors)
+  // 평균은 일반 도메인만, 비교표는 모두 표시
+  const { regular } = partitionCompetitors(competitors)
+  const average = calculateCompetitorAverage(regular)
+  const platformCount = competitors.length - regular.length
 
   return (
     <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
@@ -139,7 +144,15 @@ export function AnalyzeCompetitorTable({ comp, myDomainLabel }: Props) {
           경쟁사 비교{comp.keyword ? ` — "${comp.keyword}"` : ''}
         </h2>
         <p className="mt-0.5 text-xs text-slate-500">
-          구글 검색 상위 {competitors.length}개 도메인 · 우측 평균 컬럼으로 한눈에 비교
+          구글 검색 상위 {competitors.length}개 도메인
+          {platformCount > 0 && (
+            <>
+              {' '}
+              · 그 중 <strong className="text-amber-700">{platformCount}개는 플랫폼</strong>(평균
+              제외)
+            </>
+          )}{' '}
+          · 우측 평균 컬럼으로 한눈에 비교
         </p>
       </div>
 
@@ -151,6 +164,7 @@ export function AnalyzeCompetitorTable({ comp, myDomainLabel }: Props) {
             me={me}
             competitors={competitors}
             average={average}
+            regularCount={regular.length}
             myDomainLabel={myDomainLabel}
           />
         ))}
@@ -164,12 +178,14 @@ function SectionTable({
   me,
   competitors,
   average,
+  regularCount,
   myDomainLabel,
 }: {
   section: Section
   me: CompetitorMetrics | null
   competitors: CompetitorMetrics[]
   average: CompetitorMetrics | null
+  regularCount: number
   myDomainLabel: string
 }) {
   return (
@@ -192,21 +208,33 @@ function SectionTable({
                 <br />
                 <span className="text-[10px] font-normal text-rose-400">내 사이트</span>
               </th>
-              {competitors.map((c, i) => (
-                <th
-                  key={i}
-                  className="min-w-[92px] px-3 py-2.5 text-center text-xs font-semibold text-slate-600"
-                >
-                  {trimDomainLabel(c.domain, 14)}
-                  <br />
-                  <span className="text-[10px] font-normal text-slate-400">{i + 1}위</span>
-                </th>
-              ))}
-              <th className="min-w-[92px] bg-indigo-50 px-3 py-2.5 text-center text-xs font-bold text-indigo-700">
+              {competitors.map((c, i) => {
+                const det = detectPlatform(c.domain)
+                return (
+                  <th
+                    key={i}
+                    className={`min-w-[100px] px-3 py-2.5 text-center text-xs font-semibold ${
+                      det.isPlatform ? 'bg-slate-100 text-slate-400' : 'text-slate-600'
+                    }`}
+                    title={det.isPlatform ? `${det.label} 하위 도메인` : undefined}
+                  >
+                    {trimDomainLabel(c.domain, 14)}
+                    <br />
+                    {det.isPlatform ? (
+                      <span className="mt-0.5 inline-block rounded bg-amber-100 px-1.5 py-0 text-[9px] font-semibold text-amber-700">
+                        플랫폼
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-normal text-slate-400">{i + 1}위</span>
+                    )}
+                  </th>
+                )
+              })}
+              <th className="min-w-[100px] bg-indigo-50 px-3 py-2.5 text-center text-xs font-bold text-indigo-700">
                 평균
                 <br />
                 <span className="text-[10px] font-normal text-indigo-500">
-                  상위 {competitors.length}개
+                  일반 {regularCount}개
                 </span>
               </th>
             </tr>
@@ -234,10 +262,13 @@ function SectionTable({
                   </td>
                   {competitors.map((c, i) => {
                     const cellValue = getCellValue(row, c)
+                    const isPlatform = detectPlatform(c.domain).isPlatform
                     return (
                       <td
                         key={i}
-                        className="px-3 py-2 text-center text-xs font-semibold text-slate-700"
+                        className={`px-3 py-2 text-center text-xs font-semibold ${
+                          isPlatform ? 'bg-slate-100/60 text-slate-400' : 'text-slate-700'
+                        }`}
                       >
                         {cellValue}
                       </td>
