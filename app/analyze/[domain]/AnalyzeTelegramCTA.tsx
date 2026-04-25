@@ -1,6 +1,11 @@
 'use client'
 
+import { sha256Email } from '@/lib/hash'
+import { trackTelegramClick, trackSetUser, LP_EMAIL_STORAGE_KEY } from '@/lib/gtag'
+
 type Props = {
+  domain: string
+  placement: string
   variant?: 'primary' | 'secondary'
   label?: string
   subLabel?: string
@@ -8,16 +13,32 @@ type Props = {
 }
 
 export function AnalyzeTelegramCTA({
+  domain,
+  placement,
   variant = 'primary',
   label = '텔레그램으로 1:1 전문가 상담',
   subLabel,
   className = '',
 }: Props) {
-  const handleClick = () => {
-    if (typeof window !== 'undefined') {
-      const w = window as unknown as { trackTelegramClick?: () => void }
-      w.trackTelegramClick?.()
+  const handleClick = async () => {
+    if (typeof window === 'undefined') return
+
+    // EC: LP에서 받았던 이메일이 sessionStorage에 있으면 해싱해서 user_data 셋업
+    let storedEmail = ''
+    try {
+      storedEmail = sessionStorage.getItem(LP_EMAIL_STORAGE_KEY) || ''
+    } catch {
+      /* storage 차단 — 무시 */
     }
+    if (storedEmail) {
+      try {
+        const emailHash = await sha256Email(storedEmail)
+        trackSetUser(emailHash)
+      } catch {
+        /* 해시 실패해도 이벤트는 발화 */
+      }
+    }
+    trackTelegramClick({ domain, placement })
   }
 
   const base =

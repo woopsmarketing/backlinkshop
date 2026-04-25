@@ -115,7 +115,12 @@ export function AnalyzePendingPoller({ domain, url, keyword, status }: Props) {
           <strong>도메인·키워드만 알려주시면</strong> 전문가가 가장 빠른 상위 노출 루트를 바로
           제안해드립니다. 분석 결과가 나오기 전에 먼저 상담받으시는 분이 많아요.
         </p>
-        <AnalyzeTelegramCTA label="전문가에게 1:1 상담 요청" subLabel="응답까지 보통 5~15분" />
+        <AnalyzeTelegramCTA
+          domain={domain}
+          placement="pending"
+          label="전문가에게 1:1 상담 요청"
+          subLabel="응답까지 보통 5~15분"
+        />
       </section>
     </div>
   )

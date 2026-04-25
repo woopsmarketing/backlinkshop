@@ -102,9 +102,6 @@ function LoginContent() {
         const result = await signUp(email, password)
         if (result.success) {
           setMessage(result.message || '회원가입이 완료되었습니다')
-          if (typeof window !== 'undefined' && (window as any).trackSignup) {
-            ;(window as any).trackSignup()
-          }
         } else {
           setError(result.error || '회원가입에 실패했습니다')
         }

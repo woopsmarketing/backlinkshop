@@ -101,7 +101,12 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
           <strong>백링크·DA 격차를 어떻게 뒤집을지</strong> 도메인 상태에 맞춰 5~15분 안에
           답변드립니다.
         </p>
-        <AnalyzeTelegramCTA label="텔레그램 1:1 상담 시작" subLabel="평균 응답 5~15분" />
+        <AnalyzeTelegramCTA
+          domain={domain}
+          placement="result_mid"
+          label="텔레그램 1:1 상담 시작"
+          subLabel="평균 응답 5~15분"
+        />
       </section>
 
       <AnalyzeOnPageDetail parsed={parsed} />
@@ -126,7 +131,12 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         <p className="mb-5 text-sm text-slate-300 sm:text-base">
           전문가가 도메인 상태에 맞는 가장 빠른 상위 노출 루트를 알려드립니다
         </p>
-        <AnalyzeTelegramCTA label="텔레그램으로 전문가 상담 시작" subLabel="채널: @goat82" />
+        <AnalyzeTelegramCTA
+          domain={domain}
+          placement="result_bottom"
+          label="텔레그램으로 전문가 상담 시작"
+          subLabel="채널: @goat82"
+        />
       </section>
     </div>
   )

@@ -1,11 +1,27 @@
 'use client'
 
-export function AnalyzeStickyCTA() {
-  const handleClick = () => {
-    if (typeof window !== 'undefined') {
-      const w = window as unknown as { trackTelegramClick?: () => void }
-      w.trackTelegramClick?.()
+import { sha256Email } from '@/lib/hash'
+import { trackTelegramClick, trackSetUser, LP_EMAIL_STORAGE_KEY } from '@/lib/gtag'
+
+export function AnalyzeStickyCTA({ domain }: { domain: string }) {
+  const handleClick = async () => {
+    if (typeof window === 'undefined') return
+
+    let storedEmail = ''
+    try {
+      storedEmail = sessionStorage.getItem(LP_EMAIL_STORAGE_KEY) || ''
+    } catch {
+      /* storage 차단 — 무시 */
     }
+    if (storedEmail) {
+      try {
+        const emailHash = await sha256Email(storedEmail)
+        trackSetUser(emailHash)
+      } catch {
+        /* 해시 실패해도 이벤트는 발화 */
+      }
+    }
+    trackTelegramClick({ domain, placement: 'sticky' })
   }
 
   return (

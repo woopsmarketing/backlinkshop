@@ -41,7 +41,12 @@ export function AnalyzeFailedView({ domain, url, keyword }: Props) {
         <p className="mb-5 text-sm leading-relaxed text-slate-600">
           텔레그램으로 도메인만 알려주시면 전문가가 직접 확인 후 답변드립니다. 평균 응답까지 5~15분.
         </p>
-        <AnalyzeTelegramCTA label="텔레그램으로 수동 진단 요청" subLabel="평균 응답 5~15분" />
+        <AnalyzeTelegramCTA
+          domain={domain}
+          placement="failed"
+          label="텔레그램으로 수동 진단 요청"
+          subLabel="평균 응답 5~15분"
+        />
       </section>
     </div>
   )

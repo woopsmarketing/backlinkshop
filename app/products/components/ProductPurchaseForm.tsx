@@ -103,17 +103,6 @@ export default function ProductPurchaseForm({ productId, productName, price }: P
       )
 
       if (result.success) {
-        // 전환 추적: 무료 주문(0원)은 free_order_complete, 유료는 purchase
-        if (typeof window !== 'undefined') {
-          if (totalPrice === 0) {
-            const fn = (window as any).trackFreeOrder
-            if (typeof fn === 'function') fn()
-          } else if (isOnPageProduct) {
-            const fn = (window as any).trackPurchase
-            if (typeof fn === 'function') fn(totalPrice)
-          }
-        }
-
         // 성공 페이지로 리디렉트
         const successUrl = new URL('/orders/success', window.location.origin)
         successUrl.searchParams.set('product', encodeURIComponent(productName))

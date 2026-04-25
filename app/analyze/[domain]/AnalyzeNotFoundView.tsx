@@ -25,7 +25,12 @@ export function AnalyzeNotFoundView({ domain }: { domain: string }) {
           >
             무료 SEO 진단 다시 신청
           </Link>
-          <AnalyzeTelegramCTA label="전문가에게 바로 상담 요청" subLabel="평균 응답 5~15분" />
+          <AnalyzeTelegramCTA
+            domain={domain}
+            placement="notfound"
+            label="전문가에게 바로 상담 요청"
+            subLabel="평균 응답 5~15분"
+          />
         </div>
       </section>
     </div>

@@ -1,13 +1,16 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { toDomainSlug } from '@/lib/domain'
+import { sha256Email, normalizeEmail } from '@/lib/hash'
+import { trackLpSubmit, trackSetUser, LP_EMAIL_STORAGE_KEY } from '@/lib/gtag'
 
 type Step = 'form' | 'loading' | 'redirecting' | 'error'
 
 export function LPHeroForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [url, setUrl] = useState('')
   const [keyword, setKeyword] = useState('')
   const [email, setEmail] = useState('')
@@ -18,10 +21,27 @@ export function LPHeroForm() {
     e.preventDefault()
     if (!url.trim() || !keyword.trim() || !email.trim()) return
 
-    // LP 폼 제출 전환 발화 (부전환)
-    if (typeof window !== 'undefined' && (window as any).trackLpSubmit) {
-      ;(window as any).trackLpSubmit()
+    const cleanedEmail = normalizeEmail(email)
+    const submittedDomain = toDomainSlug(url.trim())
+    const ref = (searchParams?.get('ref') || '').trim().toLowerCase() || '(none)'
+
+    // analyze 페이지의 텔레그램 CTA EC용으로 이메일을 세션에 보존 (탭 종료 시 자동 소멸)
+    if (typeof window !== 'undefined' && cleanedEmail) {
+      try {
+        sessionStorage.setItem(LP_EMAIL_STORAGE_KEY, cleanedEmail)
+      } catch {
+        /* private mode 등 storage 차단 — 무시 */
+      }
     }
+
+    // EC: 이메일 해시 → user_data 셋업 후 lp_form_submit 발화
+    try {
+      const emailHash = await sha256Email(cleanedEmail)
+      trackSetUser(emailHash)
+    } catch {
+      /* 해시 실패해도 이벤트는 발화 */
+    }
+    trackLpSubmit({ ref, domain: submittedDomain })
 
     setStep('loading')
     setErrorMsg('')
@@ -41,13 +61,8 @@ export function LPHeroForm() {
         return
       }
 
-      // purchase 전환 발화 (무료 주문 완료)
-      if (typeof window !== 'undefined' && (window as any).trackFreeOrder) {
-        ;(window as any).trackFreeOrder()
-      }
-
       // 응답에 redirectUrl이 있으면 그대로, 없으면 도메인에서 직접 slug 생성
-      const fallbackSlug = toDomainSlug(url.trim())
+      const fallbackSlug = submittedDomain
       const redirectUrl: string =
         data.redirectUrl || (fallbackSlug ? `/analyze/${encodeURIComponent(fallbackSlug)}` : '')
 
@@ -65,11 +80,8 @@ export function LPHeroForm() {
     }
   }
 
-  const handleTelegramClick = () => {
-    if (typeof window !== 'undefined' && (window as any).trackTelegramClick) {
-      ;(window as any).trackTelegramClick()
-    }
-  }
+  // LP의 텔레그램 버튼은 telegram_click을 발화하지 않는다.
+  // 광고 전환 측정은 /analyze/[domain]의 텔레그램 CTA에서 단일 진입점으로 통일.
 
   const busy = step === 'loading' || step === 'redirecting'
 
@@ -256,7 +268,6 @@ export function LPHeroForm() {
             href="https://t.me/goat82"
             target="_blank"
             rel="noopener noreferrer"
-            onClick={handleTelegramClick}
             className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-emerald-500/25 transition-all"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

@@ -6,6 +6,7 @@ import { AnalyzeResultView } from './AnalyzeResultView'
 import { AnalyzeStickyCTA } from './AnalyzeStickyCTA'
 import { AnalyzeFailedView } from './AnalyzeFailedView'
 import { AnalyzeNotFoundView } from './AnalyzeNotFoundView'
+import { AnalyzePageView } from './AnalyzePageView'
 
 export type AnalyzeStatus =
   | 'pending_analysis'
@@ -118,6 +119,7 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
 
   return (
     <main className="min-h-screen bg-slate-50">
+      <AnalyzePageView domain={state.domain} />
       <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10 pb-32 sm:pb-10">
         {state.status === 'none' && <AnalyzeNotFoundView domain={state.domain} />}
 
@@ -147,7 +149,7 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
         )}
       </div>
 
-      {state.status !== 'none' && <AnalyzeStickyCTA />}
+      {state.status !== 'none' && <AnalyzeStickyCTA domain={state.domain} />}
     </main>
   )
 }
