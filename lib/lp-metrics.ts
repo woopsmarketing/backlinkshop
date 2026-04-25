@@ -14,24 +14,54 @@ export type Metric = {
 }
 
 export type ParsedFields = {
+  url?: string
+  statusCode?: number
   title?: string | null
   titleLength?: number
   metaDescription?: string | null
   metaDescriptionLength?: number
+  metaKeywords?: string | null
+  canonical?: string | null
   h1?: string[]
+  h2?: string[]
+  h3Count?: number
   imgTotal?: number
   imgWithoutAlt?: number
+  internalLinks?: number
+  externalLinks?: number
+  nofollowLinks?: number
   wordCount?: number
+  htmlSize?: number
   loadTimeMs?: number
   isHttps?: boolean
   hasViewport?: boolean
+  hasCharset?: boolean
+  hasOgTitle?: boolean
+  hasOgDescription?: boolean
+  hasOgImage?: boolean
+  hasTwitterCard?: boolean
+  hasRobotsMeta?: string | null
+  hasHreflang?: boolean
   hasStructuredData?: boolean
   structuredDataTypes?: string[]
-  internalLinks?: number
-  externalLinks?: number
-  hasOgImage?: boolean
-  canonical?: string | null
+  textToHtmlRatio?: number
+  urlDepth?: number
+  urlLength?: number
+  inlineCssSize?: number
+  inlineJsSize?: number
+  hasGzip?: boolean
+  hasCacheControl?: string | null
+  hasHsts?: boolean
+  redirectCount?: number
+  redirectIsWww?: boolean
+  duplicateH1?: boolean
+  duplicateDescription?: boolean
+  ogImageUrl?: string | null
+  hasFavicon?: boolean
   lang?: string | null
+  xRobotsTag?: string | null
+  contentType?: string | null
+  hasIframes?: number
 }
 
 export function buildMetrics(p: ParsedFields): Metric[] {
@@ -134,6 +164,100 @@ export function isVisibleReport(status: string, raw: unknown): boolean {
   }
   if (!raw || typeof raw !== 'object') return false
   return 'analysisHtml' in (raw as Record<string, unknown>)
+}
+
+/* ───────────────────────── 플랫폼 도메인 감지 ───────────────────────── */
+
+/**
+ * 거대 플랫폼·블로그·SaaS 호스트 리스트.
+ *
+ * 이 도메인의 본체이거나 하위 도메인일 경우 일반 개인 사이트와 직접 비교가
+ * 불공평하므로 (DA 80+, 백링크 수천만 개 단위) 평균 계산에서 제외한다.
+ *
+ * key 는 도메인 매칭에 쓰이고, value 는 사용자 친화 라벨.
+ */
+const PLATFORM_HOSTS: Record<string, string> = {
+  // 블로그 / 문서 플랫폼
+  'tistory.com': '티스토리 블로그',
+  'blogspot.com': 'Blogger',
+  'wordpress.com': '워드프레스닷컴',
+  'medium.com': 'Medium',
+  'velog.io': 'velog',
+  'brunch.co.kr': '브런치',
+  'postype.com': '포스타입',
+  'note.com': 'note',
+  // 위키 / 지식
+  'wikipedia.org': '위키피디아',
+  'namu.wiki': '나무위키',
+  'fandom.com': 'Fandom 위키',
+  'wikia.com': 'Wikia',
+  // 호스팅 / SaaS
+  'github.io': 'GitHub Pages',
+  'gitbook.io': 'GitBook',
+  'gitbook.com': 'GitBook',
+  'notion.so': 'Notion',
+  'notion.site': 'Notion',
+  'vercel.app': 'Vercel',
+  'netlify.app': 'Netlify',
+  'pages.dev': 'Cloudflare Pages',
+  // 도메인·SEO 산업 본체
+  'godaddy.com': '고대디',
+  'semrush.com': 'Semrush',
+  'ahrefs.com': 'Ahrefs',
+  'moz.com': 'Moz',
+  'namecheap.com': 'Namecheap',
+  'similarweb.com': 'SimilarWeb',
+  // 대형 SNS / 영상
+  'youtube.com': 'YouTube',
+  'facebook.com': 'Facebook',
+  'twitter.com': 'Twitter',
+  'x.com': 'X(Twitter)',
+  'instagram.com': 'Instagram',
+  'linkedin.com': 'LinkedIn',
+  'reddit.com': 'Reddit',
+  'pinterest.com': 'Pinterest',
+  // 국내 대형 포털
+  'naver.com': '네이버',
+  'daum.net': '다음',
+  'google.com': '구글',
+  'kakao.com': '카카오',
+  // 국내 빌더 / 쇼핑몰 플랫폼
+  'cafe24.com': '카페24',
+  'imweb.me': '아임웹',
+  'makeshop.co.kr': '메이크샵',
+  'godo.co.kr': '고도몰',
+  'modoo.at': 'modoo!',
+  'creatorlink.net': '크리에이터링크',
+}
+
+export type PlatformDetection = {
+  isPlatform: boolean
+  /** 매칭된 본체 호스트 (예: tistory.com). 미매칭 시 undefined */
+  platformHost?: string
+  /** 사용자에게 보여줄 한국어 라벨 (예: "티스토리 블로그") */
+  label?: string
+}
+
+/**
+ * 도메인이 거대 플랫폼 본체이거나 그 하위 도메인인지 판별한다.
+ *
+ * - 'X.tistory.com' 또는 'tistory.com' 모두 platform=true
+ * - 'X.blog.naver.com' 도 naver.com 매칭으로 platform=true
+ * - 입력 도메인은 소문자·www 제거 후 비교
+ */
+export function detectPlatform(domain: string | null | undefined): PlatformDetection {
+  if (!domain || typeof domain !== 'string') return { isPlatform: false }
+  const normalized = domain
+    .trim()
+    .toLowerCase()
+    .replace(/^www\./, '')
+  if (!normalized) return { isPlatform: false }
+  for (const host of Object.keys(PLATFORM_HOSTS)) {
+    if (normalized === host || normalized.endsWith('.' + host)) {
+      return { isPlatform: true, platformHost: host, label: PLATFORM_HOSTS[host] }
+    }
+  }
+  return { isPlatform: false }
 }
 
 /* ───────────────────────── KPI · 경쟁사 ───────────────────────── */
@@ -383,11 +507,14 @@ export function calculateCompetitorAverage(
   competitors: CompetitorMetrics[] | null | undefined
 ): CompetitorMetrics | null {
   if (!competitors || competitors.length === 0) return null
+  // 거대 플랫폼은 평균 왜곡을 일으키므로 제외 (DA 80+, 백링크 수천만 단위)
+  const eligible = competitors.filter(c => !detectPlatform(c.domain).isPlatform)
+  if (eligible.length === 0) return null
   const avg: Record<string, number> = {}
   let hasAny = false
   for (const field of AVG_NUMERIC_FIELDS) {
     const vals: number[] = []
-    for (const c of competitors) {
+    for (const c of eligible) {
       const v = c[field]
       if (typeof v === 'number' && Number.isFinite(v)) vals.push(v)
     }
@@ -398,6 +525,26 @@ export function calculateCompetitorAverage(
   }
   if (!hasAny) return null
   return avg as CompetitorMetrics
+}
+
+/**
+ * 경쟁사 배열에서 플랫폼 도메인과 일반 도메인을 분리한다.
+ *
+ * 결과 페이지에서 평균 계산은 일반 도메인만, 비교표는 양쪽 모두 표시하되
+ * 플랫폼은 회색 + 안내 배지를 붙이기 위해 사용.
+ */
+export function partitionCompetitors(competitors: CompetitorMetrics[] | null | undefined): {
+  regular: CompetitorMetrics[]
+  platforms: CompetitorMetrics[]
+} {
+  if (!competitors || competitors.length === 0) return { regular: [], platforms: [] }
+  const regular: CompetitorMetrics[] = []
+  const platforms: CompetitorMetrics[] = []
+  for (const c of competitors) {
+    if (detectPlatform(c.domain).isPlatform) platforms.push(c)
+    else regular.push(c)
+  }
+  return { regular, platforms }
 }
 
 /* ───────────────────────── 경쟁사 격차 ───────────────────────── */
@@ -496,4 +643,462 @@ export function trimDomainLabel(domain: string | undefined, maxLen = 13): string
   if (!domain) return '-'
   if (domain.length <= maxLen) return domain
   return domain.slice(0, maxLen - 2) + '..'
+}
+
+/* ───────────────────────── 온페이지 상세 진단 ───────────────────────── */
+
+export type OnPageItem = {
+  label: string
+  value: string
+  hint?: string
+  level: MetricLevel
+}
+
+export type OnPageGroup = {
+  title: string
+  description?: string
+  items: OnPageItem[]
+}
+
+function fmtBytes(bytes: number | undefined | null): string {
+  if (bytes === undefined || bytes === null || !Number.isFinite(bytes)) return '-'
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+}
+
+function lvl(cond: 'good' | 'warn' | 'bad' | 'neutral'): MetricLevel {
+  return cond
+}
+
+/**
+ * ParsedFields(SEO 분석기 출력) 를 결과 페이지에서 표시할 6개 카테고리·35+ 항목으로 변환.
+ *
+ * 각 항목은 ✓/✗/⚠ 표시와 권장 기준 힌트를 포함한다. 데이터가 없는 항목은 생략.
+ */
+export function buildOnPageDetail(p: ParsedFields | null | undefined): OnPageGroup[] {
+  if (!p) return []
+  const groups: OnPageGroup[] = []
+
+  // 1. 기본 정보
+  const basic: OnPageItem[] = []
+  if (p.statusCode !== undefined) {
+    const ok = p.statusCode >= 200 && p.statusCode < 300
+    basic.push({
+      label: '상태 코드',
+      value: String(p.statusCode),
+      hint: ok ? '정상 응답' : '비정상 응답',
+      level: ok ? lvl('good') : lvl('bad'),
+    })
+  }
+  if (p.isHttps !== undefined) {
+    basic.push({
+      label: 'HTTPS',
+      value: p.isHttps ? '적용됨' : '미적용',
+      hint: p.isHttps ? '보안 연결' : '구글이 비보안 사이트를 낮게 평가',
+      level: p.isHttps ? lvl('good') : lvl('bad'),
+    })
+  }
+  if (p.loadTimeMs !== undefined) {
+    const ms = p.loadTimeMs
+    basic.push({
+      label: '로딩 시간',
+      value: ms >= 1000 ? `${(ms / 1000).toFixed(1)}초` : `${ms}ms`,
+      hint: ms < 800 ? '빠름' : ms < 2000 ? '보통' : '느림 (개선 필요)',
+      level: ms < 800 ? lvl('good') : ms < 2000 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.htmlSize !== undefined) {
+    const kb = p.htmlSize / 1024
+    basic.push({
+      label: 'HTML 크기',
+      value: fmtBytes(p.htmlSize),
+      hint: kb < 500 ? '경량' : kb < 1024 ? '보통' : '용량 큼',
+      level: kb < 500 ? lvl('good') : kb < 1024 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.wordCount !== undefined) {
+    basic.push({
+      label: '본문 단어 수',
+      value: p.wordCount.toLocaleString('en-US') + '개',
+      hint: p.wordCount >= 300 ? '충분' : p.wordCount >= 100 ? '얇음' : '본문 부족',
+      level: p.wordCount >= 300 ? lvl('good') : p.wordCount >= 100 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.textToHtmlRatio !== undefined) {
+    const r = p.textToHtmlRatio
+    basic.push({
+      label: '텍스트/HTML 비율',
+      value: `${r.toFixed(1)}%`,
+      hint: r >= 10 ? '콘텐츠 비중 양호' : 'SPA·프레임워크 사이트일 수 있음',
+      level: r >= 10 ? lvl('good') : r >= 3 ? lvl('warn') : lvl('neutral'),
+    })
+  }
+  if (p.urlDepth !== undefined && p.urlLength !== undefined) {
+    basic.push({
+      label: 'URL 깊이·길이',
+      value: `${p.urlDepth}단계 (${p.urlLength}자)`,
+      hint:
+        p.urlDepth <= 3 && p.urlLength <= 75
+          ? '간결'
+          : p.urlDepth > 5 || p.urlLength > 100
+            ? '너무 깊거나 김'
+            : '보통',
+      level:
+        p.urlDepth <= 3 && p.urlLength <= 75
+          ? lvl('good')
+          : p.urlDepth > 5 || p.urlLength > 100
+            ? lvl('bad')
+            : lvl('warn'),
+    })
+  }
+  if (p.redirectCount !== undefined) {
+    const n = p.redirectCount
+    basic.push({
+      label: '리다이렉트',
+      value: n === 0 ? '없음' : `${n}회${p.redirectIsWww ? ' (www 정규화)' : ''}`,
+      hint: n === 0 ? '직접 응답' : n <= 1 ? 'www 정규화 정도는 OK' : '체인 길어 권장 안 됨',
+      level: n === 0 ? lvl('good') : n <= 1 ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (basic.length > 0) {
+    groups.push({
+      title: '기본 정보',
+      description: '검색엔진이 가장 먼저 확인하는 응답·로딩·구조 신호',
+      items: basic,
+    })
+  }
+
+  // 2. 메타 태그
+  const meta: OnPageItem[] = []
+  if (p.title !== undefined) {
+    const len = p.titleLength ?? p.title?.length ?? 0
+    const ok = !!p.title && len >= 10 && len <= 60
+    meta.push({
+      label: 'Title',
+      value: p.title
+        ? `${p.title.slice(0, 60)}${p.title.length > 60 ? '…' : ''} (${len}자)`
+        : '없음',
+      hint: ok ? '적정 길이 (10~60자)' : len === 0 ? '제목 누락' : '길이 조정 권장',
+      level: ok ? lvl('good') : !p.title ? lvl('bad') : lvl('warn'),
+    })
+  }
+  if (p.metaDescription !== undefined) {
+    const len = p.metaDescriptionLength ?? p.metaDescription?.length ?? 0
+    const ok = !!p.metaDescription && len >= 50 && len <= 160
+    meta.push({
+      label: 'Description',
+      value: p.metaDescription
+        ? `${p.metaDescription.slice(0, 80)}${p.metaDescription.length > 80 ? '…' : ''} (${len}자)`
+        : '없음',
+      hint: ok ? '적정 길이 (50~160자)' : len === 0 ? '설명 누락' : '길이 조정 권장',
+      level: ok ? lvl('good') : !p.metaDescription ? lvl('bad') : lvl('warn'),
+    })
+  }
+  if (p.metaKeywords !== undefined) {
+    const arr = p.metaKeywords ? p.metaKeywords.split(',').filter(Boolean) : []
+    meta.push({
+      label: 'Keywords',
+      value: arr.length > 0 ? `${arr.length}개` : '없음',
+      hint: arr.length > 0 ? '구글은 미사용, 네이버 일부 참고' : '필수 아님',
+      level: lvl('neutral'),
+    })
+  }
+  if (p.canonical !== undefined) {
+    meta.push({
+      label: 'Canonical',
+      value: p.canonical ? '설정됨' : '없음',
+      hint: p.canonical ? '중복 URL 정리됨' : '중복 콘텐츠 위험',
+      level: p.canonical ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (p.hasRobotsMeta !== undefined) {
+    const v = p.hasRobotsMeta ?? 'index, follow'
+    const blocked = /noindex|nofollow/i.test(String(v))
+    meta.push({
+      label: 'Robots',
+      value: v ? String(v) : 'index, follow (기본값)',
+      hint: blocked ? '색인·추적 차단 설정됨' : '검색 노출 허용',
+      level: blocked ? lvl('bad') : lvl('good'),
+    })
+  }
+  if (p.lang !== undefined) {
+    meta.push({
+      label: 'Lang',
+      value: p.lang || '없음',
+      hint: p.lang ? '언어 명시됨' : 'lang 속성 권장',
+      level: p.lang ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (meta.length > 0) {
+    groups.push({
+      title: '메타 태그',
+      description: '검색 결과에 노출되는 핵심 텍스트',
+      items: meta,
+    })
+  }
+
+  // 3. 제목 구조
+  const heading: OnPageItem[] = []
+  if (p.h1) {
+    const c = p.h1.length
+    heading.push({
+      label: 'H1',
+      value:
+        c === 0
+          ? '없음'
+          : `${c}개${p.h1[0] ? ` — "${p.h1[0].slice(0, 30)}${p.h1[0].length > 30 ? '…' : ''}"` : ''}`,
+      hint: c === 1 ? '권장 (1개)' : c === 0 ? 'H1 누락' : '중복 H1',
+      level: c === 1 ? lvl('good') : c === 0 ? lvl('bad') : lvl('warn'),
+    })
+  }
+  if (p.h2) {
+    const c = p.h2.length
+    heading.push({
+      label: 'H2',
+      value: `${c}개`,
+      hint: c >= 3 ? '구조 양호' : c > 0 ? '얇은 구조' : 'H2 누락',
+      level: c >= 3 ? lvl('good') : c > 0 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.h3Count !== undefined) {
+    heading.push({
+      label: 'H3',
+      value: `${p.h3Count}개`,
+      hint: p.h3Count >= 3 ? '세부 구조 갖춤' : '필요 시 추가',
+      level: p.h3Count >= 3 ? lvl('good') : lvl('neutral'),
+    })
+  }
+  if (heading.length > 0) {
+    groups.push({
+      title: '제목 구조',
+      description: '본문의 의미 계층 (검색엔진의 콘텐츠 이해 기준)',
+      items: heading,
+    })
+  }
+
+  // 4. 이미지 & 링크
+  const links: OnPageItem[] = []
+  if (p.imgTotal !== undefined) {
+    links.push({
+      label: '이미지',
+      value: `${p.imgTotal}개`,
+      level: lvl('neutral'),
+    })
+  }
+  if (p.imgWithoutAlt !== undefined) {
+    const miss = p.imgWithoutAlt
+    links.push({
+      label: 'Alt 미설정',
+      value: `${miss}개`,
+      hint: miss === 0 ? '모든 이미지에 alt' : miss < 3 ? '일부 누락' : '다수 누락',
+      level: miss === 0 ? lvl('good') : miss < 3 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.internalLinks !== undefined) {
+    links.push({
+      label: '내부 링크',
+      value: `${p.internalLinks}개`,
+      hint: p.internalLinks >= 5 ? '내부 연결 양호' : '내부 링크 부족',
+      level: p.internalLinks >= 5 ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (p.externalLinks !== undefined) {
+    links.push({
+      label: '외부 링크',
+      value: `${p.externalLinks}개`,
+      level: lvl('neutral'),
+    })
+  }
+  if (p.nofollowLinks !== undefined) {
+    links.push({
+      label: 'Nofollow 링크',
+      value: `${p.nofollowLinks}개`,
+      level: lvl('neutral'),
+    })
+  }
+  if (links.length > 0) {
+    groups.push({
+      title: '이미지 & 링크',
+      description: '내부 SEO 와 사용자 탐색 동선의 기반',
+      items: links,
+    })
+  }
+
+  // 5. 기술 SEO
+  const tech: OnPageItem[] = []
+  if (p.hasViewport !== undefined) {
+    tech.push({
+      label: 'Viewport',
+      value: p.hasViewport ? '설정됨' : '없음',
+      hint: p.hasViewport ? '모바일 대응' : '모바일 SEO 핵심 요소 누락',
+      level: p.hasViewport ? lvl('good') : lvl('bad'),
+    })
+  }
+  if (p.hasCharset !== undefined) {
+    tech.push({
+      label: 'Charset',
+      value: p.hasCharset ? '설정됨' : '없음',
+      hint: p.hasCharset ? 'UTF-8 등 명시' : 'charset 권장',
+      level: p.hasCharset ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (p.hasFavicon !== undefined) {
+    tech.push({
+      label: 'Favicon',
+      value: p.hasFavicon ? '있음' : '없음',
+      hint: p.hasFavicon ? 'SERP 가독성' : '추가 권장',
+      level: p.hasFavicon ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (p.hasGzip !== undefined) {
+    tech.push({
+      label: 'Gzip / Brotli',
+      value: p.hasGzip ? '적용됨' : '미적용',
+      hint: p.hasGzip ? '압축 전송' : '서버 압축 권장',
+      level: p.hasGzip ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (p.hasHsts !== undefined) {
+    tech.push({
+      label: 'HSTS',
+      value: p.hasHsts ? '적용됨' : '미적용',
+      hint: p.hasHsts ? 'HTTPS 강제' : '권장 (선택)',
+      level: p.hasHsts ? lvl('good') : lvl('neutral'),
+    })
+  }
+  if (p.hasCacheControl !== undefined) {
+    tech.push({
+      label: 'Cache-Control',
+      value: p.hasCacheControl || '없음',
+      hint: p.hasCacheControl ? '캐시 정책 명시' : '캐시 헤더 권장',
+      level: p.hasCacheControl ? lvl('good') : lvl('neutral'),
+    })
+  }
+  if (p.inlineCssSize !== undefined) {
+    const kb = p.inlineCssSize / 1024
+    tech.push({
+      label: '인라인 CSS',
+      value: fmtBytes(p.inlineCssSize),
+      hint: kb < 10 ? '경량' : kb < 50 ? '보통' : '외부 분리 권장',
+      level: kb < 10 ? lvl('good') : kb < 50 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.inlineJsSize !== undefined) {
+    const kb = p.inlineJsSize / 1024
+    tech.push({
+      label: '인라인 JS',
+      value: fmtBytes(p.inlineJsSize),
+      hint: kb < 50 ? '경량' : kb < 150 ? '보통 (프레임워크 사이트는 정상)' : '외부 분리 권장',
+      level: kb < 50 ? lvl('good') : kb < 150 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.hasHreflang !== undefined) {
+    tech.push({
+      label: 'Hreflang',
+      value: p.hasHreflang ? '있음' : '없음',
+      hint: p.hasHreflang ? '다국어 명시' : '단일 언어면 불필요',
+      level: p.hasHreflang ? lvl('good') : lvl('neutral'),
+    })
+  }
+  if (p.hasIframes !== undefined) {
+    tech.push({
+      label: 'iFrame',
+      value: `${p.hasIframes}개`,
+      hint: p.hasIframes === 0 ? '없음' : '과다 사용 시 SEO 영향',
+      level: p.hasIframes === 0 ? lvl('good') : p.hasIframes < 3 ? lvl('neutral') : lvl('warn'),
+    })
+  }
+  if (tech.length > 0) {
+    groups.push({
+      title: '기술 SEO',
+      description: '모바일·성능·보안 등 인프라 신호',
+      items: tech,
+    })
+  }
+
+  // 6. 소셜 & 구조화 데이터
+  const social: OnPageItem[] = []
+  if (
+    p.hasOgTitle !== undefined ||
+    p.hasOgDescription !== undefined ||
+    p.hasOgImage !== undefined
+  ) {
+    const parts: string[] = []
+    if (p.hasOgTitle) parts.push('title')
+    if (p.hasOgDescription) parts.push('desc')
+    if (p.hasOgImage) parts.push('image')
+    const total = [p.hasOgTitle, p.hasOgDescription, p.hasOgImage].filter(
+      v => v !== undefined
+    ).length
+    const present = parts.length
+    social.push({
+      label: 'Open Graph',
+      value: parts.length > 0 ? parts.join(', ') : '없음',
+      hint:
+        present === total && total > 0
+          ? '소셜 공유 카드 완비'
+          : present > 0
+            ? '일부 누락'
+            : 'OG 태그 누락',
+      level: present === total && total > 0 ? lvl('good') : present > 0 ? lvl('warn') : lvl('bad'),
+    })
+  }
+  if (p.hasTwitterCard !== undefined) {
+    social.push({
+      label: 'Twitter Card',
+      value: p.hasTwitterCard ? '있음' : '없음',
+      hint: p.hasTwitterCard ? 'X(Twitter) 공유 카드' : '추가 권장',
+      level: p.hasTwitterCard ? lvl('good') : lvl('neutral'),
+    })
+  }
+  if (p.hasStructuredData !== undefined) {
+    const types = p.structuredDataTypes ?? []
+    social.push({
+      label: 'JSON-LD',
+      value: p.hasStructuredData ? (types.length > 0 ? types.join(', ') : '있음') : '없음',
+      hint: p.hasStructuredData ? '리치 결과 노출 가능' : '구조화 데이터 권장',
+      level: p.hasStructuredData ? lvl('good') : lvl('warn'),
+    })
+  }
+  if (p.ogImageUrl !== undefined && p.ogImageUrl) {
+    social.push({
+      label: 'OG Image URL',
+      value: p.ogImageUrl.length > 50 ? p.ogImageUrl.slice(0, 50) + '…' : p.ogImageUrl,
+      level: lvl('good'),
+    })
+  }
+  if (social.length > 0) {
+    groups.push({
+      title: '소셜 & 구조화 데이터',
+      description: '검색 결과·SNS 공유 카드의 외형을 결정',
+      items: social,
+    })
+  }
+
+  return groups
+}
+
+/**
+ * 항목 그룹들의 카운트 요약 — 카드 헤더에 "총 N개 / ✓N / ⚠N / ✗N" 표시용
+ */
+export function summarizeOnPage(groups: OnPageGroup[]): {
+  total: number
+  good: number
+  warn: number
+  bad: number
+} {
+  let total = 0
+  let good = 0
+  let warn = 0
+  let bad = 0
+  for (const g of groups) {
+    for (const i of g.items) {
+      total += 1
+      if (i.level === 'good') good += 1
+      else if (i.level === 'warn') warn += 1
+      else if (i.level === 'bad') bad += 1
+    }
+  }
+  return { total, good, warn, bad }
 }

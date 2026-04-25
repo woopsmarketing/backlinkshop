@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest'
 import {
   buildKpiCards,
   buildMetrics,
+  buildOnPageDetail,
   calculateCompetitorAverage,
   calculateCompetitorGap,
+  detectPlatform,
   formatMetricValue,
   isVisibleReport,
+  partitionCompetitors,
+  summarizeOnPage,
   trimDomainLabel,
 } from './lp-metrics'
 
@@ -417,6 +421,92 @@ describe('calculateCompetitorGap', () => {
   })
 })
 
+describe('detectPlatform', () => {
+  it('일반 도메인은 platform=false', () => {
+    expect(detectPlatform('example.com').isPlatform).toBe(false)
+    expect(detectPlatform('domainchecker.co.kr').isPlatform).toBe(false)
+    expect(detectPlatform('joyful-classic-cosmos.com').isPlatform).toBe(false)
+  })
+
+  it('티스토리 하위 도메인을 식별한다', () => {
+    const r = detectPlatform('luv-n-interest.tistory.com')
+    expect(r.isPlatform).toBe(true)
+    expect(r.platformHost).toBe('tistory.com')
+    expect(r.label).toBe('티스토리 블로그')
+  })
+
+  it('위키피디아 하위 도메인을 식별한다', () => {
+    const r = detectPlatform('ko.wikipedia.org')
+    expect(r.isPlatform).toBe(true)
+    expect(r.label).toBe('위키피디아')
+  })
+
+  it('velog 본체 도메인도 platform=true', () => {
+    expect(detectPlatform('velog.io').isPlatform).toBe(true)
+  })
+
+  it('고대디·셈러쉬 본체도 plat폼으로 분류', () => {
+    expect(detectPlatform('godaddy.com').isPlatform).toBe(true)
+    expect(detectPlatform('semrush.com').isPlatform).toBe(true)
+  })
+
+  it('대소문자·www 접두사를 정규화한다', () => {
+    expect(detectPlatform('WWW.Tistory.com').isPlatform).toBe(true)
+    expect(detectPlatform('  X.Tistory.COM  ').isPlatform).toBe(true)
+  })
+
+  it('빈 입력 / null / undefined 는 false', () => {
+    expect(detectPlatform('').isPlatform).toBe(false)
+    expect(detectPlatform(null).isPlatform).toBe(false)
+    expect(detectPlatform(undefined).isPlatform).toBe(false)
+  })
+
+  it('호스트의 부분 문자열이 우연히 일치해도 매칭하지 않는다', () => {
+    // 'mytistory.com' 은 '.tistory.com' 으로 끝나지 않음
+    expect(detectPlatform('mytistory.com').isPlatform).toBe(false)
+    expect(detectPlatform('faketistory.com').isPlatform).toBe(false)
+  })
+})
+
+describe('partitionCompetitors', () => {
+  it('플랫폼과 일반 도메인을 분리한다', () => {
+    const { regular, platforms } = partitionCompetitors([
+      { domain: 'foo.tistory.com' },
+      { domain: 'normal-site.co.kr' },
+      { domain: 'ko.wikipedia.org' },
+      { domain: 'another-blog.com' },
+    ])
+    expect(regular.map(c => c.domain)).toEqual(['normal-site.co.kr', 'another-blog.com'])
+    expect(platforms.map(c => c.domain)).toEqual(['foo.tistory.com', 'ko.wikipedia.org'])
+  })
+
+  it('빈 입력은 빈 배열들', () => {
+    expect(partitionCompetitors(null)).toEqual({ regular: [], platforms: [] })
+    expect(partitionCompetitors([])).toEqual({ regular: [], platforms: [] })
+  })
+})
+
+describe('calculateCompetitorAverage 의 플랫폼 제외', () => {
+  it('플랫폼 도메인은 평균에서 제외', () => {
+    const avg = calculateCompetitorAverage([
+      { domain: 'normal1.com', mozDA: 20 },
+      { domain: 'foo.tistory.com', mozDA: 100 }, // 평균 왜곡 시도
+      { domain: 'normal2.com', mozDA: 30 },
+    ])!
+    // 플랫폼 제외 → (20+30)/2 = 25
+    expect(avg.mozDA).toBe(25)
+  })
+
+  it('전부 플랫폼이면 null', () => {
+    expect(
+      calculateCompetitorAverage([
+        { domain: 'a.tistory.com', mozDA: 50 },
+        { domain: 'ko.wikipedia.org', mozDA: 90 },
+      ])
+    ).toBeNull()
+  })
+})
+
 describe('trimDomainLabel', () => {
   it('짧은 도메인은 그대로 유지', () => {
     expect(trimDomainLabel('example.com')).toBe('example.com')
@@ -432,5 +522,104 @@ describe('trimDomainLabel', () => {
 
   it('maxLen 옵션을 지원한다', () => {
     expect(trimDomainLabel('abcdefghij', 8)).toBe('abcdef..')
+  })
+})
+
+describe('buildOnPageDetail', () => {
+  it('null/undefined 입력은 빈 배열', () => {
+    expect(buildOnPageDetail(null)).toEqual([])
+    expect(buildOnPageDetail(undefined)).toEqual([])
+  })
+
+  it('비어있는 객체에서는 그룹이 생기지 않는다', () => {
+    expect(buildOnPageDetail({})).toEqual([])
+  })
+
+  it('카테고리별 그룹화', () => {
+    const groups = buildOnPageDetail({
+      statusCode: 200,
+      isHttps: true,
+      title: 'Hello SEO World',
+      titleLength: 15,
+      h1: ['헤드라인'],
+      h2: ['소제목1', '소제목2', '소제목3'],
+      h3Count: 5,
+      imgTotal: 10,
+      imgWithoutAlt: 0,
+      hasViewport: true,
+      hasOgTitle: true,
+      hasOgDescription: true,
+      hasOgImage: true,
+      hasStructuredData: true,
+      structuredDataTypes: ['Organization'],
+    })
+    const titles = groups.map(g => g.title)
+    expect(titles).toContain('기본 정보')
+    expect(titles).toContain('메타 태그')
+    expect(titles).toContain('제목 구조')
+    expect(titles).toContain('이미지 & 링크')
+    expect(titles).toContain('기술 SEO')
+    expect(titles).toContain('소셜 & 구조화 데이터')
+  })
+
+  it('상태 코드 200 은 good, 404 는 bad', () => {
+    const ok = buildOnPageDetail({ statusCode: 200 })
+    const bad = buildOnPageDetail({ statusCode: 404 })
+    expect(ok[0].items[0].level).toBe('good')
+    expect(bad[0].items[0].level).toBe('bad')
+  })
+
+  it('Robots 가 noindex 면 bad', () => {
+    const groups = buildOnPageDetail({ hasRobotsMeta: 'noindex, nofollow' })
+    const meta = groups.find(g => g.title === '메타 태그')!
+    expect(meta.items[0].level).toBe('bad')
+  })
+
+  it('OG 일부 누락 시 warn', () => {
+    const groups = buildOnPageDetail({
+      hasOgTitle: true,
+      hasOgDescription: true,
+      hasOgImage: false,
+    })
+    const social = groups.find(g => g.title === '소셜 & 구조화 데이터')!
+    const og = social.items.find(i => i.label === 'Open Graph')!
+    expect(og.level).toBe('warn')
+    expect(og.value).toContain('title')
+    expect(og.value).toContain('desc')
+    expect(og.value).not.toContain('image')
+  })
+
+  it('인라인 JS 가 큰 경우 bad', () => {
+    const [g] = buildOnPageDetail({ inlineJsSize: 200 * 1024 })
+    expect(g.title).toBe('기술 SEO')
+    expect(g.items[0].level).toBe('bad')
+  })
+
+  it('값 없는 항목은 생략', () => {
+    const groups = buildOnPageDetail({ statusCode: 200 })
+    expect(groups.length).toBe(1)
+    expect(groups[0].items.length).toBe(1)
+  })
+})
+
+describe('summarizeOnPage', () => {
+  it('레벨별로 카운트한다', () => {
+    const summary = summarizeOnPage([
+      {
+        title: 'X',
+        items: [
+          { label: 'a', value: '', level: 'good' },
+          { label: 'b', value: '', level: 'good' },
+          { label: 'c', value: '', level: 'warn' },
+          { label: 'd', value: '', level: 'bad' },
+          { label: 'e', value: '', level: 'neutral' },
+        ],
+      },
+    ])
+    expect(summary).toEqual({ total: 5, good: 2, warn: 1, bad: 1 })
+  })
+
+  it('빈 입력은 0', () => {
+    expect(summarizeOnPage([])).toEqual({ total: 0, good: 0, warn: 0, bad: 0 })
   })
 })
