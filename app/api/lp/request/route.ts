@@ -153,8 +153,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '요청 처리 중 오류가 발생했습니다' }, { status: 500 })
     }
 
-    // 결과는 /analyze/{도메인} 페이지에서 실시간으로 보여주므로 별도 이메일 발송하지 않음.
-    // 관리자 알림이 필요하면 Supabase 대시보드에서 lp_requests 테이블을 직접 모니터링.
+    // 신청자에게는 결과 이메일 발송 안 함 (/analyze/{도메인} 에서 실시간 노출).
+    // 단, 관리자에게는 신청 알림 이메일을 보내 운영 모니터링이 가능하게 한다.
+    try {
+      const { sendEmail } = await import('@/lib/email/send-email')
+      const { renderLpAdminNotifyEmail } = await import('@/lib/email/render')
+      const ADMIN_NOTIFY_EMAIL = 'vnfm0580@gmail.com'
+      const cachedTag = cached ? ' [캐시]' : ''
+      await sendEmail(
+        ADMIN_NOTIFY_EMAIL,
+        `[LP 신청${cachedTag}] ${cleanUrl} - ${trimmedKeyword}`,
+        renderLpAdminNotifyEmail({
+          url: cleanUrl,
+          keyword: trimmedKeyword,
+          email: normalizedEmail,
+          ip,
+          timestamp: now,
+        })
+      )
+    } catch (emailErr) {
+      console.error('[LP Request] 관리자 알림 이메일 실패 (무시):', emailErr)
+    }
 
     return NextResponse.json({
       success: true,
