@@ -312,7 +312,7 @@ export async function GET(request: Request) {
           console.error(`[SEO Analysis] LP 실패 (시도 ${retryCount}/2): ${lpReq.id}`, err.message)
 
           if (retryCount >= 2) {
-            // 2회 실패 → failed 상태로 변경 (더 이상 재시도 안 함)
+            // 2회 실패 → failed 상태로 변경 (결과 페이지에서 실패 안내 노출)
             await adminClient
               .from('lp_requests')
               .update({
@@ -320,23 +320,6 @@ export async function GET(request: Request) {
                 seo_report_data: { _retryCount: retryCount, _lastError: err.message },
               })
               .eq('id', lpReq.id)
-
-            // 실패 안내 이메일 발송
-            try {
-              const { sendEmail } = await import('@/lib/email/send-email')
-              const { renderLpAnalysisFailedEmail } = await import('@/lib/email/render')
-              await sendEmail(
-                lpReq.email,
-                'SEO 진단 요청을 처리할 수 없었습니다 - 백링크샵',
-                renderLpAnalysisFailedEmail({
-                  email: lpReq.email,
-                  url: lpReq.url,
-                  keyword: lpReq.keyword,
-                })
-              )
-            } catch (emailErr: any) {
-              console.error(`[SEO Analysis] LP 실패 안내 이메일 발송 실패:`, emailErr.message)
-            }
           } else {
             // 재시도 카운트 기록 후 pending_analysis로 되돌림
             await adminClient

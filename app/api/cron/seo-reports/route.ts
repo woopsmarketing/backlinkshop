@@ -154,83 +154,26 @@ export async function GET(request: Request) {
       }
     }
 
-    // ── LP 비로그인 요청 리포트 발송 ──
-    const { data: lpTargets } = await adminClient
+    // ── LP 비로그인 요청: 이메일 미발송, 결과는 /analyze/{도메인} 페이지에서 노출 ──
+    // processing 상태 + seo_report_data 있는 레코드를 그대로 completed 로 마감.
+    const { data: lpClaimed } = await adminClient
       .from('lp_requests')
-      .select('id')
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('status', 'processing')
       .not('seo_report_data', 'is', null)
       .lt('analyzed_at', twoMinutesAgo)
-      .limit(5)
+      .select('id')
 
-    let lpProcessed = 0
-    let lpFailed = 0
-
-    if (lpTargets && lpTargets.length > 0) {
-      const lpIds = lpTargets.map(r => r.id)
-      const { data: lpClaimed } = await adminClient
-        .from('lp_requests')
-        .update({ status: 'sending_report' })
-        .in('id', lpIds)
-        .eq('status', 'processing')
-        .select('id, url, keyword, email, seo_report_data, created_at')
-
-      if (lpClaimed) {
-        for (const lpReq of lpClaimed) {
-          try {
-            const reportData = lpReq.seo_report_data as {
-              score: number | null
-              analysisHtml: string
-              parsedData: ParsedSeo
-              competitorData?: import('@/lib/competitor-analyzer').CompetitorAnalysis | null
-            }
-
-            console.log(`[SEO Reports] LP 이메일 발송: ${lpReq.id} → ${lpReq.email}`)
-
-            await sendEmail(
-              lpReq.email,
-              '온페이지 SEO 점검 결과가 준비되었습니다 - 백링크샵',
-              renderSeoReportEmail({
-                customerEmail: lpReq.email,
-                orderId: lpReq.id,
-                siteUrl: lpReq.url,
-                keywords: lpReq.keyword,
-                score: reportData.score,
-                analysisHtml: reportData.analysisHtml,
-                parsedData: reportData.parsedData,
-                competitorData: reportData.competitorData || null,
-              })
-            )
-
-            await adminClient
-              .from('lp_requests')
-              .update({
-                status: 'completed',
-                completed_at: new Date().toISOString(),
-              })
-              .eq('id', lpReq.id)
-
-            console.log('✅ LP 리포트 발송 완료:', { id: lpReq.id, email: lpReq.email })
-            lpProcessed++
-          } catch (err) {
-            console.error('❌ LP 리포트 발송 실패:', { id: lpReq.id, error: err })
-            await adminClient
-              .from('lp_requests')
-              .update({ status: 'processing' })
-              .eq('id', lpReq.id)
-              .eq('status', 'sending_report')
-            lpFailed++
-          }
-        }
-      }
+    const lpProcessed = lpClaimed?.length ?? 0
+    if (lpProcessed > 0) {
+      console.log(`✅ LP 분석 ${lpProcessed}건 completed 로 마감 (이메일 미발송)`)
     }
 
     return NextResponse.json({
-      message: `Processed ${processed} reports + ${lpProcessed} LP reports`,
+      message: `Processed ${processed} reports + ${lpProcessed} LP completed`,
       processed,
       failed,
       lpProcessed,
-      lpFailed,
       total: pendingOrders.length,
     })
   } catch (error) {
