@@ -156,8 +156,49 @@ export function LPHeroForm() {
             htmlFor="keyword"
             className="block text-left text-sm text-gray-700 mb-2 font-semibold"
           >
-            핵심 키워드 1개
+            상위노출 노리는 메인 키워드 1개
           </label>
+
+          {/* 키워드 작성 가이드 — 광범위 키워드 입력 방지 */}
+          <div className="mb-3 rounded-xl bg-orange-50 border border-orange-200 p-3 text-xs leading-relaxed">
+            <p className="text-orange-800 font-semibold mb-2 flex items-center gap-1.5">
+              <svg
+                className="w-3.5 h-3.5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              실제로 검색될 만한 구체적인 키워드를 적어주세요
+            </p>
+            <div className="space-y-1.5 text-gray-700">
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex-shrink-0 mt-0.5">
+                  O
+                </span>
+                <span>
+                  <b className="text-gray-900">좋은 예:</b> 강남 인테리어 시공, 무직자 소액대출,
+                  30대 남성 다이어트, 부산 카드결제 단말기
+                </span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex-shrink-0 mt-0.5">
+                  X
+                </span>
+                <span>
+                  <b className="text-gray-900">피해주세요:</b> 대출, 스포츠, 축구, 카드, 정치
+                  <span className="text-gray-500"> (너무 광범위해서 분석 정확도가 떨어집니다)</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="relative mb-4">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <svg
@@ -179,7 +220,7 @@ export function LPHeroForm() {
               type="text"
               value={keyword}
               onChange={e => setKeyword(e.target.value)}
-              placeholder="예: 인테리어 소품"
+              placeholder="예: 강남 인테리어 시공"
               required
               disabled={busy}
               className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
