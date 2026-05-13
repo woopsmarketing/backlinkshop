@@ -109,6 +109,12 @@ export function LPHeroForm() {
             </span>
           </div>
 
+          {/* 폼 전체 플로우 안내 (헤더 알약과 역할 분리: 알약=입력시간, 이 줄=전체플로우) */}
+          <p className="text-xs text-gray-500 text-center mb-5 leading-relaxed">
+            이메일 입력 <span className="text-gray-300">→</span> 즉시 요약 결과 화면{' '}
+            <span className="text-gray-300">→</span> 10분 안에 상세 리포트 메일 발송
+          </p>
+
           {/* 에러 메시지 */}
           {step === 'error' && errorMsg && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
@@ -287,8 +293,10 @@ export function LPHeroForm() {
             )}
           </button>
 
-          <p className="text-center text-xs text-gray-500 mt-3">
-            제출 즉시 결과 페이지로 이동합니다 · 분석 결과는 이메일로도 전송됩니다
+          <p className="text-center text-xs text-gray-500 mt-3 leading-relaxed">
+            광고·자동 결제·영업 전화 없습니다.
+            <br />
+            도움이 필요하다고 직접 알려주신 분에게만 연락드립니다.
           </p>
 
           {/* 구분선 */}
@@ -302,9 +310,7 @@ export function LPHeroForm() {
           </div>
 
           {/* 텔레그램 1:1 문의 */}
-          <p className="text-center text-xs text-gray-500 mb-3">
-            구글 상위노출에 필요한 모든 서비스를 제공합니다
-          </p>
+          <p className="text-center text-xs text-gray-500 mb-3">지금 바로 상담받고 싶으시다면</p>
           <a
             href="https://t.me/goat82"
             target="_blank"

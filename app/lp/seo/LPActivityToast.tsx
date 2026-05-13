@@ -3,10 +3,7 @@
 import { useState, useEffect } from 'react'
 
 const KEYWORDS = [
-  '스포츠중계',
-  '베팅사이트',
-  '여성알바',
-  '강남출장',
+  // 기존 정상 키워드 16개
   '인테리어 소품',
   '강남 피부과',
   '프로젝트 관리 툴',
@@ -23,9 +20,27 @@ const KEYWORDS = [
   '중고차 매매',
   '네일 아트',
   '필라테스',
+  // 신규: 의료
+  '한의원',
+  '안과',
+  '정형외과',
+  // 신규: 교육
+  '수학 학원',
+  '영어 과외',
+  // 신규: 인테리어 확장
+  '카페 인테리어',
+  '음식점 인테리어',
+  // 신규: B2B (전문직 비중 조정 — 변호사 상담 유지 + 세무사 추가, 노무사는 제외)
+  'B2B 마케팅',
+  '세무사',
+  // 신규: 운동·레저
+  '골프 레슨',
+  '요가',
+  '크로스핏',
 ]
 
 const TIMES = ['방금 전', '1분 전', '2분 전', '3분 전']
+const MAX_TOASTS_PER_SESSION = 4
 
 export function LPActivityToast() {
   const [current, setCurrent] = useState<{ keyword: string; time: string } | null>(null)
@@ -33,8 +48,12 @@ export function LPActivityToast() {
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
+    let count = 0
 
     const showNext = () => {
+      if (count >= MAX_TOASTS_PER_SESSION) return
+      count += 1
+
       const keyword = KEYWORDS[Math.floor(Math.random() * KEYWORDS.length)]
       const time = TIMES[Math.floor(Math.random() * TIMES.length)]
       setCurrent({ keyword, time })
@@ -43,12 +62,12 @@ export function LPActivityToast() {
       // Hide after 4 seconds
       setTimeout(() => setShow(false), 4000)
 
-      // Schedule next one in 15-25 seconds
-      timeout = setTimeout(showNext, 15000 + Math.random() * 10000)
+      // Schedule next one in 40-60 seconds
+      timeout = setTimeout(showNext, 40000 + Math.random() * 20000)
     }
 
-    // First one after 3 seconds
-    timeout = setTimeout(showNext, 3000)
+    // First one after 5 seconds
+    timeout = setTimeout(showNext, 5000)
 
     return () => clearTimeout(timeout)
   }, [])

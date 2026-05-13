@@ -263,66 +263,41 @@ export default function LPSeoPage() {
         </div>
       </section>
 
-      {/* ── SECTION 3: 문제 인식 (손실 회피) ── */}
-      <section className="py-16 sm:py-24 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-orange-600 font-semibold text-sm mb-2">왜 SEO 진단이 필요한가요?</p>
-            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
-              검색 2페이지 이후 사이트는
-              <br />
-              <span className="text-red-500">사실상 존재하지 않습니다</span>
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
-              구글 검색 사용자의 91.5%는 1페이지에서 클릭을 완료합니다. 당신의 사이트가 2페이지
-              이하라면, 매일 잠재 고객을 경쟁사에게 빼앗기고 있습니다.
+      {/* ── SECTION 2.5: "왜 무료냐" 안심 박스 (의심 차단) ── */}
+      <section className="py-12 sm:py-16 px-4 bg-orange-50/50">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-2xl border border-orange-100 shadow-sm p-6 sm:p-10">
+            <p className="text-gray-400 font-semibold text-xs uppercase tracking-wider mb-2">
+              자주 받는 질문
             </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-8 items-center">
-            {/* 왼쪽: 시각적 비교 */}
-            <div className="space-y-5">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-semibold text-gray-900">1페이지 (1~10위)</span>
-                  <span className="text-blue-600 font-bold text-lg">91.5%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-5">
-                  <div
-                    className="bg-gradient-to-r from-blue-600 to-cyan-500 h-5 rounded-full flex items-center justify-end pr-3"
-                    style={{ width: '91.5%' }}
-                  >
-                    <span className="text-xs text-white font-semibold">클릭의 대부분</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-semibold text-gray-900">2페이지 (11~20위)</span>
-                  <span className="text-orange-500 font-bold text-lg">4.8%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-5">
-                  <div className="bg-orange-400 h-5 rounded-full" style={{ width: '4.8%' }} />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-semibold text-gray-900">3페이지 이후</span>
-                  <span className="text-red-500 font-bold text-lg">0.63%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-5">
-                  <div className="bg-red-400 h-5 rounded-full" style={{ width: '2%' }} />
-                </div>
-              </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+              왜 무료로 제공하나요?
+            </h2>
+            <div className="space-y-4 text-gray-600 leading-relaxed text-[15px] sm:text-base">
+              <p>
+                진단은 어디가 막혔는지를 짚는 작업입니다. 결과를 보면 두 가지로 나뉩니다. 직접
+                적용해서 해결되는 경우와, 구조적으로 도움이 필요한 경우.
+              </p>
+              <p>
+                저희는 후자에 해당하는 분들과만 따로 일합니다. 그래서 진단 자체는 비용을 받지
+                않습니다.
+              </p>
+              <p>
+                회원가입·카드 등록·자동 결제는 없습니다. 원치 않으시면 보고서만 받고 끝내셔도
+                됩니다.
+              </p>
             </div>
 
-            {/* 오른쪽: 임팩트 카드 */}
-            <div className="space-y-4">
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center flex-shrink-0">
+            {/* 안심 알약 4개 */}
+            <div className="flex flex-wrap gap-2 mt-7">
+              {['회원가입 없음', '카드 등록 없음', '자동 결제 없음', '원치 않으면 연락 없음'].map(
+                label => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100"
+                  >
                     <svg
-                      className="w-5 h-5 text-red-500"
+                      className="w-3.5 h-3.5"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -330,20 +305,109 @@ export default function LPSeoPage() {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
                       />
                     </svg>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">매출 기회 손실</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      2페이지 사이트는 1페이지 대비 클릭률이{' '}
-                      <strong className="text-red-500">95% 낮습니다</strong>
-                    </p>
+                    {label}
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 3: 매출이 안 나는 사이트의 3가지 막힘 (진단 톤) ── */}
+      <section className="py-16 sm:py-24 px-4 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-orange-600 font-semibold text-sm mb-2">왜 매출이 안 나는가</p>
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-4">
+              매출이 안 나는 사이트는
+              <br />
+              <span className="text-orange-600">보통 3가지 중 하나입니다</span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              추측해서 백링크부터 사거나 광고비를 늘리면, 돈은 쓰고 결과는 안 나옵니다. 어디가
+              막혔는지부터 짚는 게 먼저입니다.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-5 gap-8 items-start">
+            {/* 왼쪽: 3가지 막힘 카드 (lg:col-span-3) */}
+            <div className="lg:col-span-3 space-y-4">
+              {[
+                {
+                  num: '1',
+                  title: '검색에 안 잡힘',
+                  sub: '인덱싱·기술 SEO 문제',
+                  symptom: '구글에 사이트 이름을 쳐도 안 나옴, 페이지가 색인되지 않음',
+                  fix: '기술 SEO 점검부터',
+                  accent: 'orange',
+                },
+                {
+                  num: '2',
+                  title: '검색에 잡히는데 클릭이 안 됨',
+                  sub: '메타·제목 문제',
+                  symptom: '노출은 되는데 클릭률(CTR) 1% 미만',
+                  fix: '메타태그·제목 구조 재설계',
+                  accent: 'amber',
+                },
+                {
+                  num: '3',
+                  title: '클릭은 되는데 문의로 안 이어짐',
+                  sub: '콘텐츠·신뢰 문제',
+                  symptom: '방문자는 있는데 문의·구매 전환이 거의 없음',
+                  fix: '콘텐츠 신뢰 구조 개선',
+                  accent: 'blue',
+                },
+              ].map(item => (
+                <div
+                  key={item.num}
+                  className="bg-white rounded-xl p-5 sm:p-6 shadow-sm border border-gray-100"
+                >
+                  <div className="flex items-start gap-4">
+                    <span
+                      className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-extrabold text-lg ${
+                        item.accent === 'orange'
+                          ? 'bg-orange-50 text-orange-600'
+                          : item.accent === 'amber'
+                            ? 'bg-amber-50 text-amber-600'
+                            : 'bg-blue-50 text-blue-600'
+                      }`}
+                    >
+                      {item.num}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-base sm:text-lg leading-tight">
+                        {item.title}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5 font-semibold uppercase tracking-wider">
+                        {item.sub}
+                      </p>
+                      <div className="mt-3 space-y-2 text-sm">
+                        <div className="flex items-start gap-2">
+                          <span className="text-gray-400 font-semibold flex-shrink-0 w-12">
+                            증상
+                          </span>
+                          <span className="text-gray-700">{item.symptom}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-gray-400 font-semibold flex-shrink-0 w-12">
+                            해결
+                          </span>
+                          <span className="text-gray-900 font-semibold">{item.fix}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+
+            {/* 오른쪽: 진단 톤 카드 3개 (lg:col-span-2) */}
+            <div className="lg:col-span-2 space-y-4">
               <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center flex-shrink-0">
@@ -357,15 +421,41 @@ export default function LPSeoPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                       />
                     </svg>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">시간이 지날수록 불리</p>
+                    <p className="font-semibold text-gray-900">
+                      어디가 막혔는지 모르면 광고비만 쌓입니다
+                    </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      경쟁사가 SEO를 강화할수록{' '}
-                      <strong className="text-orange-500">격차는 매일 벌어집니다</strong>
+                      원인 없이 비용을 늘리는 건 가장 비싼 길입니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      className="w-5 h-5 text-amber-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">원인을 찾으면 우선순위가 보입니다</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      막힌 지점을 알면, 어디부터 손볼지가 명확해집니다.
                     </p>
                   </div>
                 </div>
@@ -388,10 +478,9 @@ export default function LPSeoPage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">해결의 첫 걸음</p>
+                    <p className="font-semibold text-gray-900">정확한 진단이 가장 빠른 길입니다</p>
                     <p className="text-sm text-gray-500 mt-1">
-                      정확한 진단 없이는 어디를 고쳐야 하는지{' '}
-                      <strong className="text-blue-500">알 수 없습니다</strong>
+                      추측이 아니라 데이터로 짚으면 시행착오가 줄어듭니다.
                     </p>
                   </div>
                 </div>
@@ -479,26 +568,31 @@ export default function LPSeoPage() {
             ))}
           </div>
 
-          {/* 가격 비교 + CTA */}
-          <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-8 sm:p-10 text-center text-white">
-            <div className="flex items-center justify-center gap-4 mb-4">
-              <div>
-                <p className="text-sm text-orange-200">일반 SEO 진단 비용</p>
-                <p className="text-2xl font-bold line-through text-orange-200">30~50만원</p>
+          {/* 진단 안내 + CTA (차분한 분석 톤) */}
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-8 sm:p-10 text-white">
+            <div className="max-w-3xl mx-auto text-center sm:text-left sm:grid sm:grid-cols-5 sm:gap-8 sm:items-center">
+              <div className="sm:col-span-2 mb-5 sm:mb-0">
+                <p className="text-2xl sm:text-3xl font-extrabold leading-snug">
+                  진단은 어디가
+                  <br className="hidden sm:block" /> 막혔는지 짚는 일입니다
+                </p>
               </div>
-              <div className="text-3xl">→</div>
-              <div>
-                <p className="text-sm text-orange-100">백링크샵</p>
-                <p className="text-3xl font-extrabold">무료</p>
+              <div className="sm:col-span-3 text-orange-50 text-[15px] leading-relaxed">
+                이 단계에서 비용을 받지 않는 이유는, 진단 결과를 보고 직접 해결하실 분과 도움이
+                필요하신 분이 나뉘기 때문입니다. 어느 쪽인지부터 같이 확인해보세요.
               </div>
             </div>
-            <a
-              href="#hero-form"
-              className="inline-flex items-center justify-center px-10 py-5 text-xl font-bold rounded-xl bg-white text-orange-600 hover:bg-gray-100 hover:scale-105 shadow-2xl transition-all"
-            >
-              무료 SEO 진단 받기
-            </a>
-            <p className="text-orange-200 text-sm mt-3">이메일만 입력하면 10분 안에 리포트 발송</p>
+            <div className="text-center mt-8">
+              <a
+                href="#hero-form"
+                className="inline-flex items-center justify-center px-10 py-5 text-xl font-bold rounded-xl bg-white text-orange-600 hover:bg-gray-100 hover:scale-105 shadow-2xl transition-all"
+              >
+                무료 진단부터 시작하기
+              </a>
+              <p className="text-orange-100 text-sm mt-3">
+                이메일만 입력하면 10분 안에 리포트 발송
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -683,6 +777,66 @@ export default function LPSeoPage() {
                   </div>
                 </div>
 
+                {/* 후일담 박스: 리포트 마지막 페이지 미리보기 */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />이 3가지를 먼저
+                    고치면 예상되는 변화
+                  </p>
+                  <div className="space-y-2.5">
+                    {[
+                      {
+                        fix: '메타태그 최적화',
+                        result: '검색 결과 클릭률 약 1.5~2배',
+                      },
+                      {
+                        fix: '페이지 속도 개선',
+                        result: '이탈률 20~30% 감소',
+                      },
+                      {
+                        fix: '우선순위 백링크 10건',
+                        result: '3개월 내 1페이지 진입 가능 키워드 3~5개',
+                      },
+                    ].map(item => (
+                      <div
+                        key={item.fix}
+                        className="flex items-start gap-3 py-2 px-3 rounded-lg bg-orange-50/60 border border-orange-100"
+                      >
+                        <svg
+                          className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M13 7l5 5m0 0l-5 5m5-5H6"
+                          />
+                        </svg>
+                        <div className="text-sm">
+                          <span className="text-gray-700">{item.fix}</span>
+                          <span className="text-gray-400 mx-1.5">→</span>
+                          <span className="text-gray-900 font-semibold">{item.result}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 p-4 rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100">
+                    <p className="text-sm text-gray-800 leading-relaxed">
+                      동일 업종 컨설팅 사례에서{' '}
+                      <strong className="text-orange-600">
+                        3~6개월 내 월 문의 수가 1.5~3배 사이로 증가
+                      </strong>
+                      한 케이스가 다수입니다. 보고서에는 키워드별 구체적 예상치가 함께 포함됩니다.
+                    </p>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-3 text-center">
+                    * 실제 결과는 업종·키워드 경쟁도에 따라 달라질 수 있습니다
+                  </p>
+                </div>
+
                 {/* 흐릿한 추가 영역 (더 많은 내용이 있다는 암시) */}
                 <div className="relative">
                   <div className="space-y-2 opacity-30 blur-[1px]">
@@ -716,38 +870,108 @@ export default function LPSeoPage() {
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-orange-600 rounded-full filter blur-[150px] opacity-20"
           aria-hidden="true"
         />
-        <div className="relative max-w-2xl mx-auto text-center">
-          <p className="text-red-400 font-semibold text-sm mb-3">
-            매일 놓치고 있는 고객이 있습니다
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">
-            경쟁사는 이미 SEO를 하고 있습니다.
-            <br />
-            당신은요?
-          </h2>
-          <p className="text-gray-300 mb-8 max-w-lg mx-auto">
-            하루가 지날수록 경쟁사와의 격차는 벌어집니다.
-            <br />
-            30초면 내 사이트의 현재 상태를 무료로 확인할 수 있습니다.
-          </p>
+        <div className="relative max-w-3xl mx-auto">
+          <div className="text-center">
+            <p className="text-orange-400 font-semibold text-sm mb-3">다음 단계</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">두 가지 길이 있습니다</h2>
+            <p className="text-gray-300 mb-10 max-w-xl mx-auto">
+              어느 쪽이 맞을지는, 진단 결과를 보고 결정하셔도 늦지 않습니다.
+            </p>
+          </div>
 
-          <a
-            href="#hero-form"
-            className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-2xl hover:shadow-orange-500/25 hover:scale-105 transition-all mb-4"
-          >
-            무료 SEO 진단 시작하기
-          </a>
+          {/* 두 가지 길 카드 */}
+          <div className="grid sm:grid-cols-2 gap-4 mb-10">
+            {/* 좌: 직접 해결하기 */}
+            <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-white/10">
+              <div className="w-11 h-11 rounded-xl bg-gray-700/60 flex items-center justify-center mb-4">
+                <svg
+                  className="w-5 h-5 text-gray-200"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
+                  />
+                </svg>
+              </div>
+              <p className="text-lg font-bold text-white mb-3">직접 해결하기</p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-500 mt-0.5">·</span>
+                  <span>보고서를 받고 개선 항목을 직접 적용</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-500 mt-0.5">·</span>
+                  <span>시간은 들지만 비용은 0원</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-500 mt-0.5">·</span>
+                  <span>보고서만 받고 끝내셔도 됩니다</span>
+                </li>
+              </ul>
+            </div>
 
-          <p className="text-gray-400 text-sm mb-12">
-            이메일 입력만으로 10분 안에 리포트 발송 · 회원가입 불필요
-          </p>
+            {/* 우: 함께 진행하기 (좌와 동등 비중을 위해 강조 약화) */}
+            <div className="bg-white/5 backdrop-blur rounded-2xl p-6 border border-orange-400/20">
+              <div className="w-11 h-11 rounded-xl bg-orange-500/15 flex items-center justify-center mb-4">
+                <svg
+                  className="w-5 h-5 text-orange-300/90"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <p className="text-lg font-bold text-white mb-3">함께 진행하기</p>
+              <ul className="space-y-2 text-sm text-gray-300">
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-500 mt-0.5">·</span>
+                  <span>매출 직결 항목 3개를 1~3개월 내 같이 처리</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-500 mt-0.5">·</span>
+                  <span>진단 결과 보고 필요할 때만 결정</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-500 mt-0.5">·</span>
+                  <span>부담 없이 상담부터 가능합니다</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* 통합 CTA */}
+          <div className="text-center">
+            <p className="text-gray-200 mb-4 text-base sm:text-lg">
+              어느 쪽이든, 먼저 진단부터 받아보세요
+            </p>
+            <a
+              href="#hero-form"
+              className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-2xl hover:shadow-orange-500/25 hover:scale-105 transition-all mb-4"
+            >
+              무료 SEO 진단 시작하기
+            </a>
+            <p className="text-gray-400 text-sm mb-12">
+              이메일 입력만으로 10분 안에 리포트 발송 · 회원가입 불필요
+            </p>
+          </div>
 
           {/* FAQ */}
           <div className="text-left space-y-4 max-w-lg mx-auto">
             {[
               {
                 q: '정말 무료인가요?',
-                a: '네, 회원가입도 카드 등록도 필요 없습니다. 이메일 주소만 입력하면 무료로 진단 리포트를 받아보실 수 있습니다.',
+                a: '네, 회원가입·카드 등록·자동 결제 모두 없습니다. 이메일 주소만 입력하면 됩니다. 진단 결과를 보고 도움이 필요하다고 명시하신 분에게만 추가 안내를 드립니다.',
               },
               {
                 q: '결과는 어떻게 받나요?',
