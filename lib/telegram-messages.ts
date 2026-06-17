@@ -7,6 +7,7 @@
 
 import { escapeHtml, type TelegramInlineKeyboard } from './telegram'
 import { calculateCompetitorGap, type CompetitorMetrics, type CompetitorGap } from './lp-metrics'
+import type { AnalyzeV2Result, AiVisibilityResult, KeywordMetric, TopRankedKeyword } from './vebapi'
 
 export type LpRequestRow = {
   id: string
@@ -651,4 +652,172 @@ function inferUrgentActions(report: Record<string, unknown>): string[] {
   if (actions.length === 0) actions.push('전반적 SEO 점검 후 우선순위 잡기')
 
   return actions.slice(0, 3)
+}
+
+// ─────────────────────────────────────────────────────────────
+// 정밀 분석 메시지 빌더 (R3-C)
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 키워드 정밀 분석 — 입력 키워드 + 관련 키워드 전체 + 도메인 기존 노출 키워드.
+ * 페이지에서 잠겨 있던 데이터를 텔레그램에서 풀로 공개.
+ */
+export function buildKeywordDetailMessage(
+  inputKeyword: string | null,
+  singleKeyword: KeywordMetric | null,
+  related: KeywordMetric[],
+  topRanked: TopRankedKeyword[]
+): string {
+  if (!singleKeyword && related.length === 0 && topRanked.length === 0) return ''
+
+  let text = `🔓 <b>키워드 정밀 분석 (전체 공개)</b>\n\n`
+
+  if (singleKeyword && inputKeyword) {
+    text += `🎯 <b>입력하신 키워드:</b> ${escapeHtml(singleKeyword.text)}\n`
+    text += `• 월 검색량: <b>${(singleKeyword.searchVolume ?? 0).toLocaleString('ko-KR')}회</b>\n`
+    text += `• CPC: $${singleKeyword.cpc?.toFixed(2) ?? '—'}\n`
+    text += `• 경쟁도: <b>${competitionKo(singleKeyword.competition)}</b>\n\n`
+  }
+
+  if (related.length > 0) {
+    const sorted = [...related].sort((a, b) => (b.searchVolume ?? 0) - (a.searchVolume ?? 0))
+    text += `━━━━━━━━━━━━━━━\n`
+    text += `📋 <b>매출 기회 관련 키워드 ${sorted.length}개</b> (전체 공개)\n\n`
+    sorted.slice(0, 15).forEach((k, i) => {
+      const vol = (k.searchVolume ?? 0).toLocaleString('ko-KR')
+      text += `${i + 1}. <b>${escapeHtml(k.text)}</b>\n`
+      text += `   월 ${vol}회 · ${competitionKo(k.competition)}${k.cpc ? ` · CPC $${k.cpc.toFixed(2)}` : ''}\n`
+    })
+    text += `\n`
+  }
+
+  if (topRanked.length > 0) {
+    const sorted = [...topRanked].sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999))
+    const inTop10 = sorted.filter(k => k.rank !== null && k.rank <= 10).length
+    const nearTop10 = sorted.filter(k => k.rank !== null && k.rank >= 11 && k.rank <= 20)
+
+    text += `━━━━━━━━━━━━━━━\n`
+    text += `📈 <b>이미 구글에 노출 중인 키워드 ${sorted.length}개</b>\n`
+    text += `• 1페이지 진입: ${inTop10}개\n`
+    text += `• 11~20위 (진입 임박): ${nearTop10.length}개 ⚡\n\n`
+
+    if (nearTop10.length > 0) {
+      text += `<b>🔥 1페이지 진입이 가장 빠른 키워드:</b>\n`
+      nearTop10.slice(0, 5).forEach(k => {
+        text += `• <b>${escapeHtml(k.keyword)}</b> (현재 ${k.rank}위, 월 ${(k.searchVolume ?? 0).toLocaleString('ko-KR')}회)\n`
+      })
+      text += `\n`
+    }
+
+    text += `<b>상위 노출 키워드 (TOP 10):</b>\n`
+    sorted.slice(0, 10).forEach(k => {
+      text += `• ${escapeHtml(k.keyword)} — ${k.rank}위 (월 ${(k.searchVolume ?? 0).toLocaleString('ko-KR')}회)\n`
+    })
+    text += `\n`
+  }
+
+  text += `━━━━━━━━━━━━━━━\n`
+  text += `💬 어떤 키워드부터 공략하면 매출이 가장 빨리 늘어날지, 회원님 사업 규모에 맞춰 직접 안내드릴게요.`
+
+  return text
+}
+
+/**
+ * AI 친화도 + 정밀 진단 6분류 + 우선순위 이슈 통합 메시지.
+ */
+export function buildAiAndPrecisionMessage(
+  aiVisibility: AiVisibilityResult | null,
+  analyzeV2: AnalyzeV2Result | null
+): string {
+  if (!aiVisibility && !analyzeV2) return ''
+
+  let text = `🔓 <b>AI SEO + 정밀 진단 (전체 공개)</b>\n\n`
+
+  if (aiVisibility && aiVisibility.overall !== null) {
+    text += `🤖 <b>AI 검색 친화도</b> (ChatGPT/Perplexity)\n`
+    text += `• 종합 점수: <b>${aiVisibility.overall}/100${aiVisibility.grade ? ` (${aiVisibility.grade}등급)` : ''}</b>\n`
+    if (aiVisibility.aiScrapable !== null) {
+      text += `• AI 크롤러 접근: ${aiVisibility.aiScrapable ? '✓ 가능' : '✗ 차단됨'}\n`
+    }
+    text += `\n`
+
+    if (aiVisibility.issues.length > 0) {
+      text += `<b>발견된 AI SEO 문제 ${aiVisibility.issues.length}개:</b>\n`
+      aiVisibility.issues.slice(0, 8).forEach(i => {
+        const sev = i.severity === 'high' ? '🔴' : i.severity === 'medium' ? '🟡' : '⚪'
+        text += `${sev} ${escapeHtml(i.description)}\n`
+      })
+      text += `\n`
+    }
+  }
+
+  if (analyzeV2) {
+    text += `━━━━━━━━━━━━━━━\n`
+    text += `⚙️ <b>정밀 진단 6분류 점수</b>\n`
+    if (analyzeV2.scores.overall !== null) {
+      text += `• 종합: <b>${analyzeV2.scores.overall}/100${analyzeV2.scores.grade ? ` (${analyzeV2.scores.grade}등급)` : ''}</b>\n`
+    }
+    const bucketLabels: Array<[string, number | null]> = [
+      ['성능', analyzeV2.scores.performance],
+      ['기술 SEO', analyzeV2.scores.technical],
+      ['온페이지', analyzeV2.scores.onpage],
+      ['보안', analyzeV2.scores.security],
+      ['AI 준비도', analyzeV2.scores.ai_readiness],
+      ['접근성', analyzeV2.scores.accessibility],
+    ]
+    bucketLabels
+      .filter(([, v]) => v !== null)
+      .forEach(([label, value]) => {
+        const v = value as number
+        const emoji = v >= 70 ? '🟢' : v >= 40 ? '🟡' : '🔴'
+        text += `${emoji} ${label}: <b>${Math.round(v)}</b>\n`
+      })
+    text += `\n`
+
+    if (analyzeV2.priorityIssues.length > 0) {
+      text += `<b>우선 개선 이슈 ${analyzeV2.priorityIssues.length}개:</b>\n`
+      analyzeV2.priorityIssues.slice(0, 8).forEach(i => {
+        const sev = i.severity === 'high' ? '🔴' : i.severity === 'medium' ? '🟡' : '⚪'
+        text += `${sev} ${escapeHtml(i.issue)}`
+        if (i.fix) text += ` — <i>${escapeHtml(i.fix)}</i>`
+        text += `\n`
+      })
+      text += `\n`
+    }
+  }
+
+  text += `━━━━━━━━━━━━━━━\n`
+  text += `💬 이 이슈들을 어떤 순서로 고치면 매출 상승이 가장 빠른지, 회원님 도메인 상태 보고 직접 추천드릴게요.`
+
+  return text
+}
+
+/**
+ * 매출 강조 마무리 멘트 (자동 발송 마지막).
+ */
+export function buildClosingPitch(domain: string): string {
+  return (
+    `━━━━━━━━━━━━━━━\n` +
+    `💎 <b>${escapeHtml(domain)} 매출 상승 로드맵</b>\n\n` +
+    `여기까지 받으신 데이터를 토대로:\n` +
+    `✓ <b>1순위 작업과 예상 매출 증가분</b>\n` +
+    `✓ <b>3~6개월 내 1페이지 진입 가능 키워드 3~5개</b>\n` +
+    `✓ <b>회원님 업종의 실제 매출 상승 사례</b>\n` +
+    `✓ <b>작업별 정확한 견적</b>\n\n` +
+    `이 4가지를 회원님 도메인 상태/사업 규모에 맞춰 운영자가 직접 산출해드립니다.\n\n` +
+    `편하게 질문해주세요 — 평균 응답 5~15분 ☺️`
+  )
+}
+
+function competitionKo(c: 'Low' | 'Medium' | 'High' | null): string {
+  switch (c) {
+    case 'Low':
+      return '낮음 ⭐'
+    case 'Medium':
+      return '중간'
+    case 'High':
+      return '높음'
+    default:
+      return '—'
+  }
 }

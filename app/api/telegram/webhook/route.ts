@@ -25,6 +25,9 @@ import {
   buildMenuContact,
   buildMenuQuote,
   buildPersistentMenuKeyboard,
+  buildKeywordDetailMessage,
+  buildAiAndPrecisionMessage,
+  buildClosingPitch,
   buildAdminAlertForNewSession,
   buildAdminAlertForUserMessage,
   buildAdminAlertForDiscovery,
@@ -33,6 +36,13 @@ import {
   type TelegramFromPayload,
   type TelegramUserRow,
 } from '@/lib/telegram-messages'
+import {
+  getAnalyzeV2,
+  getSingleKeyword,
+  getRelatedKeywords,
+  getTopRankedKeywords,
+  getAiVisibility,
+} from '@/lib/vebapi'
 import { extractDomain } from '@/lib/domain'
 
 export const dynamic = 'force-dynamic'
@@ -291,6 +301,8 @@ async function handleStart(
 
   // 응답 분기
   if (lp && session) {
+    const domain = extractDomain(lp.url)
+
     const { text, keyboard } = buildUserWelcomeWithReport(lp, session)
     await sendMessage({
       chatId,
@@ -299,7 +311,41 @@ async function handleStart(
       disableWebPagePreview: true,
     })
 
-    // discovery question — 약간의 텀을 두고
+    // 정밀 데이터 (페이지에서 잠겼던 것) 자동 발송
+    try {
+      const [singleKw, related, topRanked, ai, av2] = await Promise.all([
+        lp.keyword ? safeAwait(() => getSingleKeyword(lp.keyword, 'kr')) : Promise.resolve(null),
+        lp.keyword
+          ? safeAwait(() => getRelatedKeywords(lp.keyword, 'kr')).then(r => r ?? [])
+          : Promise.resolve([] as Awaited<ReturnType<typeof getRelatedKeywords>>),
+        safeAwait(() => getTopRankedKeywords(domain)).then(r => r ?? []),
+        safeAwait(() => getAiVisibility(domain)),
+        safeAwait(() => getAnalyzeV2(domain)),
+      ])
+
+      // 키워드 정밀 분석 메시지
+      const kwText = buildKeywordDetailMessage(lp.keyword, singleKw, related, topRanked)
+      if (kwText) {
+        await sendMessage({ chatId, text: kwText, disableWebPagePreview: true })
+      }
+
+      // AI + 정밀 진단 메시지
+      const aiPrecisionText = buildAiAndPrecisionMessage(ai, av2)
+      if (aiPrecisionText) {
+        await sendMessage({ chatId, text: aiPrecisionText, disableWebPagePreview: true })
+      }
+
+      // 매출 강조 마무리
+      await sendMessage({
+        chatId,
+        text: buildClosingPitch(domain),
+        disableWebPagePreview: true,
+      })
+    } catch (err) {
+      console.error('[telegram/webhook] enrichment 발송 실패:', err)
+    }
+
+    // discovery question — 마지막에 행동 유도
     const discovery = buildDiscoveryQuestion()
     await sendMessage({
       chatId,
@@ -453,5 +499,14 @@ async function safeSendToAdmin(text: string) {
     await sendMessage({ chatId: adminId, text, disableWebPagePreview: true })
   } catch (err) {
     console.error('[telegram/webhook] admin 알림 실패:', err)
+  }
+}
+
+async function safeAwait<T>(fn: () => Promise<T | null>): Promise<T | null> {
+  try {
+    return await fn()
+  } catch (err) {
+    console.error('[telegram/webhook] safeAwait 실패:', err)
+    return null
   }
 }
