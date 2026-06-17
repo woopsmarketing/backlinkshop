@@ -34,6 +34,15 @@ export function LPHeroForm() {
       }
     }
 
+    // 텔레그램 세션 발급 시 광고그룹 추적용 ref 보존
+    if (typeof window !== 'undefined' && ref && ref !== '(none)') {
+      try {
+        sessionStorage.setItem('lp_ref', ref)
+      } catch {
+        /* ignore */
+      }
+    }
+
     // EC: 이메일 해시 → user_data 셋업 후 lp_form_submit 발화
     try {
       const emailHash = await sha256Email(cleanedEmail)

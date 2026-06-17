@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { sha256Email } from '@/lib/hash'
 import { trackTelegramClick, trackSetUser, LP_EMAIL_STORAGE_KEY } from '@/lib/gtag'
 
@@ -12,6 +13,8 @@ type Props = {
   className?: string
 }
 
+const FALLBACK_DEEPLINK = 'https://t.me/backlinkshop_seo_bot'
+
 export function AnalyzeTelegramCTA({
   domain,
   placement,
@@ -20,25 +23,65 @@ export function AnalyzeTelegramCTA({
   subLabel,
   className = '',
 }: Props) {
-  const handleClick = async () => {
-    if (typeof window === 'undefined') return
+  const [loading, setLoading] = useState(false)
 
-    // EC: LP에서 받았던 이메일이 sessionStorage에 있으면 해싱해서 user_data 셋업
-    let storedEmail = ''
+  const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    if (typeof window === 'undefined' || loading) return
+    setLoading(true)
+
+    // GA 트래킹 (이전 동작 유지)
     try {
-      storedEmail = sessionStorage.getItem(LP_EMAIL_STORAGE_KEY) || ''
-    } catch {
-      /* storage 차단 — 무시 */
-    }
-    if (storedEmail) {
+      let storedEmail = ''
       try {
-        const emailHash = await sha256Email(storedEmail)
-        trackSetUser(emailHash)
+        storedEmail = sessionStorage.getItem(LP_EMAIL_STORAGE_KEY) || ''
       } catch {
-        /* 해시 실패해도 이벤트는 발화 */
+        /* storage 차단 — 무시 */
+      }
+      if (storedEmail) {
+        try {
+          const emailHash = await sha256Email(storedEmail)
+          trackSetUser(emailHash)
+        } catch {
+          /* 해시 실패 무시 */
+        }
+      }
+      trackTelegramClick({ domain, placement })
+    } catch {
+      /* 트래킹 실패는 무시 */
+    }
+
+    // ref(광고그룹) 파악 — sessionStorage 에 저장된 LP ref 또는 URL 쿼리
+    let ref: string | null = null
+    try {
+      ref = sessionStorage.getItem('lp_ref')
+    } catch {
+      /* ignore */
+    }
+    if (!ref) {
+      try {
+        const params = new URLSearchParams(window.location.search)
+        ref = params.get('ref')
+      } catch {
+        /* ignore */
       }
     }
-    trackTelegramClick({ domain, placement })
+
+    // 세션 발급 후 deeplink 로 이동
+    try {
+      const res = await fetch('/api/telegram/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain, source: placement, ref }),
+      })
+      const data = await res.json().catch(() => null)
+      const deeplink = data?.deeplink || FALLBACK_DEEPLINK
+      window.open(deeplink, '_blank', 'noopener,noreferrer')
+    } catch {
+      window.open(FALLBACK_DEEPLINK, '_blank', 'noopener,noreferrer')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const base =
@@ -48,18 +91,21 @@ export function AnalyzeTelegramCTA({
 
   return (
     <a
-      href="https://t.me/goat82"
+      href={FALLBACK_DEEPLINK}
       target="_blank"
       rel="noopener noreferrer"
       onClick={handleClick}
-      className={`flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-base font-semibold transition-all ${base} ${className}`}
+      aria-busy={loading}
+      className={`flex w-full items-center justify-center gap-3 rounded-xl px-6 py-4 text-base font-semibold transition-all ${
+        loading ? 'opacity-70 cursor-wait' : ''
+      } ${base} ${className}`}
     >
       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
       </svg>
       <span className="flex flex-col items-start text-left leading-tight">
-        <span>{label}</span>
-        {subLabel && <span className="text-xs font-normal opacity-80">{subLabel}</span>}
+        <span>{loading ? '연결 중...' : label}</span>
+        {subLabel && !loading && <span className="text-xs font-normal opacity-80">{subLabel}</span>}
       </span>
     </a>
   )

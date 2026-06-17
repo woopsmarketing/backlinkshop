@@ -109,19 +109,21 @@ export function AnalyzePendingPoller({ domain, url, keyword, status }: Props) {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
-        <p className="mb-1 text-sm font-semibold text-emerald-900">분석을 기다리는 동안</p>
-        <p className="mb-4 text-sm leading-relaxed text-emerald-800">
-          <strong>도메인·키워드만 알려주시면</strong> 전문가가 가장 빠른 상위 노출 루트를 바로
-          제안해드립니다. 분석 결과가 나오기 전에 먼저 상담받으시는 분이 많아요.
-        </p>
-        <AnalyzeTelegramCTA
-          domain={domain}
-          placement="pending"
-          label="전문가에게 1:1 상담 요청"
-          subLabel="응답까지 보통 5~15분"
-        />
-      </section>
+      {elapsed >= 60 && (
+        <section className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 sm:p-7">
+          <p className="mb-1 text-sm font-semibold text-emerald-900">분석이 조금 길어지고 있어요</p>
+          <p className="mb-4 text-sm leading-relaxed text-emerald-800">
+            기다리기 어려우시면 <strong>도메인과 키워드만 알려주세요.</strong> 전문가가 사이트를
+            직접 확인하고 가장 빠른 상위 노출 루트를 제안드립니다.
+          </p>
+          <AnalyzeTelegramCTA
+            domain={domain}
+            placement="pending"
+            label="텔레그램에서 먼저 상담받기"
+            subLabel="응답까지 보통 5~15분 · 분석 결과는 그대로 받으실 수 있어요"
+          />
+        </section>
+      )}
     </div>
   )
 }
