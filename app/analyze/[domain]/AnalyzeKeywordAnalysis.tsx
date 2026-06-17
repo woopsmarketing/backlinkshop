@@ -70,12 +70,15 @@ export function AnalyzeKeywordAnalysis({
           키워드 정밀 분석
         </span>
         <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-          VebAPI 실시간
+          실시간 검색 데이터
         </span>
       </div>
-      <h2 className="mb-4 text-base font-bold text-slate-900 sm:text-lg">
+      <h2 className="mb-1 text-base font-bold text-slate-900 sm:text-lg">
         회원님 키워드의 시장 데이터
       </h2>
+      <p className="mb-4 text-xs text-slate-500">
+        구글 실제 검색량·CPC·경쟁도를 기반으로 키워드 가치를 측정했어요.
+      </p>
 
       {/* 사용자 입력 키워드 — 풀 공개 */}
       <div className="mb-5 rounded-xl border border-purple-200 bg-purple-50/40 p-4">

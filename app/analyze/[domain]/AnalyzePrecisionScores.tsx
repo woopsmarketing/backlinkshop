@@ -69,11 +69,13 @@ export function AnalyzePrecisionScores({ domain, data, loading }: Props) {
           정밀 진단
         </span>
         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
-          6분류 정밀 점수
+          6분류 종합 점수
         </span>
       </div>
-      <h2 className="mb-1 text-base font-bold text-slate-900 sm:text-lg">VebAPI 정밀 분석 점수</h2>
-      <p className="mb-5 text-xs text-slate-500">외부 SEO 진단 엔진으로 6개 분야 정밀 측정</p>
+      <h2 className="mb-1 text-base font-bold text-slate-900 sm:text-lg">백링크샵 정밀 SEO 점수</h2>
+      <p className="mb-5 text-xs text-slate-500">
+        성능·기술·온페이지·보안·AI 준비도·접근성 6가지를 따로 측정한 종합 등급
+      </p>
 
       {data.scores.overall !== null && (
         <div className="mb-5 flex items-center gap-4 rounded-xl bg-slate-50 p-4">

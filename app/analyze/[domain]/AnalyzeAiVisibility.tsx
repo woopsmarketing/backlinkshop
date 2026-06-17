@@ -148,13 +148,18 @@ export function AnalyzeAiVisibility({ domain, data, loading }: Props) {
 }
 
 function DimensionBar({ label, value }: { label: string; value: number }) {
-  const pct = Math.max(0, Math.min(100, value))
+  // VebAPI 의 5차원 점수가 0-20 스케일일 수 있어 자동 정규화
+  const max = value <= 25 ? 20 : 100
+  const pct = Math.max(0, Math.min(100, (value / max) * 100))
   const color = pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-500' : 'bg-red-500'
   return (
     <div>
       <div className="mb-1 flex items-center justify-between text-xs">
         <span className="font-semibold text-slate-700">{label}</span>
-        <span className="font-bold text-slate-900">{pct}</span>
+        <span className="font-bold text-slate-900">
+          {Math.round(value)}
+          <span className="text-slate-400">/{max}</span>
+        </span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-white">
         <div

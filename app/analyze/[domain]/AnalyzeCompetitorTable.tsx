@@ -40,12 +40,12 @@ const SECTIONS: Section[] = [
   },
   {
     title: '백링크 프로필',
-    description: 'Ahrefs · VebAPI 수집 기반 링크 양·질 지표',
+    description: '글로벌 SEO 데이터 기반 링크 양·질 지표',
     rows: [
       { label: 'Ahrefs 백링크', key: 'ahrefsBacklinks', format: 'number' },
       { label: '참조 도메인', key: 'ahrefsRefDomains', format: 'number' },
-      { label: 'VebAPI 백링크', key: 'backlinkTotal', format: 'number' },
-      { label: 'VebAPI 참조도메인', key: 'referringDomains', format: 'number' },
+      { label: '실측 백링크', key: 'backlinkTotal', format: 'number' },
+      { label: '실측 참조도메인', key: 'referringDomains', format: 'number' },
       { label: 'EDU 링크', key: 'majesticRefEdu', format: 'number' },
       { label: 'GOV 링크', key: 'majesticRefGov', format: 'number' },
     ],
