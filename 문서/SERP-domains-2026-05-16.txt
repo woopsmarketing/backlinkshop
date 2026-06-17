@@ -1,0 +1,184 @@
+# 유일 도메인 목록 (대형 플랫폼 + outlookindia 제외)
+# 총 89개 도메인  /  URL 105건 기준
+
+## 도메인만 (정렬: 노출 빈도 ↓, 이름 ↑)
+totohot.net
+scribd.com
+slotnara2.com
+visitorstv.com
+19bamalba.com
+9alba.co.kr
+acetop.co.kr
+attv24.com
+badalba.com
+bamfox.co.kr
+bbangtv.com
+bluelive77.com
+bubblealba.com
+charmjoun.co.kr
+choicealba.co.kr
+coktv1.com
+cu-tv.com
+ditto-style.com
+dodoanma.com
+dopaminemassage.clickn.co.kr
+exitmassage.com
+floweralba.com
+fox2.kr
+foxalba.com
+gomassage.clickn.co.kr
+grinmassage.com
+hlshop5.kr
+hometai25.uriweb.kr
+hulk24.com
+insamdome.com
+itsalbajob.com
+jgtv24.com
+jktv24.com
+kittyalba.com
+kr.slotsup.com
+ladyalba.co.kr
+linktr.ee
+litnmoa.co.kr
+lovealba.co.kr
+ltn.kr
+m.imbc.com
+massagego.clickn.co.kr
+maxim-anma.net
+msgcall.kr
+msggo.co.kr
+msghaja.com
+mt-catch.com
+mt-police07.com
+mtgal.com
+mtpolice.kr
+mukflix.com
+munito.co.kr
+musinsa.com
+namu.wiki
+njtv-01.com
+ohvely.net
+omaoma.kr
+pragmaticplay.com
+princessalba.com
+pulua.co.kr
+queenalba.net
+quick-tv.com
+rememberapp.co.kr
+rep111.isweb.co.kr
+replica.uriweb.kr
+royaltv01.com
+rpnara123.kr
+safetycheck.isweb.co.kr
+search.danawa.com
+search.gb.go.kr
+secondalba.kr
+seoulmassage.clickn.co.kr
+shs-dome5.com
+signatureanma.com
+slotboxx.com
+slotslot.clickn.co.kr
+slotsmoa03.com
+sportstoto.co.kr
+stake.com
+streamingcity.kr
+tethercasino.isweb.co.kr
+timecare24.uriweb.kr
+viptv24.com
+xn--9g3b5ay89a20c2sd.com
+xn--9g3b5az35c.kr
+xn--hg3b84gyf.com
+xn--hy1bu53asuh.com
+xn--hz2b29j7ogx9bb7g9ml9sc.isweb.co.kr
+xn--hz2b29jka982d57aq6frrj.isweb.co.kr
+
+## 상세 (빈도 + 해당 키워드)
+ 8x  totohot.net                                         [먹튀검증, 토토사이트]
+ 5x  scribd.com                                          [먹튀검증, 토토사이트]
+ 5x  slotnara2.com                                       [슬롯사이트]
+ 2x  visitorstv.com                                      [스포츠중계]
+ 1x  19bamalba.com                                       [밤알바]
+ 1x  9alba.co.kr                                         [밤알바]
+ 1x  acetop.co.kr                                        [출장마사지]
+ 1x  attv24.com                                          [스포츠중계]
+ 1x  badalba.com                                         [밤알바]
+ 1x  bamfox.co.kr                                        [밤알바]
+ 1x  bbangtv.com                                         [스포츠중계]
+ 1x  bluelive77.com                                      [스포츠중계]
+ 1x  bubblealba.com                                      [밤알바]
+ 1x  charmjoun.co.kr                                     [먹튀검증]
+ 1x  choicealba.co.kr                                    [밤알바]
+ 1x  coktv1.com                                          [스포츠중계]
+ 1x  cu-tv.com                                           [스포츠중계]
+ 1x  ditto-style.com                                     [레플리카]
+ 1x  dodoanma.com                                        [출장마사지]
+ 1x  dopaminemassage.clickn.co.kr                        [출장마사지]
+ 1x  exitmassage.com                                     [출장마사지]
+ 1x  floweralba.com                                      [밤알바]
+ 1x  fox2.kr                                             [밤알바]
+ 1x  foxalba.com                                         [밤알바]
+ 1x  gomassage.clickn.co.kr                              [출장마사지]
+ 1x  grinmassage.com                                     [출장마사지]
+ 1x  hlshop5.kr                                          [레플리카]
+ 1x  hometai25.uriweb.kr                                 [출장마사지]
+ 1x  hulk24.com                                          [스포츠중계]
+ 1x  insamdome.com                                       [먹튀검증]
+ 1x  itsalbajob.com                                      [밤알바]
+ 1x  jgtv24.com                                          [스포츠중계]
+ 1x  jktv24.com                                          [스포츠중계]
+ 1x  kittyalba.com                                       [밤알바]
+ 1x  kr.slotsup.com                                      [슬롯사이트]
+ 1x  ladyalba.co.kr                                      [밤알바]
+ 1x  linktr.ee                                           [먹튀검증]
+ 1x  litnmoa.co.kr                                       [레플리카]
+ 1x  lovealba.co.kr                                      [밤알바]
+ 1x  ltn.kr                                              [레플리카]
+ 1x  m.imbc.com                                          [스포츠중계]
+ 1x  massagego.clickn.co.kr                              [출장마사지]
+ 1x  maxim-anma.net                                      [출장마사지]
+ 1x  msgcall.kr                                          [출장마사지]
+ 1x  msggo.co.kr                                         [출장마사지]
+ 1x  msghaja.com                                         [출장마사지]
+ 1x  mt-catch.com                                        [먹튀검증]
+ 1x  mt-police07.com                                     [먹튀검증]
+ 1x  mtgal.com                                           [먹튀검증]
+ 1x  mtpolice.kr                                         [먹튀검증]
+ 1x  mukflix.com                                         [먹튀검증]
+ 1x  munito.co.kr                                        [밤알바]
+ 1x  musinsa.com                                         [레플리카]
+ 1x  namu.wiki                                           [레플리카]
+ 1x  njtv-01.com                                         [스포츠중계]
+ 1x  ohvely.net                                          [레플리카]
+ 1x  omaoma.kr                                           [출장마사지]
+ 1x  pragmaticplay.com                                   [슬롯사이트]
+ 1x  princessalba.com                                    [밤알바]
+ 1x  pulua.co.kr                                         [레플리카]
+ 1x  queenalba.net                                       [밤알바]
+ 1x  quick-tv.com                                        [스포츠중계]
+ 1x  rememberapp.co.kr                                   [레플리카]
+ 1x  rep111.isweb.co.kr                                  [레플리카]
+ 1x  replica.uriweb.kr                                   [레플리카]
+ 1x  royaltv01.com                                       [스포츠중계]
+ 1x  rpnara123.kr                                        [레플리카]
+ 1x  safetycheck.isweb.co.kr                             [먹튀검증]
+ 1x  search.danawa.com                                   [레플리카]
+ 1x  search.gb.go.kr                                     [먹튀검증]
+ 1x  secondalba.kr                                       [밤알바]
+ 1x  seoulmassage.clickn.co.kr                           [출장마사지]
+ 1x  shs-dome5.com                                       [레플리카]
+ 1x  signatureanma.com                                   [출장마사지]
+ 1x  slotboxx.com                                        [슬롯사이트]
+ 1x  slotslot.clickn.co.kr                               [슬롯사이트]
+ 1x  slotsmoa03.com                                      [슬롯사이트]
+ 1x  sportstoto.co.kr                                    [토토사이트]
+ 1x  stake.com                                           [슬롯사이트]
+ 1x  streamingcity.kr                                    [스포츠중계]
+ 1x  tethercasino.isweb.co.kr                            [먹튀검증]
+ 1x  timecare24.uriweb.kr                                [출장마사지]
+ 1x  viptv24.com                                         [스포츠중계]
+ 1x  xn--9g3b5ay89a20c2sd.com                            [밤알바]
+ 1x  xn--9g3b5az35c.kr                                   [밤알바]
+ 1x  xn--hg3b84gyf.com                                   [레플리카]
+ 1x  xn--hy1bu53asuh.com                                 [레플리카]
+ 1x  xn--hz2b29j7ogx9bb7g9ml9sc.isweb.co.kr              [출장마사지]
+ 1x  xn--hz2b29jka982d57aq6frrj.isweb.co.kr              [출장마사지]

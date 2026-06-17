@@ -138,11 +138,15 @@ npm run test:e2e
 
 ## 📚 문서
 
-- `prd.md` - 제품 요구사항 문서
-- `MVP_LAUNCH_CHECKLIST.md` - 배포 체크리스트
-- `DEPLOYMENT_GUIDE.md` - 배포 완전 가이드
-- `RENDERING_GUIDE.md` - Next.js 렌더링 가이드
-- `PERFORMANCE_OPTIMIZATION.md` - 성능 최적화 가이드
+모든 문서는 `문서/` 폴더에 분류되어 있습니다. 폴더 구조 전체는 루트의 `파일구조안내.md` 참조.
+
+- `문서/01-기획/prd.md` — 제품 요구사항 문서
+- `문서/02-배포/DEPLOY_GUIDE.md` — 배포 가이드 (최신)
+- `문서/02-배포/VERCEL_FIX_GUIDE.md` — Vercel 트러블슈팅
+- `문서/03-개발/RENDERING_GUIDE.md` — Next.js 렌더링 가이드
+- `문서/03-개발/PERFORMANCE_OPTIMIZATION.md` — 성능 최적화
+- `문서/04-API참고자료/` — VebAPI / RapidAPI / Serper 엔드포인트 문서
+- `문서/05-대화기록/` — Claude 논의 요약
 
 ## 🔐 환경 변수
 
@@ -168,7 +172,7 @@ NEXT_PUBLIC_GA_TRACKING_ID=G-XXXXXXXXXX
 4. 환경 변수 설정
 5. Deploy 클릭!
 
-자세한 내용은 `DEPLOYMENT_GUIDE.md` 참조
+자세한 내용은 `문서/02-배포/DEPLOY_GUIDE.md` 참조
 
 ## 📞 문의
 
