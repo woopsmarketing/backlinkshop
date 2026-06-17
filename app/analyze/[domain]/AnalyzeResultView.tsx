@@ -233,50 +233,182 @@ export function AnalyzeResultView({
 
       {url && <p className="break-all text-center text-xs text-slate-400">분석 대상 URL: {url}</p>}
 
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 p-6 text-center text-white sm:p-10">
-        <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-300">
-          🔓 더 면밀한 분석이 필요하신가요?
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 p-6 text-white sm:p-10">
+        <div className="text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-300">
+            🔓 텔레그램 문의로만 받을 수 있는 것
+          </div>
+          <h2 className="mb-4 text-xl font-extrabold leading-tight text-white sm:text-3xl">
+            여기까지는 <span className="text-slate-400">시작일 뿐</span>입니다.
+            <br />
+            <span className="text-emerald-400">방문자→매출까지의 진짜 길</span>은
+            <br className="sm:hidden" /> 텔레그램에서 받아보세요.
+          </h2>
+          <p className="mx-auto mb-8 max-w-2xl text-sm leading-relaxed text-slate-300 sm:text-base">
+            위 진단은 <strong className="text-white">증상을 짚어드린 것</strong>이고, 이걸 실제로
+            매출로 연결하는 단계는 회원님 도메인 상태/업종/예산을 같이 봐야 합니다.
+            <br className="hidden sm:block" />
+            <strong className="text-emerald-300">아래 8가지를 텔레그램에서 풀로 받아보세요.</strong>
+          </p>
         </div>
-        <h2 className="mb-4 text-xl font-extrabold leading-tight text-white sm:text-3xl">
-          방문자를 늘리고 <span className="text-emerald-400">매출을 직접 끌어올리는</span>
-          <br className="hidden sm:block" /> 구체적 개선 가이드를 받아보세요
-        </h2>
-        <p className="mb-6 text-sm leading-relaxed text-slate-300 sm:text-base">
-          위 진단 결과는 <strong className="text-white">증상</strong>을 보여드린 거예요.
-          <br />이 사이트가 어떤 작업을 어떤 순서로 진행해야{' '}
-          <strong className="text-emerald-300">3~6개월 내 매출이 늘어나는지</strong>,
-          <br className="hidden sm:block" /> 회원님 도메인과 사업 규모를 보고 구체적으로
-          안내드립니다.
-        </p>
 
-        <div className="mb-6 mx-auto grid max-w-2xl gap-3 sm:grid-cols-2">
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
-            <p className="mb-1 text-xs font-bold text-emerald-300">🎯 매출 직결 분석</p>
-            <p className="text-xs text-slate-300">키워드 진입 순서 + 예상 매출 증가분</p>
+        {/* 잠금 해제될 데이터 — 위 카드들과 연결 */}
+        <div className="mb-6">
+          <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-300">
+            <span className="inline-block h-1 w-6 rounded bg-emerald-400" />
+            🔓 페이지에서 잠겨있는 데이터
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {(() => {
+              const hiddenKeywords = Math.max(0, (enrichment?.relatedKeywords?.length ?? 0) - 3)
+              const aiIssues = enrichment?.aiVisibility?.issues?.length ?? 0
+              const precisionIssues = enrichment?.analyzeV2?.priorityIssues?.length ?? 0
+              const topRankedHidden = Math.max(0, (enrichment?.topRankedKeywords?.length ?? 0) - 3)
+
+              const items = [
+                {
+                  icon: '🎯',
+                  title: `매출 기회 키워드 ${hiddenKeywords > 0 ? `${hiddenKeywords}개+` : '전체'} 풀 공개`,
+                  desc: '진입 우선순위·예상 매출 영향·1페이지 진입 가능성까지',
+                },
+                {
+                  icon: '📈',
+                  title: `이미 노출 중인 키워드 ${topRankedHidden > 0 ? `${topRankedHidden}개+` : '전체'}`,
+                  desc: '11~20위 임박 키워드를 어떤 순서로 끌어올릴지',
+                },
+                {
+                  icon: '🤖',
+                  title: `AI 검색 SEO 문제 ${aiIssues > 0 ? `${aiIssues}개` : ''} 구체 가이드`,
+                  desc: 'ChatGPT/Perplexity에서 노출되려면 뭘 고쳐야 하는지',
+                },
+                {
+                  icon: '⚙️',
+                  title: `정밀 진단 이슈 ${precisionIssues > 0 ? `${precisionIssues}개` : ''} 우선순위`,
+                  desc: '어떤 이슈부터 고쳐야 매출이 빨리 오르는지',
+                },
+              ]
+              return items.map(item => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-3 rounded-xl bg-white/5 px-4 py-3 backdrop-blur"
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-white">{item.title}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-slate-400">{item.desc}</p>
+                  </div>
+                </div>
+              ))
+            })()}
           </div>
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
-            <p className="mb-1 text-xs font-bold text-emerald-300">📋 구체 실행 가이드</p>
-            <p className="text-xs text-slate-300">각 작업별 기간/방법/예상 효과</p>
+        </div>
+
+        {/* 추가로만 받을 수 있는 것 */}
+        <div className="mb-8">
+          <p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-300">
+            <span className="inline-block h-1 w-6 rounded bg-emerald-400" />
+            💎 텔레그램에서만 받을 수 있는 추가 분석
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              {
+                icon: '💰',
+                title: '회원님 사업 기준 매출 시뮬레이션',
+                desc: '객단가·전환율·마진 반영한 실제 매출 증가분 예상',
+              },
+              {
+                icon: '🚀',
+                title: '3~6개월 내 1페이지 진입 가능 키워드',
+                desc: '주력 키워드 3~5개 구체 추정 + 진입 기간',
+              },
+              {
+                icon: '🏆',
+                title: '회원님 업종의 실제 매출 상승 사례',
+                desc: '비슷한 도메인이 어떤 작업으로 얼마나 늘었는지',
+              },
+              {
+                icon: '📋',
+                title: '작업별 정확한 견적',
+                desc: '백링크/콘텐츠/속도/온페이지 별 맞춤 견적',
+              },
+            ].map(item => (
+              <div
+                key={item.title}
+                className="flex items-start gap-3 rounded-xl bg-emerald-500/10 px-4 py-3 backdrop-blur"
+              >
+                <span className="text-lg">{item.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-white">{item.title}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-slate-400">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
-            <p className="mb-1 text-xs font-bold text-emerald-300">💰 정확한 견적</p>
-            <p className="text-xs text-slate-300">회원님 사이트 규모 기준 맞춤 견적</p>
-          </div>
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
-            <p className="mb-1 text-xs font-bold text-emerald-300">🏆 업종 사례</p>
-            <p className="text-xs text-slate-300">비슷한 사이트의 실제 매출 상승 데이터</p>
+        </div>
+
+        {/* 비교 안내 */}
+        <div className="mb-6 rounded-xl bg-white/5 p-4 backdrop-blur sm:p-5">
+          <p className="mb-3 text-center text-xs font-bold uppercase tracking-wider text-slate-400">
+            한눈에 비교
+          </p>
+          <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+            <div>
+              <p className="mb-2 font-semibold text-slate-400">현재 페이지에서</p>
+              <ul className="space-y-1 text-slate-500">
+                <li>
+                  · 관련 키워드 <strong className="text-slate-300">3개</strong>
+                </li>
+                <li>
+                  · 노출 키워드 <strong className="text-slate-300">3개</strong>
+                </li>
+                <li>
+                  · AI/정밀 진단 <strong className="text-slate-300">점수만</strong>
+                </li>
+                <li>
+                  · 우선순위 <strong className="text-slate-300">3개 미리보기</strong>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p className="mb-2 font-semibold text-emerald-300">텔레그램 문의 시</p>
+              <ul className="space-y-1 text-slate-200">
+                <li>
+                  · 관련 키워드 <strong className="text-emerald-300">전체 + 분석</strong>
+                </li>
+                <li>
+                  · 노출 키워드 <strong className="text-emerald-300">전체 + 우선순위</strong>
+                </li>
+                <li>
+                  · AI/정밀 진단 <strong className="text-emerald-300">구체 개선 가이드</strong>
+                </li>
+                <li>
+                  · 우선순위 <strong className="text-emerald-300">매출 시뮬 + 견적</strong>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
         <AnalyzeTelegramCTA
           domain={domain}
           placement="result_bottom"
-          label="텔레그램에서 정밀 분석 + 매출 상승 가이드 받기"
-          subLabel="평균 응답 5~15분 · 회원가입 불필요 · 견적 부담 없음"
+          label="🚀 텔레그램에서 전체 데이터 + 매출 가이드 받기"
+          subLabel="평균 응답 5~15분 · 운영자가 직접 답변드립니다"
         />
-        <p className="mt-3 text-[11px] text-slate-400">
-          운영자가 직접 답변드립니다 · 자동 결제·구독 일절 없음
-        </p>
+
+        {/* 안심 알약 */}
+        <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+          {['✓ 회원가입 없음', '✓ 카드 등록 없음', '✓ 자동 결제 없음', '✓ 견적 부담 없음'].map(
+            label => (
+              <span
+                key={label}
+                className="inline-flex items-center rounded-full bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-200 backdrop-blur"
+              >
+                {label}
+              </span>
+            )
+          )}
+        </div>
       </section>
     </div>
   )
