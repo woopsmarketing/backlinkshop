@@ -6,6 +6,7 @@
  */
 
 import { escapeHtml, type TelegramInlineKeyboard } from './telegram'
+import { calculateCompetitorGap, type CompetitorMetrics, type CompetitorGap } from './lp-metrics'
 
 export type LpRequestRow = {
   id: string
@@ -79,6 +80,48 @@ function gapLabel(mine: number | null, comp: number | null): string {
   return formatNum(diff)
 }
 
+/**
+ * 매 메뉴 응답에 자동으로 붙는 영구 메뉴 키보드.
+ * 사용자가 메뉴를 누른 후에도 다음 행동으로 바로 넘어갈 수 있도록 한다.
+ */
+export function buildPersistentMenuKeyboard(): TelegramInlineKeyboard {
+  return [
+    [
+      { text: '💬 1:1 상담', callback_data: 'menu:contact' },
+      { text: '📊 견적 안내', callback_data: 'menu:quote' },
+    ],
+    [
+      { text: '💰 가격', callback_data: 'menu:price' },
+      { text: '🏆 사례', callback_data: 'menu:cases' },
+    ],
+    [
+      { text: '📋 서비스', callback_data: 'menu:services' },
+      { text: '❓ FAQ', callback_data: 'menu:faq' },
+    ],
+  ]
+}
+
+/**
+ * lp_requests.seo_report_data.competitorData 를 lp-metrics 형식의 CompetitorMetrics 로 변환.
+ * 필드명이 raw object 이므로 타입 단언 없이 안전하게 변환한다.
+ */
+function toCompetitorMetrics(raw: unknown): CompetitorMetrics | null {
+  if (!raw || typeof raw !== 'object') return null
+  return raw as CompetitorMetrics
+}
+
+/**
+ * 경쟁사 격차 — 뒤처진 항목만 라벨 형태로 변환 (예: "백링크 -328 · Moz DA -24점").
+ */
+function buildGapLabels(
+  customer: CompetitorMetrics | null,
+  competitors: CompetitorMetrics[]
+): string[] {
+  if (!customer || competitors.length === 0) return []
+  const gaps = calculateCompetitorGap(customer, competitors).filter(g => g.isBehind)
+  return gaps.map(g => `${g.label} -${Math.round(g.gap).toLocaleString('ko-KR')}${g.suffix ?? ''}`)
+}
+
 // ─────────────────────────────────────────────────────────────
 // 사용자 메시지: /start 진입 시 자동 응답 (분석 결과 있음)
 // ─────────────────────────────────────────────────────────────
@@ -93,38 +136,14 @@ export function buildUserWelcomeWithReport(
   const score = pickNum(report.score)
   const parsed = (report.parsedData ?? {}) as Record<string, unknown>
   const competitor = (report.competitorData ?? {}) as Record<string, unknown>
-  const myMetrics = (competitor.customerMetrics ?? {}) as Record<string, unknown>
-  const competitors = Array.isArray(competitor.competitors) ? competitor.competitors : []
+  const customerMetrics = toCompetitorMetrics(competitor.customerMetrics)
+  const competitorsRaw = Array.isArray(competitor.competitors) ? competitor.competitors : []
+  const competitors: CompetitorMetrics[] = competitorsRaw
+    .map(c => toCompetitorMetrics(c))
+    .filter((c): c is CompetitorMetrics => c !== null)
 
-  // 경쟁사 평균 산출
-  let avgDa: number | null = null
-  let avgBacklinks: number | null = null
-  let avgTraffic: number | null = null
-  if (competitors.length > 0) {
-    const sum = competitors.reduce(
-      (acc: { da: number; bl: number; tr: number; n: number }, c: Record<string, unknown>) => {
-        const da = pickNum(c.da)
-        const bl = pickNum(c.backlinks)
-        const tr = pickNum(c.organicTraffic)
-        return {
-          da: acc.da + (da ?? 0),
-          bl: acc.bl + (bl ?? 0),
-          tr: acc.tr + (tr ?? 0),
-          n: acc.n + 1,
-        }
-      },
-      { da: 0, bl: 0, tr: 0, n: 0 }
-    )
-    if (sum.n > 0) {
-      avgDa = Math.round(sum.da / sum.n)
-      avgBacklinks = Math.round(sum.bl / sum.n)
-      avgTraffic = Math.round(sum.tr / sum.n)
-    }
-  }
-
-  const myDa = pickNum(myMetrics.da)
-  const myBacklinks = pickNum(myMetrics.backlinks)
-  const myTraffic = pickNum(myMetrics.organicTraffic)
+  // 격차 (lp-metrics.calculateCompetitorGap 활용 — 분석 페이지와 동일 로직)
+  const gapLabels = buildGapLabels(customerMetrics, competitors)
 
   // 진단 이슈 (parsed 기반)
   const issues: string[] = []
@@ -149,9 +168,9 @@ export function buildUserWelcomeWithReport(
   const imgNoAlt = pickNum(parsed.imgWithoutAlt) ?? 0
   if (imgNoAlt > 0) issues.push(`이미지 alt 누락 ${imgNoAlt}건`)
 
-  if (myBacklinks !== null && avgBacklinks !== null && myBacklinks < avgBacklinks * 0.5) {
-    issues.push(`백링크 부족 (${myBacklinks} → 목표 ${avgBacklinks}+)`)
-  }
+  // 백링크 격차가 큰 경우 issue 로도 추가
+  const backlinkGap = gapLabels.find(g => g.startsWith('백링크') || g.includes('백링크'))
+  if (backlinkGap) issues.push(backlinkGap)
 
   if (parsed.isHttps === true) passes.push('SSL 정상')
   if (parsed.hasViewport === true) passes.push('모바일 반응형 정상')
@@ -169,11 +188,13 @@ export function buildUserWelcomeWithReport(
   text += `${score !== null ? `${score} / 100점` : '점수 산출 중'}\n\n`
   text += `🎯 핵심 키워드: <b>${escapeHtml(lp.keyword)}</b>\n\n`
 
-  if (avgDa !== null) {
+  if (gapLabels.length > 0) {
     text += `⚠️ <b>경쟁사 대비 격차</b>\n`
-    text += `• DA: ${formatNum(myDa)} (경쟁사 평균 ${formatNum(avgDa)}) → <b>${gapLabel(myDa, avgDa)}</b>\n`
-    text += `• 백링크: ${formatNum(myBacklinks)} (평균 ${formatNum(avgBacklinks)}) → <b>${gapLabel(myBacklinks, avgBacklinks)}</b>\n`
-    text += `• 월간 트래픽: ${formatNum(myTraffic)} (평균 ${formatNum(avgTraffic)}) → <b>${gapLabel(myTraffic, avgTraffic)}</b>\n`
+    text += gapLabels
+      .slice(0, 4)
+      .map(g => `• ${escapeHtml(g)}`)
+      .join('\n')
+    text += `\n`
   }
   text += `━━━━━━━━━━━━━━━\n\n`
 
@@ -414,32 +435,13 @@ export function buildAdminAlertForNewSession(
   const report = (lp?.seo_report_data ?? {}) as Record<string, unknown>
   const score = pickNum(report.score)
   const competitor = (report.competitorData ?? {}) as Record<string, unknown>
-  const myMetrics = (competitor.customerMetrics ?? {}) as Record<string, unknown>
-  const competitors = Array.isArray(competitor.competitors) ? competitor.competitors : []
+  const customerMetrics = toCompetitorMetrics(competitor.customerMetrics)
+  const competitorsRaw = Array.isArray(competitor.competitors) ? competitor.competitors : []
+  const competitors: CompetitorMetrics[] = competitorsRaw
+    .map(c => toCompetitorMetrics(c))
+    .filter((c): c is CompetitorMetrics => c !== null)
 
-  let avgDa: number | null = null
-  let avgBacklinks: number | null = null
-  let avgTraffic: number | null = null
-  if (competitors.length > 0) {
-    const sum = competitors.reduce(
-      (acc: { da: number; bl: number; tr: number; n: number }, c: Record<string, unknown>) => ({
-        da: acc.da + (pickNum(c.da) ?? 0),
-        bl: acc.bl + (pickNum(c.backlinks) ?? 0),
-        tr: acc.tr + (pickNum(c.organicTraffic) ?? 0),
-        n: acc.n + 1,
-      }),
-      { da: 0, bl: 0, tr: 0, n: 0 }
-    )
-    if (sum.n > 0) {
-      avgDa = Math.round(sum.da / sum.n)
-      avgBacklinks = Math.round(sum.bl / sum.n)
-      avgTraffic = Math.round(sum.tr / sum.n)
-    }
-  }
-
-  const myDa = pickNum(myMetrics.da)
-  const myBacklinks = pickNum(myMetrics.backlinks)
-  const myTraffic = pickNum(myMetrics.organicTraffic)
+  const gapLabels = buildGapLabels(customerMetrics, competitors)
 
   const firstSeenDate = new Date(user.first_seen_at)
   const daysSinceFirst = Math.floor((Date.now() - firstSeenDate.getTime()) / (1000 * 60 * 60 * 24))
@@ -456,8 +458,11 @@ export function buildAdminAlertForNewSession(
     text += `키워드: <b>${escapeHtml(lp.keyword)}</b>\n`
     text += `이메일: <code>${escapeHtml(lp.email)}</code>\n`
     text += `점수: ${score !== null ? `${score}점` : '—'}\n`
-    if (avgDa !== null) {
-      text += `주요 격차: DA ${gapLabel(myDa, avgDa)} / 백링크 ${gapLabel(myBacklinks, avgBacklinks)} / 트래픽 ${gapLabel(myTraffic, avgTraffic)}\n`
+    if (gapLabels.length > 0) {
+      text += `주요 격차: ${gapLabels
+        .slice(0, 3)
+        .map(g => escapeHtml(g))
+        .join(' / ')}\n`
     }
     text += `\n`
   } else {
@@ -633,10 +638,12 @@ function inferUrgentActions(report: Record<string, unknown>): string[] {
     actions.push(`이미지 alt 일괄 추가 (${imgNoAlt}건)`)
   }
 
-  // 백링크
+  // 백링크 — 실제 필드명: ahrefsBacklinks 또는 backlinkTotal
   const competitor = (report.competitorData ?? {}) as Record<string, unknown>
-  const myMetrics = (competitor.customerMetrics ?? {}) as Record<string, unknown>
-  const myBacklinks = pickNum(myMetrics.backlinks)
+  const myMetrics = toCompetitorMetrics(competitor.customerMetrics)
+  const myBacklinks = myMetrics
+    ? (pickNum(myMetrics.ahrefsBacklinks) ?? pickNum(myMetrics.backlinkTotal))
+    : null
   if (myBacklinks !== null && myBacklinks < 30) {
     actions.push('백링크 우선순위 10건 확보 (DA 상승)')
   }

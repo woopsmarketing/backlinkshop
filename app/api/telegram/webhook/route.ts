@@ -24,6 +24,7 @@ import {
   buildMenuFaq,
   buildMenuContact,
   buildMenuQuote,
+  buildPersistentMenuKeyboard,
   buildAdminAlertForNewSession,
   buildAdminAlertForUserMessage,
   buildAdminAlertForDiscovery,
@@ -137,10 +138,11 @@ async function handleMessage(msg: TgMessage) {
     const alert = buildAdminAlertForUserMessage(user, msg.from, text)
     await safeSendToAdmin(alert)
 
-    // 사용자에게 접수 확인 (선택)
+    // 사용자에게 접수 확인 + 영구 메뉴
     await sendMessage({
       chatId,
-      text: '<b>메시지가 운영자에게 전달됐어요.</b>\n' + '평균 5~15분 안에 직접 답변드립니다 ☺️',
+      text: '<b>메시지가 운영자에게 전달됐어요.</b>\n평균 5~15분 안에 직접 답변드립니다 ☺️',
+      replyMarkup: { inline_keyboard: buildPersistentMenuKeyboard() },
     })
   }
 }
@@ -165,7 +167,12 @@ async function handleCallbackQuery(cb: TgCallbackQuery) {
     const { text, intentLabel } = buildDiscoveryResponse(intent)
 
     await answerCallbackQuery(cb.id, '전달했어요')
-    await sendMessage({ chatId, text })
+    // discovery 응답 후엔 영구 메뉴 동행
+    await sendMessage({
+      chatId,
+      text,
+      replyMarkup: { inline_keyboard: buildPersistentMenuKeyboard() },
+    })
 
     const alert = buildAdminAlertForDiscovery(user, cb.from, intentLabel)
     await safeSendToAdmin(alert)
@@ -177,29 +184,36 @@ async function handleCallbackQuery(cb: TgCallbackQuery) {
     const key = cb.data.split(':')[1]
     await answerCallbackQuery(cb.id)
 
+    // 모든 메뉴 응답에 영구 메뉴 키보드 자동 부착
+    const menuMarkup = { inline_keyboard: buildPersistentMenuKeyboard() }
+
     switch (key) {
       case 'price':
-        await sendMessage({ chatId, text: buildMenuPrice() })
+        await sendMessage({ chatId, text: buildMenuPrice(), replyMarkup: menuMarkup })
         break
       case 'cases':
-        await sendMessage({ chatId, text: buildMenuCases() })
+        await sendMessage({ chatId, text: buildMenuCases(), replyMarkup: menuMarkup })
         break
       case 'services':
-        await sendMessage({ chatId, text: buildMenuServices() })
+        await sendMessage({ chatId, text: buildMenuServices(), replyMarkup: menuMarkup })
         break
       case 'faq':
-        await sendMessage({ chatId, text: buildMenuFaq() })
+        await sendMessage({ chatId, text: buildMenuFaq(), replyMarkup: menuMarkup })
         break
       case 'contact': {
+        // 1:1 상담 응답엔 메뉴 안 붙임 (대화 시작 단계 — 시각적 노이즈 최소화)
         await sendMessage({ chatId, text: buildMenuContact() })
-        // 운영자에게 "상담 요청 클릭" 알림
         const alert = buildAdminAlertForDiscovery(user, cb.from, '1:1 상담 요청 클릭')
         await safeSendToAdmin(alert)
         break
       }
       case 'quote': {
         const lastDomain = user.analyzed_domains[user.analyzed_domains.length - 1]
-        await sendMessage({ chatId, text: buildMenuQuote(lastDomain) })
+        await sendMessage({
+          chatId,
+          text: buildMenuQuote(lastDomain),
+          replyMarkup: menuMarkup,
+        })
         const alert = buildAdminAlertForDiscovery(user, cb.from, '견적 문의 클릭')
         await safeSendToAdmin(alert)
         break
