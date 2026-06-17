@@ -10,6 +10,7 @@ import { AnalyzeOnPageDetail } from './AnalyzeOnPageDetail'
 import { AnalyzeCachingBadge } from './AnalyzeCachingBadge'
 import { AnalyzeCategoryScores } from './AnalyzeCategoryScores'
 import { AnalyzePriorityPreview } from './AnalyzePriorityPreview'
+import { AnalyzeSimulation } from './AnalyzeSimulation'
 import {
   calculateCompetitorAverage,
   calculateCompetitorGap,
@@ -107,6 +108,14 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
 
       <AnalyzePriorityPreview
         domain={domain}
+        parsed={parsed}
+        customerMetrics={customerMetrics}
+        competitorAverage={competitorAverage}
+      />
+
+      <AnalyzeSimulation
+        domain={domain}
+        score={score}
         parsed={parsed}
         customerMetrics={customerMetrics}
         competitorAverage={competitorAverage}
