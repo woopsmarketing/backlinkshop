@@ -190,8 +190,8 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         <p className="mb-5 text-sm leading-relaxed text-slate-300 sm:text-base">
           위 결과를 직접 적용하셔도 됩니다.
           <br />
-          다만 <strong className="text-white">"어떤 키워드부터 잡아야 빠른지"</strong>,{' '}
-          <strong className="text-white">"매출에 직접 연결되는 작업이 무엇인지"</strong>는
+          다만 <strong className="text-white">어떤 키워드부터 잡아야 빠른지</strong>,{' '}
+          <strong className="text-white">매출에 직접 연결되는 작업이 무엇인지</strong>는
           <br className="sm:hidden" />
           회원님 도메인 상태를 직접 봐야 정확합니다.
         </p>
