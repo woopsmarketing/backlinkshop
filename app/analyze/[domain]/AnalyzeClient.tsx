@@ -7,6 +7,7 @@ import { AnalyzeStickyCTA } from './AnalyzeStickyCTA'
 import { AnalyzeFailedView } from './AnalyzeFailedView'
 import { AnalyzeNotFoundView } from './AnalyzeNotFoundView'
 import { AnalyzePageView } from './AnalyzePageView'
+import type { EnrichmentResponse } from '@/app/api/analyze/enrichment/route'
 
 export type AnalyzeStatus =
   | 'pending_analysis'
@@ -62,6 +63,9 @@ const MAX_POLL_ATTEMPTS = 600 // 약 20분
 
 export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
   const [state, setState] = useState<AnalyzeInitialState>(initial)
+  const [enrichment, setEnrichment] = useState<EnrichmentResponse | null>(null)
+  const [enrichmentLoading, setEnrichmentLoading] = useState(false)
+  const enrichmentFetchedRef = useRef<string | null>(null)
   const attemptsRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -74,6 +78,32 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
   }, [])
 
   const shouldPoll = PENDING_STATUSES.includes(state.status)
+
+  // 분석 완료 후 한 번만 enrichment fetch
+  const isResultReady =
+    state.status === 'processing' ||
+    state.status === 'sending_report' ||
+    state.status === 'completed'
+
+  useEffect(() => {
+    if (!isResultReady) return
+    if (enrichmentFetchedRef.current === state.domain) return
+    enrichmentFetchedRef.current = state.domain
+
+    const params = new URLSearchParams({ domain: state.domain })
+    if (state.keyword) params.set('keyword', state.keyword)
+
+    setEnrichmentLoading(true)
+    fetch(`/api/analyze/enrichment?${params.toString()}`, { cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : null))
+      .then((data: EnrichmentResponse | null) => {
+        if (data) setEnrichment(data)
+      })
+      .catch(() => {
+        /* silent — UI 카드들이 null 처리 */
+      })
+      .finally(() => setEnrichmentLoading(false))
+  }, [isResultReady, state.domain, state.keyword])
 
   useEffect(() => {
     if (!shouldPoll) return
@@ -141,6 +171,8 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
             keyword={state.keyword}
             report={state.report}
             analyzedAt={state.analyzedAt}
+            enrichment={enrichment}
+            enrichmentLoading={enrichmentLoading}
           />
         )}
 

@@ -11,6 +11,11 @@ import { AnalyzeCachingBadge } from './AnalyzeCachingBadge'
 import { AnalyzeCategoryScores } from './AnalyzeCategoryScores'
 import { AnalyzePriorityPreview } from './AnalyzePriorityPreview'
 import { AnalyzeSimulation } from './AnalyzeSimulation'
+import { AnalyzeKeywordAnalysis } from './AnalyzeKeywordAnalysis'
+import { AnalyzeTopRankedKeywords } from './AnalyzeTopRankedKeywords'
+import { AnalyzeAiVisibility } from './AnalyzeAiVisibility'
+import { AnalyzePrecisionScores } from './AnalyzePrecisionScores'
+import type { EnrichmentResponse } from '@/app/api/analyze/enrichment/route'
 import {
   calculateCompetitorAverage,
   calculateCompetitorGap,
@@ -25,9 +30,19 @@ type Props = {
   keyword: string | null
   report: AnalyzeReport
   analyzedAt: string | null
+  enrichment?: EnrichmentResponse | null
+  enrichmentLoading?: boolean
 }
 
-export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: Props) {
+export function AnalyzeResultView({
+  domain,
+  url,
+  keyword,
+  report,
+  analyzedAt,
+  enrichment,
+  enrichmentLoading,
+}: Props) {
   const score = typeof report?.score === 'number' ? report.score : null
   const analysisHtml = typeof report?.analysisHtml === 'string' ? report.analysisHtml : ''
   const competitor: AnalyzeCompetitorAnalysis | null = report?.competitorData ?? null
@@ -121,6 +136,33 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         competitorAverage={competitorAverage}
       />
 
+      {/* VebAPI 정밀 분석 카드들 (R3-B) */}
+      <AnalyzeKeywordAnalysis
+        domain={domain}
+        keyword={keyword}
+        singleKeyword={enrichment?.singleKeyword ?? null}
+        relatedKeywords={enrichment?.relatedKeywords ?? []}
+        loading={enrichmentLoading}
+      />
+
+      <AnalyzeTopRankedKeywords
+        domain={domain}
+        keywords={enrichment?.topRankedKeywords ?? []}
+        loading={enrichmentLoading}
+      />
+
+      <AnalyzeAiVisibility
+        domain={domain}
+        data={enrichment?.aiVisibility ?? null}
+        loading={enrichmentLoading}
+      />
+
+      <AnalyzePrecisionScores
+        domain={domain}
+        data={enrichment?.analyzeV2 ?? null}
+        loading={enrichmentLoading}
+      />
+
       <AnalyzeGapCard comp={competitor} />
 
       {hasCompetitor && <AnalyzeCompetitorTable comp={competitor} myDomainLabel={domain} />}
@@ -191,27 +233,49 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
 
       {url && <p className="break-all text-center text-xs text-slate-400">분석 대상 URL: {url}</p>}
 
-      <section className="rounded-2xl bg-slate-900 p-5 text-center sm:p-8">
-        <h2 className="mb-3 text-lg font-bold text-white sm:text-2xl">
-          진단으로는 보이지 않는 것 —{' '}
-          <span className="text-emerald-400">매출이 늘어나는 작업 순서</span>
+      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 p-6 text-center text-white sm:p-10">
+        <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-300">
+          🔓 더 면밀한 분석이 필요하신가요?
+        </div>
+        <h2 className="mb-4 text-xl font-extrabold leading-tight text-white sm:text-3xl">
+          방문자를 늘리고 <span className="text-emerald-400">매출을 직접 끌어올리는</span>
+          <br className="hidden sm:block" /> 구체적 개선 가이드를 받아보세요
         </h2>
-        <p className="mb-5 text-sm leading-relaxed text-slate-300 sm:text-base">
-          위 결과를 직접 적용하셔도 됩니다.
-          <br />
-          다만 <strong className="text-white">어떤 키워드부터 잡아야 빠른지</strong>,{' '}
-          <strong className="text-white">매출에 직접 연결되는 작업이 무엇인지</strong>는
-          <br className="sm:hidden" />
-          회원님 도메인 상태를 직접 봐야 정확합니다.
+        <p className="mb-6 text-sm leading-relaxed text-slate-300 sm:text-base">
+          위 진단 결과는 <strong className="text-white">증상</strong>을 보여드린 거예요.
+          <br />이 사이트가 어떤 작업을 어떤 순서로 진행해야{' '}
+          <strong className="text-emerald-300">3~6개월 내 매출이 늘어나는지</strong>,
+          <br className="hidden sm:block" /> 회원님 도메인과 사업 규모를 보고 구체적으로
+          안내드립니다.
         </p>
+
+        <div className="mb-6 mx-auto grid max-w-2xl gap-3 sm:grid-cols-2">
+          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
+            <p className="mb-1 text-xs font-bold text-emerald-300">🎯 매출 직결 분석</p>
+            <p className="text-xs text-slate-300">키워드 진입 순서 + 예상 매출 증가분</p>
+          </div>
+          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
+            <p className="mb-1 text-xs font-bold text-emerald-300">📋 구체 실행 가이드</p>
+            <p className="text-xs text-slate-300">각 작업별 기간/방법/예상 효과</p>
+          </div>
+          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
+            <p className="mb-1 text-xs font-bold text-emerald-300">💰 정확한 견적</p>
+            <p className="text-xs text-slate-300">회원님 사이트 규모 기준 맞춤 견적</p>
+          </div>
+          <div className="rounded-xl bg-white/5 px-4 py-3 text-left backdrop-blur">
+            <p className="mb-1 text-xs font-bold text-emerald-300">🏆 업종 사례</p>
+            <p className="text-xs text-slate-300">비슷한 사이트의 실제 매출 상승 데이터</p>
+          </div>
+        </div>
+
         <AnalyzeTelegramCTA
           domain={domain}
           placement="result_bottom"
-          label="매출 직결 작업 순서 받기"
-          subLabel="회원가입 불필요 · 견적 부담 없음"
+          label="텔레그램에서 정밀 분석 + 매출 상승 가이드 받기"
+          subLabel="평균 응답 5~15분 · 회원가입 불필요 · 견적 부담 없음"
         />
-        <p className="mt-3 text-[11px] text-slate-500">
-          평균 응답 5~15분 · 운영자가 직접 답변드립니다
+        <p className="mt-3 text-[11px] text-slate-400">
+          운영자가 직접 답변드립니다 · 자동 결제·구독 일절 없음
         </p>
       </section>
     </div>
