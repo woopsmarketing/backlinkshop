@@ -7,6 +7,9 @@ import { AnalyzeKpiCards } from './AnalyzeKpiCards'
 import { AnalyzeCompetitorTable } from './AnalyzeCompetitorTable'
 import { AnalyzeGapCard } from './AnalyzeGapCard'
 import { AnalyzeOnPageDetail } from './AnalyzeOnPageDetail'
+import { AnalyzeCachingBadge } from './AnalyzeCachingBadge'
+import { AnalyzeCategoryScores } from './AnalyzeCategoryScores'
+import { AnalyzePriorityPreview } from './AnalyzePriorityPreview'
 import {
   calculateCompetitorAverage,
   calculateCompetitorGap,
@@ -61,6 +64,8 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
 
   return (
     <div className="space-y-6">
+      <AnalyzeCachingBadge domain={domain} analyzedAt={analyzedAt} />
+
       <header className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
         <div className="mb-2 flex items-center gap-2">
           <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -94,6 +99,19 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         competitorCount={regularCompetitors.length}
       />
 
+      <AnalyzeCategoryScores
+        parsed={parsed}
+        customerMetrics={customerMetrics}
+        competitorAverage={competitorAverage}
+      />
+
+      <AnalyzePriorityPreview
+        domain={domain}
+        parsed={parsed}
+        customerMetrics={customerMetrics}
+        competitorAverage={competitorAverage}
+      />
+
       <AnalyzeGapCard comp={competitor} />
 
       {hasCompetitor && <AnalyzeCompetitorTable comp={competitor} myDomainLabel={domain} />}
@@ -101,7 +119,7 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
       <section className="rounded-2xl border-2 border-emerald-500 bg-white p-5 sm:p-7">
         <div className="mb-3 flex items-center gap-2">
           <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
-            회원님 사이트 맞춤 가이드
+            매출 상승 정밀 분석
           </span>
         </div>
         {gapSummary && (
@@ -110,25 +128,33 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
           </div>
         )}
         <h2 className="mb-3 text-lg font-bold text-slate-900 sm:text-xl">
-          이 격차를 좁히는 <span className="text-emerald-600">가장 빠른 작업 순서</span>를
-          알려드릴게요
+          이 격차를 좁히면 <span className="text-emerald-600">월 문의가 1.5~3배</span>로 늘어납니다
         </h2>
+        <p className="mb-4 text-sm leading-relaxed text-slate-600">
+          위 우선순위만 적용해도 효과는 분명히 옵니다. 다만{' '}
+          <strong className="text-slate-900">
+            정확한 매출 상승까지 가려면 키워드 선정·진입 순서·예상 매출치
+          </strong>
+          를 회원님 사업 규모에 맞춰 잡아야 합니다.
+        </p>
         <ul className="mb-4 space-y-2 text-sm text-slate-700">
           <li className="flex items-start gap-2">
             <span className="mt-0.5 text-emerald-500">✓</span>
             <span>
-              <strong>1순위 작업</strong>과 예상 기간 (1~2주 / 1~2개월 / 3~6개월)
+              <strong>매출이 가장 빠르게 늘어나는 키워드 3~5개</strong> 추정 (월 검색량 포함)
             </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-0.5 text-emerald-500">✓</span>
             <span>
-              <strong>3~6개월 내 1페이지 진입 가능 키워드</strong> 3~5개 추정
+              회원님 업종 <strong>실제 매출 상승 사례</strong> 데이터
             </span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-0.5 text-emerald-500">✓</span>
-            <span>회원님 업종과 비슷한 실제 사례 데이터</span>
+            <span>
+              각 작업별 <strong>정확한 견적</strong>과 예상 ROI
+            </span>
           </li>
         </ul>
         <p className="mb-4 text-xs text-slate-500">
@@ -137,7 +163,7 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
         <AnalyzeTelegramCTA
           domain={domain}
           placement="result_mid"
-          label="텔레그램에서 맞춤 가이드 받기"
+          label="매출 상승 정밀 분석 받기"
           subLabel="평균 응답 5~15분 · 회원가입 불필요"
         />
       </section>
@@ -158,22 +184,26 @@ export function AnalyzeResultView({ domain, url, keyword, report, analyzedAt }: 
 
       <section className="rounded-2xl bg-slate-900 p-5 text-center sm:p-8">
         <h2 className="mb-3 text-lg font-bold text-white sm:text-2xl">
-          진단은 끝났습니다. <br className="sm:hidden" />
-          이제 우선순위가 필요해요
+          진단으로는 보이지 않는 것 —{' '}
+          <span className="text-emerald-400">매출이 늘어나는 작업 순서</span>
         </h2>
         <p className="mb-5 text-sm leading-relaxed text-slate-300 sm:text-base">
           위 결과를 직접 적용하셔도 됩니다.
           <br />
-          어디부터 시작할지 헷갈리시면,
+          다만 <strong className="text-white">"어떤 키워드부터 잡아야 빠른지"</strong>,{' '}
+          <strong className="text-white">"매출에 직접 연결되는 작업이 무엇인지"</strong>는
           <br className="sm:hidden" />
-          <strong className="text-white">가장 빠른 작업 순서를 5~15분 안에 알려드릴게요.</strong>
+          회원님 도메인 상태를 직접 봐야 정확합니다.
         </p>
         <AnalyzeTelegramCTA
           domain={domain}
           placement="result_bottom"
-          label="텔레그램에서 우선순위 받기"
+          label="매출 직결 작업 순서 받기"
           subLabel="회원가입 불필요 · 견적 부담 없음"
         />
+        <p className="mt-3 text-[11px] text-slate-500">
+          평균 응답 5~15분 · 운영자가 직접 답변드립니다
+        </p>
       </section>
     </div>
   )

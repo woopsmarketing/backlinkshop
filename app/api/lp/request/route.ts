@@ -4,7 +4,7 @@ import { extractDomain, isValidDomain, normalizeUrl } from '@/lib/domain'
 
 export const dynamic = 'force-dynamic'
 
-const CACHE_WINDOW_DAYS = 30
+const CACHE_WINDOW_DAYS = 14
 const COMPLETED_STATUSES = ['processing', 'sending_report', 'completed'] as const
 
 function buildRedirectUrl(domain: string) {
