@@ -15,7 +15,7 @@ export const runtime = 'nodejs'
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
 
-const MAX_HISTORY = 16
+const MAX_HISTORY = 24
 const MAX_CONTENT_LEN = 2000
 const RATE_LIMIT_PER_HOUR = 40
 
