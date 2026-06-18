@@ -33,6 +33,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
   const [loading, setLoading] = useState(false)
   const [tgLoading, setTgLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const taRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -44,6 +45,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
     const next: Msg[] = [...messages, { role: 'user', content: trimmed }]
     setMessages(next)
     setInput('')
+    if (taRef.current) taRef.current.style.height = 'auto'
     setLoading(true)
     try {
       const res = await fetch('/api/chat', {
@@ -99,7 +101,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
         <button
           onClick={() => setOpen(true)}
           aria-label="SEO 상담 AI 열기"
-          className="fixed bottom-4 left-4 z-50 flex items-center gap-2 rounded-full bg-purple-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-purple-600/30 transition hover:bg-purple-700"
+          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-purple-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-purple-600/30 transition hover:bg-purple-700"
         >
           <span className="text-lg">💬</span>
           <span className="hidden sm:inline">SEO 무엇이든 물어보세요</span>
@@ -109,7 +111,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
 
       {/* 채팅 패널 */}
       {open && (
-        <div className="fixed bottom-4 left-4 z-50 flex h-[70vh] max-h-[560px] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:w-96">
+        <div className="fixed bottom-4 right-4 z-50 flex h-[70vh] max-h-[560px] w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:w-96">
           {/* 헤더 */}
           <div className="flex items-center justify-between bg-purple-600 px-4 py-3 text-white">
             <div className="flex items-center gap-2">
@@ -172,13 +174,26 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
               e.preventDefault()
               send(input)
             }}
-            className="flex items-center gap-2 border-t border-slate-200 bg-white p-2"
+            className="flex items-end gap-2 border-t border-slate-200 bg-white p-2"
           >
-            <input
+            <textarea
+              ref={taRef}
               value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="메시지를 입력하세요…"
-              className="min-w-0 flex-1 rounded-full border border-slate-200 px-3 py-2 text-sm outline-none focus:border-purple-400"
+              rows={1}
+              onChange={e => {
+                setInput(e.target.value)
+                const el = e.currentTarget
+                el.style.height = 'auto'
+                el.style.height = `${Math.min(el.scrollHeight, 120)}px`
+              }}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  send(input)
+                }
+              }}
+              placeholder="메시지를 입력하세요… (Shift+Enter 줄바꿈)"
+              className="max-h-[120px] min-h-[40px] min-w-0 flex-1 resize-none overflow-y-auto rounded-2xl border border-slate-200 px-3 py-2 text-sm leading-relaxed outline-none focus:border-purple-400"
             />
             <button
               type="submit"

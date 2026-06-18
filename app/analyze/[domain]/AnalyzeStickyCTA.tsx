@@ -58,7 +58,7 @@ export function AnalyzeStickyCTA({ domain }: { domain: string }) {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-emerald-100 bg-white/95 p-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur sm:left-auto sm:right-6 sm:bottom-6 sm:w-[360px] sm:rounded-2xl sm:border sm:border-emerald-200 sm:p-4">
+    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-emerald-100 bg-white/95 p-3 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] backdrop-blur sm:left-1/2 sm:right-auto sm:bottom-6 sm:w-[360px] sm:-translate-x-1/2 sm:rounded-2xl sm:border sm:border-emerald-200 sm:p-4">
       <a
         href={FALLBACK_DEEPLINK}
         target="_blank"
