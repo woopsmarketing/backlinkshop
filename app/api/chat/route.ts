@@ -8,7 +8,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createHash } from 'crypto'
 import { createAdminSupabaseClient } from '@/server/supabase/admin'
-import { buildChatSystemPrompt, type ChatContext } from '@/lib/chat-knowledge'
+import { buildSystemPrompt, chatbotConfig, type ChatContext } from '@/lib/chatbot'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const systemPrompt = buildChatSystemPrompt(body?.context)
+  const systemPrompt = buildSystemPrompt(chatbotConfig, body?.context)
 
   // gpt-5-nano: 추론 모델 → max_completion_tokens 사용, temperature 생략,
   // reasoning_effort=minimal (추론 토큰 0, 빠른 응답). 모델은 env로 교체 가능.
