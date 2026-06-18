@@ -69,6 +69,20 @@ export async function generateKeywordIdeas(params: {
     '- reason: 이 키워드를 노려야 하는 이유 한 줄 (40자 이내)\n\n' +
     '형식: {"keywords": [{"keyword": "...", "intent": "...", "commercialValue": "...", "difficulty": "...", "reason": "..."}]}'
 
+  // gpt-5-nano: 추론 모델 → max_completion_tokens 사용, temperature 생략,
+  // reasoning_effort=low (키워드 발굴엔 약간의 추론이 도움). 모델은 env로 교체 가능.
+  const model = process.env.OPENAI_CHAT_MODEL || 'gpt-5-nano'
+  const payload: Record<string, unknown> = {
+    model,
+    max_completion_tokens: 1500,
+    response_format: { type: 'json_object' },
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+  }
+  if (model.startsWith('gpt-5')) payload.reasoning_effort = 'low'
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -77,16 +91,7 @@ export async function generateKeywordIdeas(params: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: 0.7,
-        max_tokens: 1500,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-      }),
+      body: JSON.stringify(payload),
     })
 
     if (!response.ok) {

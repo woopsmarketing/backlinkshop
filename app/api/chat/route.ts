@@ -53,6 +53,16 @@ export async function POST(request: NextRequest) {
 
   const systemPrompt = buildChatSystemPrompt(body?.context)
 
+  // gpt-5-nano: 추론 모델 → max_completion_tokens 사용, temperature 생략,
+  // reasoning_effort=minimal (추론 토큰 0, 빠른 응답). 모델은 env로 교체 가능.
+  const model = process.env.OPENAI_CHAT_MODEL || 'gpt-5-nano'
+  const payload: Record<string, unknown> = {
+    model,
+    max_completion_tokens: 800,
+    messages: [{ role: 'system', content: systemPrompt }, ...messages],
+  }
+  if (model.startsWith('gpt-5')) payload.reasoning_effort = 'minimal'
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -61,12 +71,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: 0.5,
-        max_tokens: 600,
-        messages: [{ role: 'system', content: systemPrompt }, ...messages],
-      }),
+      body: JSON.stringify(payload),
     })
 
     if (!response.ok) {
