@@ -4,6 +4,7 @@ import { LPHeroForm } from './LPHeroForm'
 import { LPHeroCopy } from './LPHeroCopy'
 import { LPStickyCTA } from './LPStickyCTA'
 import { LPActivityToast } from './LPActivityToast'
+import { AiChatWidget } from '@/app/components/AiChatWidget'
 
 export const dynamic = 'force-static'
 
@@ -1005,6 +1006,8 @@ export default function LPSeoPage() {
           &copy; 2024-{new Date().getFullYear()} 백링크샵. SEO 전문 컨설팅.
         </p>
       </footer>
+
+      <AiChatWidget />
     </main>
   )
 }

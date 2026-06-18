@@ -7,6 +7,7 @@ import { AnalyzeStickyCTA } from './AnalyzeStickyCTA'
 import { AnalyzeFailedView } from './AnalyzeFailedView'
 import { AnalyzeNotFoundView } from './AnalyzeNotFoundView'
 import { AnalyzePageView } from './AnalyzePageView'
+import { AiChatWidget } from '@/app/components/AiChatWidget'
 import type { EnrichmentResponse } from '@/app/api/analyze/enrichment/route'
 
 export type AnalyzeStatus =
@@ -187,6 +188,14 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
       </div>
 
       {state.status !== 'none' && <AnalyzeStickyCTA domain={state.domain} />}
+
+      <AiChatWidget
+        context={{
+          domain: state.domain,
+          keyword: state.keyword,
+          score: state.report?.score ?? null,
+        }}
+      />
     </main>
   )
 }
