@@ -138,6 +138,9 @@ export function AnalyzeResultView({
         parsed={parsed}
         customerMetrics={customerMetrics}
         competitorAverage={competitorAverage}
+        topRankedKeywords={enrichment?.topRankedKeywords ?? []}
+        analyzeV2={enrichment?.analyzeV2 ?? null}
+        loading={enrichmentLoading}
       />
 
       {/* VebAPI 정밀 분석 카드들 (R3-B) */}

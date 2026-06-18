@@ -209,10 +209,13 @@ export function buildUserWelcomeWithReport(
   }
 
   text += `━━━━━━━━━━━━━━━\n`
-  text += `💡 <b>회원님 사이트의 빠른 상위 노출 루트</b>\n\n`
-  text += `<b>1순위.</b> 메타태그 최적화 — 1~2주, 클릭률 1.5~2배\n`
-  text += `<b>2순위.</b> 백링크 우선순위 10건 — 1~2개월, 키워드 3~5개 1페이지 진입\n`
-  text += `<b>3순위.</b> 페이지 속도 개선 — 1주, 이탈률 20~30% 감소\n\n`
+  text += `💡 <b>회원님 사이트의 빠른 상위 노출 루트</b>\n`
+  text += `<i>(아래는 회원님 사이트 실제 진단 결과 기반입니다)</i>\n\n`
+  const priorityActions = buildPrioritizedActions(report)
+  priorityActions.forEach((a, i) => {
+    text += `<b>${i + 1}순위.</b> ${escapeHtml(a.title)} — ${escapeHtml(a.period)}, ${escapeHtml(a.effect)}\n`
+  })
+  text += `\n`
   text += `━━━━━━━━━━━━━━━\n`
   text += `🎯 <b>비슷한 업종 사례</b>\n`
   text += `동일 업종에서 위 순서로 진행 시 3~6개월 내 월 문의가 1.5~3배로 늘어난 케이스가 다수입니다.\n\n`
@@ -617,41 +620,76 @@ function inferUserType(
   return parts.join(' / ')
 }
 
-function inferUrgentActions(report: Record<string, unknown>): string[] {
+export type PriorityAction = { title: string; period: string; effect: string }
+
+/**
+ * 실제 진단(report.parsedData + competitorData) 기반으로 우선순위 작업 1~3순위를 도출한다.
+ * 사용자 환영 메시지와 운영자 알림이 같은 로직을 공유해 일관성을 유지한다.
+ * 진단상 문제가 거의 없으면 기본 로드맵으로 폴백한다.
+ */
+export function buildPrioritizedActions(report: Record<string, unknown>): PriorityAction[] {
   const parsed = (report.parsedData ?? {}) as Record<string, unknown>
-  const actions: string[] = []
+  const actions: PriorityAction[] = []
 
-  // 메타 디스크립션
+  // 1) 메타 디스크립션 + H1 — 가장 빠른 효과
   const mdLen = pickNum(parsed.metaDescriptionLength) ?? 0
-  if (mdLen === 0 || mdLen < 50) {
-    actions.push('메타 디스크립션 + H1 정리 (즉시 효과)')
+  const h1Missing =
+    parsed.duplicateH1 === true || !(Array.isArray(parsed.h1) && parsed.h1.length > 0)
+  if (mdLen === 0 || mdLen < 50 || mdLen > 160 || h1Missing) {
+    actions.push({
+      title: '메타태그 · H1 최적화',
+      period: '1~2주',
+      effect: '검색 노출 클릭률 1.5~2배',
+    })
   }
 
-  // 페이지 속도
+  // 2) 페이지 속도
   const loadMs = pickNum(parsed.loadTimeMs)
-  if (loadMs !== null && loadMs > 2000) {
-    actions.push('페이지 속도 개선 (이탈률 직접 감소)')
+  if (loadMs !== null && loadMs > 1500) {
+    actions.push({
+      title: `페이지 속도 개선 (현재 ${(loadMs / 1000).toFixed(1)}초)`,
+      period: '약 1주',
+      effect: '이탈률 20~30% 감소',
+    })
   }
 
-  // 이미지 alt
-  const imgNoAlt = pickNum(parsed.imgWithoutAlt) ?? 0
-  if (imgNoAlt > 10) {
-    actions.push(`이미지 alt 일괄 추가 (${imgNoAlt}건)`)
-  }
-
-  // 백링크 — 실제 필드명: ahrefsBacklinks 또는 backlinkTotal
+  // 3) 백링크 격차 — 실제 필드명: ahrefsBacklinks 또는 backlinkTotal
   const competitor = (report.competitorData ?? {}) as Record<string, unknown>
   const myMetrics = toCompetitorMetrics(competitor.customerMetrics)
   const myBacklinks = myMetrics
     ? (pickNum(myMetrics.ahrefsBacklinks) ?? pickNum(myMetrics.backlinkTotal))
     : null
   if (myBacklinks !== null && myBacklinks < 30) {
-    actions.push('백링크 우선순위 10건 확보 (DA 상승)')
+    actions.push({
+      title: '백링크 우선순위 10건 확보',
+      period: '1~2개월',
+      effect: 'DA 상승 · 키워드 3~5개 1페이지 진입',
+    })
   }
 
-  if (actions.length === 0) actions.push('전반적 SEO 점검 후 우선순위 잡기')
+  // 4) 이미지 alt
+  const imgNoAlt = pickNum(parsed.imgWithoutAlt) ?? 0
+  if (imgNoAlt > 10) {
+    actions.push({
+      title: `이미지 alt 일괄 추가 (${imgNoAlt}건)`,
+      period: '2~3일',
+      effect: '이미지 검색 유입 + 접근성 개선',
+    })
+  }
+
+  // 폴백 — 진단상 문제가 거의 없으면 기본 로드맵
+  if (actions.length === 0) {
+    actions.push(
+      { title: '메타태그 · H1 최적화', period: '1~2주', effect: '검색 노출 클릭률 1.5~2배' },
+      { title: '백링크 우선순위 10건 확보', period: '1~2개월', effect: '키워드 3~5개 1페이지 진입' }
+    )
+  }
 
   return actions.slice(0, 3)
+}
+
+function inferUrgentActions(report: Record<string, unknown>): string[] {
+  return buildPrioritizedActions(report).map(a => a.title)
 }
 
 // ─────────────────────────────────────────────────────────────
