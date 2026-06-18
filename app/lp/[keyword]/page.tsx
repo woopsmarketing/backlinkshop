@@ -5,11 +5,8 @@ import { notFound } from 'next/navigation'
 import { LandingBody, type LPTheme } from '../seo/LandingBody'
 import { VARIANTS } from '../seo/LPHeroCopy'
 
-const KEYWORDS = ['backlink', 'rank', 'audit', 'agency'] as const
-
-export function generateStaticParams() {
-  return KEYWORDS.map(keyword => ({ keyword }))
-}
+// 동적 렌더: ?theme=dark 가 요청마다 반영되도록 + 엣지 네거티브(404) 캐시 우회.
+export const dynamic = 'force-dynamic'
 
 const META: Record<string, { title: string; description: string }> = {
   backlink: {
