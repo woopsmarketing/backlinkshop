@@ -9,7 +9,7 @@ type Variant = {
   sub: string
 }
 
-const VARIANTS: Record<string, Variant> = {
+export const VARIANTS: Record<string, Variant> = {
   backlink: {
     badge: '백링크 + SEO 통합 진단',
     h1a: '백링크는 분명 효과가 있습니다. 단,',
@@ -38,9 +38,13 @@ const VARIANTS: Record<string, Variant> = {
 
 const DEFAULT: Variant = VARIANTS.rank
 
-export function LPHeroCopy() {
+/**
+ * variantKey가 주어지면 그것을 우선 사용(개별 키워드 페이지),
+ * 없으면 ?ref= 쿼리로 결정(/lp/seo 통합 페이지 하위호환).
+ */
+export function LPHeroCopy({ variantKey }: { variantKey?: string }) {
   const params = useSearchParams()
-  const ref = params?.get('ref') || ''
+  const ref = variantKey || params?.get('ref') || ''
   const variant = VARIANTS[ref] || DEFAULT
 
   return (

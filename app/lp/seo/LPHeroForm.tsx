@@ -333,6 +333,54 @@ export function LPHeroForm() {
           </a>
         </div>
       </form>
+
+      {/* 진단 후 우리 사이트에서 더 확인할 수 있는 것들 (텔레그램 언급 없이 가치만 노출) */}
+      <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-5 text-left">
+        <p className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
+          <svg
+            className="w-4 h-4 flex-shrink-0 text-emerald-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          진단을 받으면 이런 것까지 확인할 수 있어요
+        </p>
+        <ul className="space-y-2 text-sm text-gray-300">
+          {[
+            '경쟁사 TOP5의 백링크 수·도메인 등급 상세',
+            '내 사이트에 빠진 핵심 백링크 출처 목록',
+            '메인 키워드의 현재 순위와 진입 난이도',
+            '50개 항목별 점수 + 먼저 고쳐야 할 우선순위',
+          ].map(t => (
+            <li key={t} className="flex items-start gap-2">
+              <svg
+                className="w-4 h-4 flex-shrink-0 mt-0.5 text-orange-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
+              </svg>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 text-xs text-gray-500">
+          일부 상세 데이터는 진단 리포트와 분석 페이지에서 단계적으로 열립니다.
+        </p>
+      </div>
     </div>
   )
 }
