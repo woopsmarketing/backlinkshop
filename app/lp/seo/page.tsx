@@ -38,9 +38,37 @@ export default function LPSeoPage() {
 
         <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24">
           {/* 카피 (센터) */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-6">
             <LPHeroCopy />
           </div>
+
+          {/* 신뢰 스트립 (모바일 포함 above-fold 노출) */}
+          <ul className="mb-12 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-gray-300">
+            {[
+              '50개 항목 정밀 진단',
+              '경쟁사 TOP5 비교 포함',
+              '회원가입·카드 등록 없음',
+              '평균 10분 내 리포트 발송',
+            ].map(t => (
+              <li key={t} className="inline-flex items-center gap-1.5">
+                <svg
+                  className="h-4 w-4 flex-shrink-0 text-emerald-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                {t}
+              </li>
+            ))}
+          </ul>
 
           {/* 2컬럼: 폼(왼쪽) + 미리보기(오른쪽) */}
           <div className="grid lg:grid-cols-2 gap-8 items-start">
