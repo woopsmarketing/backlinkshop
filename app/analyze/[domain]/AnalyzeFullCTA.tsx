@@ -22,21 +22,20 @@ type Props = {
 export function AnalyzeFullCTA({ domain, enrichment, variant }: Props) {
   const isTop = variant === 'top'
 
-  const hiddenKeywords = Math.max(0, (enrichment?.relatedKeywords?.length ?? 0) - 3)
+  const hiddenKeywords = Math.max(0, (enrichment?.keywordIdeas?.length ?? 0) - 3)
   const aiIssues = enrichment?.aiVisibility?.issues?.length ?? 0
   const precisionIssues = enrichment?.analyzeV2?.priorityIssues?.length ?? 0
-  const topRankedHidden = Math.max(0, (enrichment?.topRankedKeywords?.length ?? 0) - 3)
 
   const lockedItems = [
     {
       icon: '🎯',
       title: `매출 기회 키워드 ${hiddenKeywords > 0 ? `${hiddenKeywords}개+` : '전체'} 풀 공개`,
-      desc: '진입 우선순위·예상 매출 영향·1페이지 진입 가능성까지',
+      desc: '진입 우선순위·상업적 가치·공략 난이도까지',
     },
     {
       icon: '📈',
-      title: `이미 노출 중인 키워드 ${topRankedHidden > 0 ? `${topRankedHidden}개+` : '전체'}`,
-      desc: '11~20위 임박 키워드를 어떤 순서로 끌어올릴지',
+      title: '어떤 키워드부터 공략할지 실행 순서',
+      desc: '방문자를 가장 빨리 늘릴 키워드 로드맵',
     },
     {
       icon: '🤖',

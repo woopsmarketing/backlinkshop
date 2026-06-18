@@ -11,14 +11,12 @@ import { extractDomain, isValidDomain } from '@/lib/domain'
 import {
   getAnalyzeV2,
   getSingleKeyword,
-  getRelatedKeywords,
-  getTopRankedKeywords,
   getAiVisibility,
   type AnalyzeV2Result,
   type KeywordMetric,
-  type TopRankedKeyword,
   type AiVisibilityResult,
 } from '@/lib/vebapi'
+import { generateKeywordIdeas, type KeywordIdea } from '@/lib/keyword-ideas'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -26,8 +24,8 @@ export const runtime = 'nodejs'
 export type EnrichmentResponse = {
   analyzeV2: AnalyzeV2Result | null
   singleKeyword: KeywordMetric | null
-  relatedKeywords: KeywordMetric[]
-  topRankedKeywords: TopRankedKeyword[]
+  /** LLM 생성 관련 키워드 아이디어 (질적 신호) — 기존 VebAPI keywordresearch 대체 */
+  keywordIdeas: KeywordIdea[]
   aiVisibility: AiVisibilityResult | null
   fetchedAt: string
 }
@@ -35,6 +33,7 @@ export type EnrichmentResponse = {
 export async function GET(request: NextRequest) {
   const rawDomain = request.nextUrl.searchParams.get('domain')?.trim()
   const keyword = request.nextUrl.searchParams.get('keyword')?.trim() || null
+  const title = request.nextUrl.searchParams.get('title')?.trim() || null
   const country = request.nextUrl.searchParams.get('country')?.trim() || 'kr'
 
   if (!rawDomain) {
@@ -46,23 +45,22 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'invalid domain' }, { status: 400 })
   }
 
-  // 5개 호출 병렬 실행. 각각 실패해도 다른 데이터는 살린다.
-  const [analyzeV2, singleKeyword, relatedKeywords, topRankedKeywords, aiVisibility] =
-    await Promise.all([
-      safeCall(() => getAnalyzeV2(domain)),
-      keyword ? safeCall(() => getSingleKeyword(keyword, country)) : Promise.resolve(null),
-      keyword
-        ? safeCall(() => getRelatedKeywords(keyword, country)).then(r => r ?? [])
-        : Promise.resolve([] as KeywordMetric[]),
-      safeCall(() => getTopRankedKeywords(domain)).then(r => r ?? []),
-      safeCall(() => getAiVisibility(domain)),
-    ])
+  // 병렬 실행. 각각 실패해도 다른 데이터는 살린다.
+  const [analyzeV2, singleKeyword, keywordIdeas, aiVisibility] = await Promise.all([
+    safeCall(() => getAnalyzeV2(domain)),
+    keyword ? safeCall(() => getSingleKeyword(keyword, country)) : Promise.resolve(null),
+    keyword
+      ? safeCall(() =>
+          generateKeywordIdeas({ seedKeyword: keyword, domain, siteTitle: title })
+        ).then(r => r ?? [])
+      : Promise.resolve([] as KeywordIdea[]),
+    safeCall(() => getAiVisibility(domain)),
+  ])
 
   const body: EnrichmentResponse = {
     analyzeV2,
     singleKeyword,
-    relatedKeywords,
-    topRankedKeywords,
+    keywordIdeas: keywordIdeas ?? [],
     aiVisibility,
     fetchedAt: new Date().toISOString(),
   }

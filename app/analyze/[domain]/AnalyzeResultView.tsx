@@ -12,7 +12,6 @@ import { AnalyzeCategoryScores } from './AnalyzeCategoryScores'
 import { AnalyzePriorityPreview } from './AnalyzePriorityPreview'
 import { AnalyzeSimulation } from './AnalyzeSimulation'
 import { AnalyzeKeywordAnalysis } from './AnalyzeKeywordAnalysis'
-import { AnalyzeTopRankedKeywords } from './AnalyzeTopRankedKeywords'
 import { AnalyzeAiVisibility } from './AnalyzeAiVisibility'
 import { AnalyzePrecisionScores } from './AnalyzePrecisionScores'
 import { AnalyzeFullCTA } from './AnalyzeFullCTA'
@@ -138,23 +137,16 @@ export function AnalyzeResultView({
         parsed={parsed}
         customerMetrics={customerMetrics}
         competitorAverage={competitorAverage}
-        topRankedKeywords={enrichment?.topRankedKeywords ?? []}
         analyzeV2={enrichment?.analyzeV2 ?? null}
         loading={enrichmentLoading}
       />
 
-      {/* VebAPI 정밀 분석 카드들 (R3-B) */}
+      {/* 정밀 분석 카드들 */}
       <AnalyzeKeywordAnalysis
         domain={domain}
         keyword={keyword}
         singleKeyword={enrichment?.singleKeyword ?? null}
-        relatedKeywords={enrichment?.relatedKeywords ?? []}
-        loading={enrichmentLoading}
-      />
-
-      <AnalyzeTopRankedKeywords
-        domain={domain}
-        keywords={enrichment?.topRankedKeywords ?? []}
+        keywordIdeas={enrichment?.keywordIdeas ?? []}
         loading={enrichmentLoading}
       />
 

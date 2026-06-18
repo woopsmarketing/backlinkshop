@@ -16,7 +16,7 @@
 
 import { useMemo, useState } from 'react'
 import type { ParsedFields, CompetitorMetrics } from '@/lib/lp-metrics'
-import type { TopRankedKeyword, AnalyzeV2Result } from '@/lib/vebapi'
+import type { AnalyzeV2Result } from '@/lib/vebapi'
 
 type Props = {
   domain: string
@@ -24,9 +24,7 @@ type Props = {
   parsed: ParsedFields | null
   customerMetrics: CompetitorMetrics | null
   competitorAverage: CompetitorMetrics | null
-  /** VebAPI 실데이터 — 도메인 기존 노출 키워드 (1페이지 진입 추정 정확화) */
-  topRankedKeywords?: TopRankedKeyword[]
-  /** VebAPI 실데이터 — 정밀 6분류 점수 (종합 점수 정확화) */
+  /** VebAPI 정밀 6분류 점수 (종합 점수 정확화) */
   analyzeV2?: AnalyzeV2Result | null
   loading?: boolean
 }
@@ -49,7 +47,6 @@ export function AnalyzeSimulation({
   parsed,
   customerMetrics,
   competitorAverage,
-  topRankedKeywords = [],
   analyzeV2 = null,
   loading: dataLoading = false,
 }: Props) {
@@ -72,7 +69,10 @@ export function AnalyzeSimulation({
         before: baseScore,
         after: Math.min(98, baseScore + gain),
         unit: '점',
-        hint: precisionScore !== null ? '정밀 진단 실측 기준 · 우선순위 3가지 적용 시' : '우선순위 3가지 적용 시',
+        hint:
+          precisionScore !== null
+            ? '정밀 진단 실측 기준 · 우선순위 3가지 적용 시'
+            : '우선순위 3가지 적용 시',
       })
     }
 
@@ -100,46 +100,7 @@ export function AnalyzeSimulation({
       })
     }
 
-    // 3) 1페이지 진입 키워드 — VebAPI 실데이터(topRanked) 우선, 없으면 추정으로 폴백
-    const rankedWithRank = topRankedKeywords.filter(k => typeof k.rank === 'number')
-    if (rankedWithRank.length > 0) {
-      // 실측: 현재 1페이지(≤10위) 개수 → 11~20위(진입 임박) 중 최대 5개 끌어올림
-      const inTop10 = rankedWithRank.filter(k => (k.rank as number) <= 10).length
-      const nearTop10 = rankedWithRank.filter(k => {
-        const r = k.rank as number
-        return r >= 11 && r <= 20
-      }).length
-      const gainable = Math.max(3, Math.min(nearTop10, 5))
-      out.push({
-        key: 'keywords',
-        label: '1페이지 진입 키워드',
-        icon: '🎯',
-        before: inTop10,
-        after: inTop10 + gainable,
-        unit: '개',
-        hint:
-          nearTop10 > 0
-            ? `현재 11~20위 ${nearTop10}개 중 우선순위 작업 시 진입 예상 (실측 기준)`
-            : '주력 키워드 진입 예상 (실측 기준)',
-      })
-    } else {
-      const myKw = customerMetrics?.ahrefsOrganicKeywords ?? null
-      if (myKw !== null) {
-        const beforeTop10 = Math.round(Math.min(myKw * 0.1, 50))
-        const after = Math.max(beforeTop10 + 3, Math.round(beforeTop10 * 2))
-        out.push({
-          key: 'keywords',
-          label: '1페이지 진입 키워드',
-          icon: '🎯',
-          before: beforeTop10,
-          after,
-          unit: '개',
-          hint: '주력 키워드 3~5개 진입 예상',
-        })
-      }
-    }
-
-    // 4) 월간 문의 — 트래픽 기반 추정 (전환율 1% 가정)
+    // 3) 월간 문의 — 트래픽 기반 추정 (전환율 1% 가정)
     if (myTraffic !== null) {
       const beforeInquiry = Math.max(1, Math.round(myTraffic * 0.01))
       // 작업 후 트래픽 × 전환율 1.5% (전환율도 같이 개선)
@@ -160,7 +121,7 @@ export function AnalyzeSimulation({
     }
 
     return out
-  }, [score, customerMetrics, competitorAverage, topRankedKeywords, analyzeV2])
+  }, [score, customerMetrics, competitorAverage, analyzeV2])
 
   const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
@@ -202,7 +163,9 @@ export function AnalyzeSimulation({
       <p className="mb-6 text-xs leading-relaxed text-slate-300 sm:text-sm">
         앞서 보여드린 우선순위 1~3순위만 적용해도 다음과 같은 변화가 예상됩니다.
         <br />
-        <span className="text-slate-400">* 회원님 사이트 실측 데이터 + 동일 업종 케이스 기반 보수적 추정치</span>
+        <span className="text-slate-400">
+          * 회원님 사이트 실측 데이터 + 동일 업종 케이스 기반 보수적 추정치
+        </span>
         {dataLoading && (
           <>
             <br />

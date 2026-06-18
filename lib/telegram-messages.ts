@@ -7,7 +7,8 @@
 
 import { escapeHtml, type TelegramInlineKeyboard } from './telegram'
 import { calculateCompetitorGap, type CompetitorMetrics, type CompetitorGap } from './lp-metrics'
-import type { AnalyzeV2Result, AiVisibilityResult, KeywordMetric, TopRankedKeyword } from './vebapi'
+import type { AnalyzeV2Result, AiVisibilityResult, KeywordMetric, AdCompetition } from './vebapi'
+import type { KeywordIdea } from './keyword-ideas'
 
 export type LpRequestRow = {
   id: string
@@ -697,65 +698,39 @@ function inferUrgentActions(report: Record<string, unknown>): string[] {
 // ─────────────────────────────────────────────────────────────
 
 /**
- * 키워드 정밀 분석 — 입력 키워드 + 관련 키워드 전체 + 도메인 기존 노출 키워드.
- * 페이지에서 잠겨 있던 데이터를 텔레그램에서 풀로 공개.
+ * 키워드 정밀 분석 — 입력 키워드(VebAPI) + AI 발굴 관련 키워드(질적 신호).
+ * 페이지에서 3개만 공개되던 관련 키워드를 텔레그램에서 전체 공개.
  */
 export function buildKeywordDetailMessage(
   inputKeyword: string | null,
   singleKeyword: KeywordMetric | null,
-  related: KeywordMetric[],
-  topRanked: TopRankedKeyword[]
+  ideas: KeywordIdea[]
 ): string {
-  if (!singleKeyword && related.length === 0 && topRanked.length === 0) return ''
+  if (!singleKeyword && ideas.length === 0) return ''
 
   let text = `🔓 <b>키워드 정밀 분석 (전체 공개)</b>\n\n`
 
   if (singleKeyword && inputKeyword) {
     text += `🎯 <b>입력하신 키워드:</b> ${escapeHtml(singleKeyword.text)}\n`
-    text += `• 월 검색량: <b>${(singleKeyword.searchVolume ?? 0).toLocaleString('ko-KR')}회</b>\n`
+    text += `• 추정 검색량: <b>${(singleKeyword.searchVolume ?? 0).toLocaleString('ko-KR')}회</b>\n`
     text += `• CPC: $${singleKeyword.cpc?.toFixed(2) ?? '—'}\n`
-    text += `• 경쟁도: <b>${competitionKo(singleKeyword.competition)}</b>\n\n`
+    text += `• 유료광고 경쟁도: <b>${competitionKo(singleKeyword.competition)}</b> <i>(구글애즈 입찰 기준, SEO 난이도와 다름)</i>\n\n`
   }
 
-  if (related.length > 0) {
-    const sorted = [...related].sort((a, b) => (b.searchVolume ?? 0) - (a.searchVolume ?? 0))
+  if (ideas.length > 0) {
     text += `━━━━━━━━━━━━━━━\n`
-    text += `📋 <b>매출 기회 관련 키워드 ${sorted.length}개</b> (전체 공개)\n\n`
-    sorted.slice(0, 15).forEach((k, i) => {
-      const vol = (k.searchVolume ?? 0).toLocaleString('ko-KR')
-      text += `${i + 1}. <b>${escapeHtml(k.text)}</b>\n`
-      text += `   월 ${vol}회 · ${competitionKo(k.competition)}${k.cpc ? ` · CPC $${k.cpc.toFixed(2)}` : ''}\n`
-    })
-    text += `\n`
-  }
-
-  if (topRanked.length > 0) {
-    const sorted = [...topRanked].sort((a, b) => (a.rank ?? 999) - (b.rank ?? 999))
-    const inTop10 = sorted.filter(k => k.rank !== null && k.rank <= 10).length
-    const nearTop10 = sorted.filter(k => k.rank !== null && k.rank >= 11 && k.rank <= 20)
-
-    text += `━━━━━━━━━━━━━━━\n`
-    text += `📈 <b>이미 구글에 노출 중인 키워드 ${sorted.length}개</b>\n`
-    text += `• 1페이지 진입: ${inTop10}개\n`
-    text += `• 11~20위 (진입 임박): ${nearTop10.length}개 ⚡\n\n`
-
-    if (nearTop10.length > 0) {
-      text += `<b>🔥 1페이지 진입이 가장 빠른 키워드:</b>\n`
-      nearTop10.slice(0, 5).forEach(k => {
-        text += `• <b>${escapeHtml(k.keyword)}</b> (현재 ${k.rank}위, 월 ${(k.searchVolume ?? 0).toLocaleString('ko-KR')}회)\n`
-      })
+    text += `📋 <b>매출 기회가 큰 관련 키워드 ${ideas.length}개</b> (AI 발굴, 전체 공개)\n\n`
+    ideas.forEach((k, i) => {
+      text += `${i + 1}. <b>${escapeHtml(k.keyword)}</b> <i>(${escapeHtml(k.intent)})</i>\n`
+      text += `   상업성 ${escapeHtml(k.commercialValue)} · 공략 난이도 ${escapeHtml(k.difficulty)}`
+      if (k.reason) text += ` — ${escapeHtml(k.reason)}`
       text += `\n`
-    }
-
-    text += `<b>상위 노출 키워드 (TOP 10):</b>\n`
-    sorted.slice(0, 10).forEach(k => {
-      text += `• ${escapeHtml(k.keyword)} — ${k.rank}위 (월 ${(k.searchVolume ?? 0).toLocaleString('ko-KR')}회)\n`
     })
     text += `\n`
   }
 
   text += `━━━━━━━━━━━━━━━\n`
-  text += `💬 어떤 키워드부터 공략하면 매출이 가장 빨리 늘어날지, 회원님 사업 규모에 맞춰 직접 안내드릴게요.`
+  text += `💬 어떤 키워드부터 공략하면 방문자·매출이 가장 빨리 늘어날지, 회원님 사업 규모에 맞춰 직접 안내드릴게요.`
 
   return text
 }
@@ -847,14 +822,16 @@ export function buildClosingPitch(domain: string): string {
   )
 }
 
-function competitionKo(c: 'Low' | 'Medium' | 'High' | null): string {
+function competitionKo(c: AdCompetition | null): string {
   switch (c) {
     case 'Low':
-      return '낮음 ⭐'
+      return '낮음'
     case 'Medium':
-      return '중간'
+      return '보통'
     case 'High':
       return '높음'
+    case 'Very High':
+      return '매우 높음'
     default:
       return '—'
   }

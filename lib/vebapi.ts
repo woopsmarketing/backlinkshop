@@ -48,7 +48,7 @@ async function fetchVeb(path: string, params: Record<string, string>): Promise<u
   return res.json()
 }
 
-async function getCached(cacheKey: string, ttlDays: number): Promise<unknown | null> {
+export async function getCached(cacheKey: string, ttlDays: number): Promise<unknown | null> {
   try {
     const supabase = createAdminSupabaseClient()
     const { data } = await supabase
@@ -64,7 +64,7 @@ async function getCached(cacheKey: string, ttlDays: number): Promise<unknown | n
   }
 }
 
-async function setCached(cacheKey: string, data: unknown): Promise<void> {
+export async function setCached(cacheKey: string, data: unknown): Promise<void> {
   try {
     const supabase = createAdminSupabaseClient()
     await supabase
@@ -145,12 +145,29 @@ export async function getAnalyzeV2(domain: string): Promise<AnalyzeV2Result | nu
 // singlekeyword — 단일 키워드 분석
 // ─────────────────────────────────────────────────────────────
 
+/** 구글애즈(키워드 플래너) 유료광고 입찰 경쟁도. SEO 난이도가 아님에 유의. */
+export type AdCompetition = 'Low' | 'Medium' | 'High' | 'Very High'
+
 export type KeywordMetric = {
   text: string
   searchVolume: number | null
   cpc: number | null
-  competition: 'Low' | 'Medium' | 'High' | null
+  competition: AdCompetition | null
   score: number | null
+}
+
+/**
+ * VebAPI competition 값 정규화. API가 'low'/'Low'/'Medium'/'High'/'Very high' 등
+ * 케이싱·표현이 제각각이라 그대로 비교하면 다수가 null로 버려진다.
+ */
+function normalizeCompetition(v: unknown): AdCompetition | null {
+  const s = pickStr(v)?.toLowerCase()
+  if (!s) return null
+  if (s.includes('very') && s.includes('high')) return 'Very High'
+  if (s === 'high') return 'High'
+  if (s === 'medium' || s === 'med') return 'Medium'
+  if (s === 'low' || (s.includes('very') && s.includes('low'))) return 'Low'
+  return null
 }
 
 export async function getSingleKeyword(
@@ -172,43 +189,12 @@ export async function getSingleKeyword(
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// keywordresearch — 관련 키워드 (배열)
-// ─────────────────────────────────────────────────────────────
-
-export async function getRelatedKeywords(
-  keyword: string,
-  country: string = 'kr'
-): Promise<KeywordMetric[]> {
-  const cacheKey = `related:${keyword.toLowerCase()}:${country}`
-  const cached = await getCached(cacheKey, KEYWORD_TTL_DAYS)
-  if (cached) return cached as KeywordMetric[]
-
-  try {
-    const raw = (await fetchVeb('/keywordresearch', { keyword, country })) as unknown
-    const items: KeywordMetric[] = Array.isArray(raw)
-      ? (raw as Array<Record<string, unknown>>)
-          .map(item => parseKeywordItem(item, ''))
-          .filter(k => k.text)
-          .slice(0, 15)
-      : []
-    await setCached(cacheKey, items)
-    return items
-  } catch (err) {
-    console.error('[vebapi.getRelatedKeywords] 실패:', err)
-    return []
-  }
-}
-
 function parseKeywordItem(raw: Record<string, unknown>, fallbackText: string): KeywordMetric {
-  const compRaw = pickStr(raw.competition)
-  const comp = compRaw === 'Low' || compRaw === 'Medium' || compRaw === 'High' ? compRaw : null
-
   return {
     text: pickStr(raw.text) ?? fallbackText,
     searchVolume: pickNum(raw.vol ?? raw.v),
     cpc: parseCpc(raw.cpc),
-    competition: comp,
+    competition: normalizeCompetition(raw.competition),
     score: parseCpc(raw.score),
   }
 }
@@ -220,52 +206,6 @@ function parseCpc(value: unknown): number | null {
     return Number.isFinite(n) ? n : null
   }
   return null
-}
-
-// ─────────────────────────────────────────────────────────────
-// topsearchkeywords — 도메인 기존 순위 키워드
-// ─────────────────────────────────────────────────────────────
-
-export type TopRankedKeyword = {
-  keyword: string
-  rank: number | null
-  searchVolume: number | null
-  rankingDifficulty: number | null
-  seoClicks: number | null
-  cpc: number | null
-  countryCode: string | null
-}
-
-export async function getTopRankedKeywords(domain: string): Promise<TopRankedKeyword[]> {
-  const cacheKey = `topkw:${domain}`
-  const cached = await getCached(cacheKey, DOMAIN_TTL_DAYS)
-  if (cached) return cached as TopRankedKeyword[]
-
-  try {
-    const raw = (await fetchVeb('/topsearchkeywords', { website: domain })) as Record<
-      string,
-      unknown
-    >
-    const items: TopRankedKeyword[] = Array.isArray(raw.keywords)
-      ? (raw.keywords as Array<Record<string, unknown>>)
-          .map(k => ({
-            keyword: pickStr(k.keyword) ?? '',
-            rank: pickNum(k.rank),
-            searchVolume: pickNum(k.searchVolume),
-            rankingDifficulty: pickNum(k.rankingDifficulty),
-            seoClicks: pickNum(k.seoClicks),
-            cpc: parseCpc(k.broadCostPerClick ?? k.phraseCostPerClick),
-            countryCode: pickStr(k.countryCode),
-          }))
-          .filter(k => k.keyword)
-          .slice(0, 30)
-      : []
-    await setCached(cacheKey, items)
-    return items
-  } catch (err) {
-    console.error('[vebapi.getTopRankedKeywords] 실패:', err)
-    return []
-  }
 }
 
 // ─────────────────────────────────────────────────────────────

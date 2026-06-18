@@ -92,6 +92,11 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
 
     const params = new URLSearchParams({ domain: state.domain })
     if (state.keyword) params.set('keyword', state.keyword)
+    // 사이트 제목/설명을 LLM 키워드 생성 맥락으로 전달 (사업 이해도 ↑)
+    const siteTitle =
+      (state.report?.parsedData?.title as string | undefined) ||
+      (state.report?.parsedData?.metaDescription as string | undefined)
+    if (siteTitle) params.set('title', siteTitle.slice(0, 200))
 
     setEnrichmentLoading(true)
     fetch(`/api/analyze/enrichment?${params.toString()}`, { cache: 'no-store' })
