@@ -654,21 +654,7 @@ export function buildPrioritizedActions(report: Record<string, unknown>): Priori
     })
   }
 
-  // 3) 백링크 격차 — 실제 필드명: ahrefsBacklinks 또는 backlinkTotal
-  const competitor = (report.competitorData ?? {}) as Record<string, unknown>
-  const myMetrics = toCompetitorMetrics(competitor.customerMetrics)
-  const myBacklinks = myMetrics
-    ? (pickNum(myMetrics.ahrefsBacklinks) ?? pickNum(myMetrics.backlinkTotal))
-    : null
-  if (myBacklinks !== null && myBacklinks < 30) {
-    actions.push({
-      title: '백링크 우선순위 10건 확보',
-      period: '1~2개월',
-      effect: 'DA 상승 · 키워드 3~5개 1페이지 진입',
-    })
-  }
-
-  // 4) 이미지 alt
+  // 2-2) 이미지 alt
   const imgNoAlt = pickNum(parsed.imgWithoutAlt) ?? 0
   if (imgNoAlt > 10) {
     actions.push({
@@ -678,15 +664,37 @@ export function buildPrioritizedActions(report: Record<string, unknown>): Priori
     })
   }
 
-  // 폴백 — 진단상 문제가 거의 없으면 기본 로드맵
+  // 온페이지 진단상 문제가 거의 없으면 기본 항목 보강
   if (actions.length === 0) {
-    actions.push(
-      { title: '메타태그 · H1 최적화', period: '1~2주', effect: '검색 노출 클릭률 1.5~2배' },
-      { title: '백링크 우선순위 10건 확보', period: '1~2개월', effect: '키워드 3~5개 1페이지 진입' }
-    )
+    actions.push({
+      title: '메타태그 · H1 최적화',
+      period: '1~2주',
+      effect: '검색 노출 클릭률 1.5~2배',
+    })
   }
 
-  return actions.slice(0, 3)
+  // 3) 백링크 — 항상 포함. 백링크는 한 번에 끝나는 게 아니라 꾸준히 쌓아야 하는
+  //    SEO의 기본 체력이므로, 격차가 크면 시급 확보로, 아니어도 주기적 구축으로 권장.
+  const competitor = (report.competitorData ?? {}) as Record<string, unknown>
+  const myMetrics = toCompetitorMetrics(competitor.customerMetrics)
+  const myBacklinks = myMetrics
+    ? (pickNum(myMetrics.ahrefsBacklinks) ?? pickNum(myMetrics.backlinkTotal))
+    : null
+  const backlinkAction: PriorityAction =
+    myBacklinks !== null && myBacklinks < 30
+      ? {
+          title: '백링크 우선순위 10건 확보 (시급)',
+          period: '1~2개월',
+          effect: 'DA 상승 · 키워드 3~5개 1페이지 진입',
+        }
+      : {
+          title: '주기적 백링크 구축',
+          period: '매월 꾸준히',
+          effect: '검색 순위 방어 + 점진적 상승 (SEO 기본 체력)',
+        }
+
+  // 온페이지 시급 항목 최대 2개 + 백링크는 항상 보장
+  return [...actions.slice(0, 2), backlinkAction]
 }
 
 function inferUrgentActions(report: Record<string, unknown>): string[] {
@@ -818,6 +826,11 @@ export function buildClosingPitch(domain: string): string {
     `✓ <b>회원님 업종의 실제 매출 상승 사례</b>\n` +
     `✓ <b>작업별 정확한 견적</b>\n\n` +
     `이 4가지를 회원님 도메인 상태/사업 규모에 맞춰 운영자가 직접 산출해드립니다.\n\n` +
+    `━━━━━━━━━━━━━━━\n` +
+    `🔗 <b>그리고 백링크는 SEO의 기본 체력입니다.</b>\n` +
+    `상위 노출을 만드는 가장 핵심 요소이자, 한 번 하고 끝나는 게 아니라 ` +
+    `<b>꾸준히 주기적으로 쌓을수록</b> 검색 순위가 안정적으로 올라가고 경쟁사에 밀리지 않습니다. ` +
+    `업종·예산에 맞는 안전한 백링크 구축 플랜도 함께 안내드릴게요.\n\n` +
     `편하게 질문해주세요 — 평균 응답 5~15분 ☺️`
   )
 }
