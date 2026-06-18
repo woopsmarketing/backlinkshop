@@ -27,7 +27,31 @@ const STORAGE_KEY = 'bls_chat_msgs'
 const GREETING =
   '안녕하세요! 백링크샵 SEO 상담 AI예요 😊\n구글 상위 노출·백링크·견적 등 무엇이든 편하게 물어보세요. 24시간 바로 답해드려요.'
 
-const SUGGESTIONS = ['백링크가 꼭 필요한가요?', '비용이 얼마나 드나요?', '얼마나 걸려요?']
+// FAQ: 클릭 시 AI 호출 없이 "고정 답변"을 즉시 노출(빠르고·정확하고·문구 통제 가능).
+// 답변 문구는 챗봇 지식(lib/chat-knowledge.ts)과 톤을 맞춘다 — 개수 단정 금지,
+// 백링크는 월 예산 정기 구축, 기간은 편차 강조.
+const FAQ_ITEMS: { q: string; a: string }[] = [
+  {
+    q: '백링크가 꼭 필요한가요?',
+    a: '네, 백링크는 구글 상위 노출의 가장 핵심 요소이자 SEO의 기본 체력이에요. 한 번 하고 끝나는 게 아니라 꾸준히 주기적으로 쌓을수록 순위가 안정적으로 올라가고 경쟁사에 밀리지 않습니다. 물론 안전한 화이트햇 방식으로만 진행해요.',
+  },
+  {
+    q: '비용이 얼마나 드나요?',
+    a: '온페이지 SEO는 대략 30만원대부터 시작해요. 백링크는 고객님의 월 예산에 맞춰 한 달 동안 꾸준히 구축하는 방식이라, 예산에 맞게 견적을 잡아드립니다. 정확한 금액은 도메인 상태·키워드 경쟁도에 따라 달라져서 텔레그램 상담에서 안내드려요.',
+  },
+  {
+    q: '구글 1페이지까지 얼마나 걸려요?',
+    a: '키워드와 사이트 상태에 따라 편차가 커요. 어떤 사이트는 1주~1달 만에 오르기도 하고, 경쟁이 센 키워드는 4~6개월 이상 걸리기도 합니다. 정해진 기간보다 꾸준한 링크 구축이 핵심이에요.',
+  },
+  {
+    q: '진단은 정말 무료인가요?',
+    a: '네, SEO 진단은 완전 무료예요. 카드 등록이나 자동 결제 같은 건 전혀 없고, 보고서만 받아보고 직접 적용하셔도 됩니다.',
+  },
+  {
+    q: '구글에서 제재받을 위험은 없나요?',
+    a: '안전한 화이트햇 방식으로만 진행해서, 구글 정책 위반 위험이 있는 블랙햇 기법은 사용하지 않아요. 그래서 순위가 안정적으로 유지됩니다.',
+  },
+]
 
 export function AiChatWidget({ context }: { context?: ChatContext }) {
   const [open, setOpen] = useState(false)
@@ -35,6 +59,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [tgLoading, setTgLoading] = useState(false)
+  const [faqOpen, setFaqOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const taRef = useRef<HTMLTextAreaElement>(null)
 
@@ -73,6 +98,17 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
     } catch {
       /* ignore */
     }
+  }
+
+  // FAQ 고정 답변: AI 호출 없이 질문+정답을 바로 대화에 추가
+  const answerFaq = (item: { q: string; a: string }) => {
+    if (loading) return
+    setFaqOpen(false)
+    setMessages(prev => [
+      ...prev,
+      { role: 'user', content: item.q },
+      { role: 'assistant', content: item.a },
+    ])
   }
 
   const send = async (text: string) => {
@@ -207,17 +243,40 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
 
             {messages.length === 0 && (
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {SUGGESTIONS.map(s => (
+                {FAQ_ITEMS.map(item => (
                   <button
-                    key={s}
-                    onClick={() => send(s)}
+                    key={item.q}
+                    onClick={() => answerFaq(item)}
                     className="rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-medium text-purple-700 hover:bg-purple-50"
                   >
-                    {s}
+                    {item.q}
                   </button>
                 ))}
               </div>
             )}
+          </div>
+
+          {/* FAQ 빠른 답변 (대화 중에도 언제든 열기) */}
+          <div className="border-t border-slate-100 bg-white">
+            {faqOpen && (
+              <div className="flex flex-wrap gap-1.5 px-3 pb-1 pt-2">
+                {FAQ_ITEMS.map(item => (
+                  <button
+                    key={item.q}
+                    onClick={() => answerFaq(item)}
+                    className="rounded-full border border-purple-200 bg-white px-3 py-1.5 text-xs font-medium text-purple-700 hover:bg-purple-50"
+                  >
+                    {item.q}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => setFaqOpen(o => !o)}
+              className="flex w-full items-center justify-center gap-1 py-1.5 text-[11px] font-medium text-slate-500 hover:text-purple-700"
+            >
+              ❓ 자주 묻는 질문 {faqOpen ? '▲' : '▼'}
+            </button>
           </div>
 
           {/* 텔레그램 승격 */}
