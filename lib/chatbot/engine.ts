@@ -38,7 +38,13 @@ export function buildSystemPrompt(config: ChatbotConfig, context?: ChatContext):
 
 ${p.businessKnowledge}`
 
-  if (context && (context.domain || context.score != null || (context.gaps?.length ?? 0) > 0)) {
+  if (
+    context &&
+    (context.domain ||
+      context.score != null ||
+      (context.gaps?.length ?? 0) > 0 ||
+      context.analyzedAt)
+  ) {
     prompt += `\n[지금 이 방문자의 진단 결과 — 답변에 자연스럽게 활용]\n`
     if (context.domain) prompt += `- 도메인: ${context.domain}\n`
     if (context.keyword) prompt += `- 핵심 키워드: ${context.keyword}\n`
@@ -47,8 +53,31 @@ ${p.businessKnowledge}`
       prompt += `- 경쟁사 대비 격차: ${context.gaps.slice(0, 5).join(', ')}\n`
     if (context.issues?.length)
       prompt += `- 우선 개선 항목: ${context.issues.slice(0, 5).join(', ')}\n`
+
+    // 캐시 진단 안내 — 같은 URL은 14일간 동일 결과 정책
+    if (context.analyzedAt) {
+      const diffDays = Math.floor(
+        (Date.now() - new Date(context.analyzedAt).getTime()) / (1000 * 60 * 60 * 24)
+      )
+      if (Number.isFinite(diffDays) && diffDays >= 0) {
+        if (diffDays >= 1) {
+          prompt += `- 진단 캐시 상태: 이 URL은 ${diffDays}일 전에 분석된 캐시 결과예요.\n`
+        } else {
+          prompt += `- 진단 캐시 상태: 이 URL은 오늘 막 분석된 최신 결과예요.\n`
+        }
+      }
+    }
+
     prompt += `이 데이터를 근거로 이 방문자에 맞춘 답을 줄 수 있으면 활용하세요. 단 없는 수치를 지어내지 마세요.\n`
   }
+
+  // 캐시 정책: 방문자가 "왜 똑같지?", "다시 진단해도 같네" 등 의문을 가질 수 있으므로 AI가 정확히 안내해야 한다.
+  prompt += `\n[진단 캐시 정책 — 질문 받으면 정확히 안내]
+- 같은 URL을 다시 입력하면 14일간은 이전 진단 결과를 그대로 보여드린다(SERP·키워드 데이터 재요청 비용 절감 + 결과 일관성).
+- 따라서 방문자가 같은 URL로 재진단해도 결과가 "동일"하게 보이는 것은 정상이며, 분석이 안 된 게 아니다.
+- 위 컨텍스트에 "진단 캐시 상태"가 있으면 그 일수를 그대로 인용해 안내한다. 없으면 "보통 14일까지 같은 결과로 안내드린다"고만 답한다.
+- 더 빨리 재진단하고 싶다는 요청에는 ${p.escalationChannelName} 상담에서 운영자가 도와드린다고 연결한다.
+`
 
   return prompt
 }

@@ -194,6 +194,7 @@ export function AnalyzeClient({ initial }: { initial: AnalyzeInitialState }) {
           domain: state.domain,
           keyword: state.keyword,
           score: state.report?.score ?? null,
+          analyzedAt: state.analyzedAt,
         }}
       />
     </main>

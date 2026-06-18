@@ -14,6 +14,8 @@ export type ChatContext = {
   gaps?: string[]
   /** 진단된 우선 개선 항목 요약 */
   issues?: string[]
+  /** 분석 시각(ISO). 같은 URL은 14일간 캐시 → AI가 캐시 여부를 안내할 수 있게 전달. */
+  analyzedAt?: string | null
 }
 
 /** 빠른 메뉴(FAQ·가격)의 한 항목 — 클릭 시 AI 호출 없이 고정 답변을 즉시 노출. */
