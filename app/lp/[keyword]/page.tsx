@@ -3,7 +3,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { LandingBody, type LPTheme } from '../seo/LandingBody'
-import { VARIANTS } from '../seo/LPHeroCopy'
+// 주의: VARIANTS는 'use client' 모듈(LPHeroCopy)에 있어 서버에서 import하면
+// 실제 객체가 아닌 클라이언트 참조가 와서 키 조회가 깨진다. 검증은 아래 META로 한다.
 
 // 동적 렌더: ?theme=dark 가 요청마다 반영되도록 + 엣지 네거티브(404) 캐시 우회.
 export const dynamic = 'force-dynamic'
@@ -49,7 +50,7 @@ export default async function LPKeywordPage({
   searchParams: Promise<{ theme?: string }>
 }) {
   const { keyword } = await params
-  if (!VARIANTS[keyword]) notFound()
+  if (!META[keyword]) notFound()
   const sp = await searchParams
   const theme: LPTheme = sp?.theme === 'dark' ? 'dark' : 'light'
   return <LandingBody variantKey={keyword} theme={theme} />
