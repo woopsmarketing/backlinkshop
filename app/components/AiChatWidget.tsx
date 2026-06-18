@@ -37,7 +37,7 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
   {
     q: '비용이 얼마나 드나요?',
-    a: '온페이지 SEO는 대략 30만원대부터 시작해요. 백링크는 고객님의 월 예산에 맞춰 한 달 동안 꾸준히 구축하는 방식이라, 예산에 맞게 견적을 잡아드립니다. 정확한 금액은 도메인 상태·키워드 경쟁도에 따라 달라져서 텔레그램 상담에서 안내드려요.',
+    a: '서비스마다 달라요. 간단히는 — 플랜 백링크는 월 예산 맞춤(월 100만원 기준 5,000건 이상), PBN 백링크는 50개 30만원부터예요. 아래 "💰 가격·견적" 버튼에서 항목별로 자세히 볼 수 있고, 정확한 견적은 텔레그램에서 안내드려요.',
   },
   {
     q: '구글 1페이지까지 얼마나 걸려요?',
@@ -53,6 +53,30 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
   },
 ]
 
+// 가격·견적: 서비스 항목별 고정 답변. 클릭 시 해당 가격표/설명을 즉시 노출.
+const PRICE_ITEMS: { q: string; a: string }[] = [
+  {
+    q: '플랜 백링크',
+    a: '플랜 백링크는 유튜브·네이버블로그·레딧·각종 SNS 등 외부 플랫폼에 회원가입·게스트로 콘텐츠를 작성하고 백링크를 거는 방식이에요.\n\n고객님의 월 예산에 맞춰 꾸준히 구축합니다.\n• 기준: 월 100만원 → 백링크 5,000건 이상 구축\n• 예산에 맞춰 자유롭게 커스터마이징\n\n정확한 구성은 텔레그램에서 안내드려요.',
+  },
+  {
+    q: 'PBN 백링크',
+    a: 'PBN 백링크는 백링크샵이 직접 보유·운영하는 고품질 프리미엄 도메인 사이트에 백링크를 거는 방식이에요. (외부 플랫폼이 아닌 "우리 자산"에 구축 — 이게 플랜 백링크와의 차이)\n\n■ 고품질 PBN\n· 50개 30만 / 100개 57만 / 200개 95만 / 500개 220만 원\n\n■ 로직 업그레이드 PBN (최상위 퀄리티)\n· 50개 80만 / 100개 150만 / 200개 250만 / 500개 450만 원\n\n서비스 특성상 유지 기간이 추가될 수 있어요. 자세한 건 텔레그램에서!',
+  },
+  {
+    q: '프리미엄 도메인',
+    a: '백링크샵이 보유한 고품질 프리미엄 도메인을 활용하는 옵션이에요. 도메인 등급·이력에 따라 가격이 달라져서, 현재 보유 현황과 정확한 견적은 텔레그램에서 바로 안내드려요.',
+  },
+  {
+    q: 'PBN 제작',
+    a: '고객님 전용 PBN(자체 운영 사이트망)을 새로 제작하는 서비스예요. 도메인·호스팅·유니크 콘텐츠가 포함되며, 제작 규모에 따라 견적이 달라집니다. 구성과 비용은 텔레그램에서 안내드려요.',
+  },
+  {
+    q: '사이트가 여러 개라면?',
+    a: '운영 사이트가 여러 개라면 백링크를 병렬로 구축해 효율을 크게 높이는 방식을 제안드려요. 사이트 수·목표에 맞춰 패키지를 구성하니, 텔레그램에서 상담받아 보시는 걸 추천드려요.',
+  },
+]
+
 export function AiChatWidget({ context }: { context?: ChatContext }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<Msg[]>([])
@@ -60,6 +84,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
   const [loading, setLoading] = useState(false)
   const [tgLoading, setTgLoading] = useState(false)
   const [faqOpen, setFaqOpen] = useState(false)
+  const [priceOpen, setPriceOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const taRef = useRef<HTMLTextAreaElement>(null)
 
@@ -100,10 +125,11 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
     }
   }
 
-  // FAQ 고정 답변: AI 호출 없이 질문+정답을 바로 대화에 추가
+  // FAQ·가격 고정 답변: AI 호출 없이 질문+정답을 바로 대화에 추가
   const answerFaq = (item: { q: string; a: string }) => {
     if (loading) return
     setFaqOpen(false)
+    setPriceOpen(false)
     setMessages(prev => [
       ...prev,
       { role: 'user', content: item.q },
@@ -256,7 +282,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
             )}
           </div>
 
-          {/* FAQ 빠른 답변 (대화 중에도 언제든 열기) */}
+          {/* 빠른 메뉴: FAQ + 가격·견적 (대화 중에도 언제든 열기) */}
           <div className="border-t border-slate-100 bg-white">
             {faqOpen && (
               <div className="flex flex-wrap gap-1.5 px-3 pb-1 pt-2">
@@ -271,12 +297,42 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
                 ))}
               </div>
             )}
-            <button
-              onClick={() => setFaqOpen(o => !o)}
-              className="flex w-full items-center justify-center gap-1 py-1.5 text-[11px] font-medium text-slate-500 hover:text-purple-700"
-            >
-              ❓ 자주 묻는 질문 {faqOpen ? '▲' : '▼'}
-            </button>
+            {priceOpen && (
+              <div className="px-3 pb-1 pt-2">
+                <p className="mb-1.5 text-[11px] text-slate-400">어떤 서비스 가격이 궁금하세요?</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {PRICE_ITEMS.map(item => (
+                    <button
+                      key={item.q}
+                      onClick={() => answerFaq(item)}
+                      className="rounded-full border border-emerald-200 bg-white px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
+                    >
+                      {item.q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="flex divide-x divide-slate-100">
+              <button
+                onClick={() => {
+                  setFaqOpen(o => !o)
+                  setPriceOpen(false)
+                }}
+                className="flex flex-1 items-center justify-center gap-1 py-1.5 text-[11px] font-medium text-slate-500 hover:text-purple-700"
+              >
+                ❓ 자주 묻는 질문 {faqOpen ? '▲' : '▼'}
+              </button>
+              <button
+                onClick={() => {
+                  setPriceOpen(o => !o)
+                  setFaqOpen(false)
+                }}
+                className="flex flex-1 items-center justify-center gap-1 py-1.5 text-[11px] font-medium text-slate-500 hover:text-emerald-700"
+              >
+                💰 가격·견적 {priceOpen ? '▲' : '▼'}
+              </button>
+            </div>
           </div>
 
           {/* 텔레그램 승격 */}
