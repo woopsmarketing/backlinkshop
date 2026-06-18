@@ -21,6 +21,9 @@ export type ChatContext = {
 type Msg = { role: 'user' | 'assistant'; content: string }
 
 const TELEGRAM_FALLBACK = 'https://t.me/backlinkshop_seo_bot'
+// 대화는 서버에 저장하지 않는다(완전 익명). 새로고침에도 유지되도록 브라우저
+// sessionStorage(탭 단위)에만 보관 — 탭을 닫으면 자동 삭제된다.
+const STORAGE_KEY = 'bls_chat_msgs'
 const GREETING =
   '안녕하세요! 백링크샵 SEO 상담 AI예요 😊\n구글 상위 노출·백링크·견적 등 무엇이든 편하게 물어보세요. 24시간 바로 답해드려요.'
 
@@ -38,6 +41,39 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages, loading, open])
+
+  // 새로고침 시 대화 복원 (sessionStorage, 서버 미전송)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) setMessages(parsed as Msg[])
+      }
+    } catch {
+      /* storage 차단 — 무시 */
+    }
+  }, [])
+
+  // 대화 변경 시 저장
+  useEffect(() => {
+    try {
+      if (messages.length > 0) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages))
+    } catch {
+      /* ignore */
+    }
+  }, [messages])
+
+  const resetChat = () => {
+    setMessages([])
+    setInput('')
+    if (taRef.current) taRef.current.style.height = 'auto'
+    try {
+      sessionStorage.removeItem(STORAGE_KEY)
+    } catch {
+      /* ignore */
+    }
+  }
 
   const send = async (text: string) => {
     const trimmed = text.trim()
@@ -121,20 +157,44 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
                 <p className="text-[11px] text-purple-100">24시간 즉시 응답</p>
               </div>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="닫기"
-              className="rounded-full p-1 text-purple-100 hover:bg-purple-500"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+            <div className="flex items-center gap-1">
+              {messages.length > 0 && (
+                <button
+                  onClick={resetChat}
+                  aria-label="새 대화 시작"
+                  className="flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium text-purple-100 hover:bg-purple-500"
+                >
+                  <svg
+                    className="h-3.5 w-3.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  새 대화
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="닫기"
+                className="rounded-full p-1 text-purple-100 hover:bg-purple-500"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
 
           {/* 메시지 영역 */}
