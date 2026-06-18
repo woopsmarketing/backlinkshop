@@ -30,6 +30,11 @@ const META: Record<string, { title: string; description: string }> = {
     description:
       '대행사 비용은 그대로인데 리드가 안 들어온다면, 어디서부터 막혔는지 데이터로 먼저 확인하세요.',
   },
+  black: {
+    title: '블랙키워드 상위노출 무료 진단 | 백링크샵',
+    description:
+      '광고가 막히는 업종일수록 검색 상위노출이 매출을 좌우합니다. 어떤 키워드가 가능한지, 내 사이트가 어디서 막혔는지 10분 무료로 확인하세요.',
+  },
 }
 
 export async function generateMetadata({
