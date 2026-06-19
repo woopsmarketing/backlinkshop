@@ -63,3 +63,19 @@ html {
     width: 5%;
   }
 }
+
+/* CTA 버튼 글로우 펄스 — 시선을 버튼으로 유도 (opacity + scale 함께 변해 또렷하게) */
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+.animate-glow {
+  animation: glowPulse 2s ease-in-out infinite;
+}

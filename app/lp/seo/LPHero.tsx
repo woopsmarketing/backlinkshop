@@ -1,0 +1,175 @@
+// 테마 반응형 hero. 라이트(backlink·audit·agency) / 다크(rank·black) 공용.
+// 레이아웃: [좌] 헤드라인+값리스트+신뢰  |  [우] 폼(강조) → 그 아래 증거 띠.
+// 폼은 우측 단독 칸 + 글로우로 띄워 주인공으로. 모바일은 스택 후 폼 아래 컴팩트 증거.
+import type { LPTheme } from './LandingBody'
+import { LPHeroForm } from './LPHeroForm'
+import { LPHeroCopy } from './LPHeroCopy'
+import { LPHeroPreview } from './LPHeroPreview'
+
+// 진단으로 얻는 것 — 상위노출 '핵심 열쇠'를 손에 쥐는 것처럼 강하게.
+const VALUE_HEADLINE = '구글 상위노출의 핵심, 진단 한 번에 전부 드러납니다'
+const VALUE_ITEMS = [
+  '경쟁사 TOP5를 1페이지에 올린 백링크 출처 — 그대로 따라갈 목록',
+  '내 사이트 순위를 막고 있는 결정적 구멍을 콕 집어서',
+  '메인 키워드, 1페이지까지 남은 거리와 진입 난이도',
+  '딱 몇 개만 고치면 순위가 뛰는 우선순위 리스트',
+]
+
+const TRUST_ITEMS = [
+  '50개 항목 정밀 진단',
+  '경쟁사 TOP5 비교 포함',
+  '회원가입·카드 등록 없음',
+  '평균 10분 내 리포트 발송',
+]
+
+export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; theme?: LPTheme }) {
+  const dark = theme === 'dark'
+
+  return (
+    <section className={`relative overflow-hidden ${dark ? 'text-white' : 'text-gray-900'}`}>
+      {/* 배경 */}
+      {dark ? (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-b from-orange-950/80 via-slate-900 to-slate-950" />
+          <div
+            className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-orange-500 rounded-full filter blur-[120px] opacity-40"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute top-1/3 -right-20 w-[400px] h-[400px] bg-amber-600 rounded-full filter blur-[100px] opacity-30"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-red-900 rounded-full filter blur-[120px] opacity-35"
+            aria-hidden="true"
+          />
+        </>
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-b from-orange-50 via-white to-white" />
+          <div
+            className="absolute -top-24 -left-24 w-[480px] h-[480px] bg-orange-200 rounded-full filter blur-[130px] opacity-50"
+            aria-hidden="true"
+          />
+          <div
+            className="absolute top-1/4 -right-24 w-[400px] h-[400px] bg-amber-200 rounded-full filter blur-[120px] opacity-40"
+            aria-hidden="true"
+          />
+        </>
+      )}
+
+      <div className="relative max-w-5xl mx-auto px-4 py-14 sm:py-20">
+        {/* 상단 헤드라인 블록 — 가운데 정렬, 일관된 폭으로 정돈 */}
+        <div className="max-w-3xl mx-auto text-center">
+          <LPHeroCopy variantKey={variantKey} theme={theme} />
+
+          {/* 값 리스트 — sub 대신, 상위노출 핵심을 쥐는 것처럼 */}
+          <div
+            className={`mt-1 mb-7 rounded-2xl border p-5 sm:p-6 text-left ${
+              dark
+                ? 'bg-white/[0.06] border-orange-400/20 backdrop-blur'
+                : 'bg-white border-orange-100 shadow-sm'
+            }`}
+          >
+            <p
+              className={`flex items-center gap-2 text-base font-bold mb-3 ${
+                dark ? 'text-white' : 'text-gray-900'
+              }`}
+            >
+              <svg
+                className="w-5 h-5 flex-shrink-0 text-emerald-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              {VALUE_HEADLINE}
+            </p>
+            <ul className="grid sm:grid-cols-2 gap-x-5 gap-y-2.5">
+              {VALUE_ITEMS.map(t => (
+                <li
+                  key={t}
+                  className={`flex items-start gap-2 text-sm ${dark ? 'text-gray-200' : 'text-gray-700'}`}
+                >
+                  <svg
+                    className="w-4 h-4 flex-shrink-0 mt-0.5 text-orange-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 신뢰 스트립 */}
+          <ul
+            className={`flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm ${
+              dark ? 'text-gray-300' : 'text-gray-600'
+            }`}
+          >
+            {TRUST_ITEMS.map(t => (
+              <li key={t} className="inline-flex items-center gap-1.5">
+                <svg
+                  className="h-4 w-4 flex-shrink-0 text-emerald-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* 2컬럼: 폼(강조) | 증거 미리보기 */}
+        <div className="grid lg:grid-cols-2 gap-8 items-start mt-12">
+          {/* 폼 — 뒤 글로우 + 카드 자체 오렌지 링으로 라이트에서도 또렷하게 */}
+          <div id="hero-form" className="relative scroll-mt-8">
+            <div
+              className="absolute -inset-3 rounded-3xl bg-gradient-to-br from-orange-400/25 to-red-400/15 blur-2xl"
+              aria-hidden="true"
+            />
+            <div className="relative">
+              <LPHeroForm />
+
+              {/* 모바일 미리보기 — 폼 바로 아래 (데스크탑은 우측 컬럼) */}
+              <div className="lg:hidden mt-5">
+                <LPHeroPreview compact />
+              </div>
+            </div>
+          </div>
+
+          {/* 데스크탑 우측 미리보기 */}
+          <div className="hidden lg:block">
+            <LPHeroPreview />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}

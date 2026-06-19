@@ -1,20 +1,24 @@
 // 공용 LP 엔진: variant(키워드 카피) + theme(light/dark)만 다르게 주면 재사용된다.
-// Hero·성과지표·최종CTA·푸터는 양쪽 테마 공통(이미 다크). 라이트/다크가 갈리는 건 본문 4개 섹션뿐.
-import { LPHeroForm } from './LPHeroForm'
-import { LPHeroCopy } from './LPHeroCopy'
+// hero는 키워드별 레지스트리(heroes/)에서 결정. 성과지표·최종CTA·푸터는 양쪽 테마 공통(이미 다크).
+// 라이트/다크가 갈리는 건 본문 섹션. theme은 키워드에서 자동 결정, themeOverride로 테스트 가능.
+import Link from 'next/link'
 import { LPFloatingCTA } from './LPFloatingCTA'
 import { LPActivityToast } from './LPActivityToast'
 import { AiChatWidget } from '@/app/components/AiChatWidget'
+import { resolveHero } from './heroes'
 
 export type LPTheme = 'light' | 'dark'
 
 export function LandingBody({
   variantKey,
-  theme = 'light',
+  themeOverride,
 }: {
   variantKey?: string
-  theme?: LPTheme
+  themeOverride?: LPTheme
 }) {
+  const heroConfig = resolveHero(variantKey)
+  const Hero = heroConfig.Hero
+  const theme = themeOverride ?? heroConfig.theme
   const dark = theme === 'dark'
   // 본문 섹션 공용 토큰 (라이트 분기는 기존 디자인 그대로)
   const tHeading = dark ? 'text-white' : 'text-gray-900'
@@ -27,233 +31,8 @@ export function LandingBody({
 
   return (
     <main className={`min-h-screen ${dark ? 'bg-slate-950' : 'bg-white'}`}>
-      {/* ── SECTION 1: Hero (테마 공통, 항상 다크 그라데이션) ── */}
-      <section className="relative overflow-hidden text-white">
-        <div className="absolute inset-0 bg-gradient-to-b from-orange-950/80 via-slate-900 to-slate-950" />
-        <div
-          className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-orange-500 rounded-full filter blur-[120px] opacity-40"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute top-1/3 -right-20 w-[400px] h-[400px] bg-amber-600 rounded-full filter blur-[100px] opacity-30"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute -bottom-32 left-1/3 w-[500px] h-[500px] bg-red-900 rounded-full filter blur-[120px] opacity-35"
-          aria-hidden="true"
-        />
-
-        <div className="relative max-w-6xl mx-auto px-4 py-16 sm:py-24">
-          <div className="text-center mb-6">
-            <LPHeroCopy variantKey={variantKey} />
-          </div>
-
-          {/* 신뢰 스트립 (모바일 포함 above-fold 노출) */}
-          <ul className="mb-12 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-gray-300">
-            {[
-              '50개 항목 정밀 진단',
-              '경쟁사 TOP5 비교 포함',
-              '회원가입·카드 등록 없음',
-              '평균 10분 내 리포트 발송',
-            ].map(t => (
-              <li key={t} className="inline-flex items-center gap-1.5">
-                <svg
-                  className="h-4 w-4 flex-shrink-0 text-emerald-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                {t}
-              </li>
-            ))}
-          </ul>
-
-          {/* 2컬럼: 폼(왼쪽) + 미리보기(오른쪽) */}
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            <div id="hero-form" className="scroll-mt-8">
-              <LPHeroForm />
-            </div>
-
-            <div className="hidden lg:block space-y-5">
-              <div className="bg-white rounded-2xl shadow-2xl p-5">
-                <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider text-center">
-                  진단 보고서 미리보기
-                </p>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-gray-900">종합 SEO 점수</span>
-                  <span className="text-lg font-extrabold text-orange-500">72 / 100</span>
-                </div>
-                <div className="w-full bg-gray-100 rounded-full h-2.5 mb-4">
-                  <div
-                    className="bg-gradient-to-r from-orange-400 to-red-500 h-2.5 rounded-full"
-                    style={{ width: '72%' }}
-                  />
-                </div>
-                <div className="space-y-1.5 mb-4">
-                  {[
-                    { label: '도메인 권위도 (DA)', value: '28', status: 'bad' },
-                    { label: '페이지 속도', value: '2.4초', status: 'warn' },
-                    { label: '모바일 최적화', value: '양호', status: 'good' },
-                    { label: '메타태그 설정', value: '미흡', status: 'bad' },
-                    { label: '백링크 수', value: '12개', status: 'bad' },
-                  ].map(item => (
-                    <div
-                      key={item.label}
-                      className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-gray-50"
-                    >
-                      <span className="text-xs text-gray-600">{item.label}</span>
-                      <span
-                        className={`text-xs font-bold ${
-                          item.status === 'bad'
-                            ? 'text-red-500'
-                            : item.status === 'warn'
-                              ? 'text-orange-500'
-                              : 'text-green-500'
-                        }`}
-                      >
-                        {item.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                  경쟁사 TOP5 비교
-                </p>
-                <div className="overflow-hidden rounded-lg border border-gray-100 mb-3">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="py-1.5 px-2 text-left text-gray-500 font-semibold">항목</th>
-                        <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">
-                          내 사이트
-                        </th>
-                        <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">
-                          경쟁사 평균
-                        </th>
-                        <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">격차</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                      <tr>
-                        <td className="py-1.5 px-2 text-gray-700">DA</td>
-                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">28</td>
-                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">52</td>
-                        <td className="py-1.5 px-2 text-right text-red-500 font-bold">-24</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 px-2 text-gray-700">백링크</td>
-                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">12</td>
-                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">340</td>
-                        <td className="py-1.5 px-2 text-right text-red-500 font-bold">-328</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1.5 px-2 text-gray-700">트래픽</td>
-                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">450</td>
-                        <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">
-                          8,200
-                        </td>
-                        <td className="py-1.5 px-2 text-right text-red-500 font-bold">-7,750</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <p className="text-xs text-center text-red-500 font-semibold">
-                  이 격차를 줄이는 방법, 리포트에서 확인하세요
-                </p>
-              </div>
-
-              <div className="bg-white rounded-2xl shadow-2xl p-5">
-                <p className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wider text-center">
-                  SEO 최적화 후 예상 순위 변화
-                </p>
-                <div className="relative h-40 mb-3">
-                  <div className="absolute inset-0 flex flex-col justify-between">
-                    <div className="border-b border-dashed border-gray-100 flex items-center">
-                      <span className="text-[10px] text-gray-400 w-10 text-right pr-2">1위</span>
-                    </div>
-                    <div className="border-b border-dashed border-gray-100 flex items-center">
-                      <span className="text-[10px] text-gray-400 w-10 text-right pr-2">25위</span>
-                    </div>
-                    <div className="border-b border-dashed border-gray-100 flex items-center">
-                      <span className="text-[10px] text-gray-400 w-10 text-right pr-2">50위</span>
-                    </div>
-                  </div>
-                  <svg
-                    className="absolute left-10 top-0 right-0 bottom-0"
-                    viewBox="0 0 300 140"
-                    preserveAspectRatio="none"
-                  >
-                    <defs>
-                      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#22c55e" stopOpacity="0.3" />
-                        <stop offset="100%" stopColor="#22c55e" stopOpacity="0.02" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M0,120 C30,115 60,110 90,100 C120,90 140,85 170,60 C200,35 230,18 260,10 C275,7 290,5 300,4 L300,140 L0,140 Z"
-                      fill="url(#areaGrad)"
-                    />
-                    <path
-                      d="M0,120 C30,115 60,110 90,100 C120,90 140,85 170,60 C200,35 230,18 260,10 C275,7 290,5 300,4"
-                      fill="none"
-                      stroke="#22c55e"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="0" cy="120" r="4" fill="#ef4444" />
-                    <circle cx="300" cy="4" r="4" fill="#22c55e" />
-                  </svg>
-                </div>
-                <div className="flex items-center justify-between px-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                    <div>
-                      <p className="text-[10px] text-gray-400">최적화 전</p>
-                      <p className="text-sm font-bold text-red-500">42위</p>
-                    </div>
-                  </div>
-                  <div className="flex-1 mx-4 flex items-center justify-center">
-                    <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-green-50">
-                      <svg
-                        className="w-3.5 h-3.5 text-green-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 10l7-7m0 0l7 7m-7-7v18"
-                        />
-                      </svg>
-                      <span className="text-xs font-bold text-green-600">+39 순위 상승</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div>
-                      <p className="text-[10px] text-gray-400">4주 후</p>
-                      <p className="text-sm font-bold text-green-500">3위</p>
-                    </div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                  </div>
-                </div>
-                <p className="text-[10px] text-gray-400 text-center mt-3">
-                  * 실제 결과는 키워드 경쟁도에 따라 달라질 수 있습니다
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── SECTION 1: Hero (키워드별 레지스트리에서 결정, 테마 반응형) ── */}
+      <Hero variantKey={variantKey} theme={theme} />
 
       {/* ── SECTION 2: 핵심 성과 지표 (테마 공통, 이미 다크) ── */}
       <section className="py-4 bg-gray-900">
@@ -261,7 +40,7 @@ export function LandingBody({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-8 text-center">
             {[
               { num: '50+', label: '진단 항목', sub: '정밀 분석' },
-              { num: '10분', label: '분석 완료', sub: '이메일 발송' },
+              { num: '1분', label: '분석 완료', sub: '즉시 보고' },
               { num: '0원', label: '완전 무료', sub: '카드 등록 불필요' },
               { num: '1만+', label: '경쟁사 데이터', sub: 'TOP5 비교 포함' },
             ].map(item => (
@@ -275,61 +54,207 @@ export function LandingBody({
         </div>
       </section>
 
-      {/* ── SECTION 2.5: "왜 무료냐" 안심 박스 ── */}
-      <section className={`py-12 sm:py-16 px-4 ${dark ? 'bg-slate-900' : 'bg-orange-50/50'}`}>
-        <div className="max-w-3xl mx-auto">
-          <div
-            className={`rounded-2xl border shadow-sm p-6 sm:p-10 ${dark ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-orange-100'}`}
-          >
-            <p className="text-gray-400 font-semibold text-xs uppercase tracking-wider mb-2">
-              자주 받는 질문
-            </p>
-            <h2 className={`text-2xl sm:text-3xl font-bold mb-6 ${tHeading}`}>
-              왜 무료로 제공하나요?
-            </h2>
-            <div className={`space-y-4 leading-relaxed text-[15px] sm:text-base ${tBody}`}>
-              <p>
-                진단은 어디가 막혔는지를 짚는 작업입니다. 결과를 보면 두 가지로 나뉩니다. 직접
-                적용해서 해결되는 경우와, 구조적으로 도움이 필요한 경우.
-              </p>
-              <p>
-                저희는 후자에 해당하는 분들과만 따로 일합니다. 그래서 진단 자체는 비용을 받지
-                않습니다.
-              </p>
-              <p>
-                회원가입·카드 등록·자동 결제는 없습니다. 원치 않으시면 보고서만 받고 끝내셔도
-                됩니다.
+      {/* ── SECTION 2.7: 생성형 AI 노출(GEO) 교차 안내 — 왜무료 위 (AI 페이지엔 숨김) ── */}
+      {variantKey !== 'ai' && (
+        <section
+          className={`py-16 sm:py-24 px-4 ${dark ? 'bg-slate-950' : 'bg-gradient-to-b from-violet-50/70 to-white'}`}
+        >
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-10">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 text-violet-500 text-xs font-bold mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
+                NEW · 생성형 AI 노출 (GEO)
+              </span>
+              <h2 className={`text-2xl sm:text-4xl font-bold mb-3 ${tHeading}`}>
+                고객은 이제 구글이 아니라
+                <br />
+                <span className="text-violet-500">AI에게 추천을 묻습니다</span>
+              </h2>
+              <p className={`max-w-2xl mx-auto ${tSub}`}>
+                ChatGPT·제미나이·퍼플렉시티가 추천하는 브랜드가 매출을 가져갑니다. 내 브랜드는 지금
+                AI 답변에 어떻게 노출되고 있을까요?
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 mt-7">
-              {['회원가입 없음', '카드 등록 없음', '자동 결제 없음', '원치 않으면 연락 없음'].map(
-                label => (
-                  <span
-                    key={label}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${
-                      dark
-                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                        : 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                    }`}
+
+            {/* 개념 카드 3 */}
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              {[
+                {
+                  icon: '💬',
+                  bg: 'bg-violet-100 text-violet-600',
+                  title: '고객은 AI에게 추천받습니다',
+                  desc: "구매 전 'OO 잘하는 곳 추천해줘'를 AI에게 묻는 사람이 빠르게 늘고 있습니다.",
+                },
+                {
+                  icon: '⚠️',
+                  bg: 'bg-red-100 text-red-500',
+                  title: 'AI에 없으면 추천도 없습니다',
+                  desc: '내 브랜드가 AI가 신뢰하는 출처에 없으면, AI 답변엔 경쟁사만 등장합니다.',
+                },
+                {
+                  icon: '🚀',
+                  bg: 'bg-indigo-100 text-indigo-600',
+                  title: '지금이 선점 타이밍',
+                  desc: '아직 대부분이 GEO를 모릅니다. 먼저 최적화한 브랜드가 AI 답변을 선점합니다.',
+                },
+              ].map(c => (
+                <div
+                  key={c.title}
+                  className={`rounded-2xl border p-6 transition hover:-translate-y-1 hover:shadow-lg ${
+                    dark
+                      ? 'bg-slate-800/60 border-slate-700 hover:border-violet-500/40'
+                      : 'bg-white border-violet-100 hover:border-violet-300'
+                  }`}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 ${c.bg}`}
                   >
-                    <svg
-                      className="w-3.5 h-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
+                    {c.icon}
+                  </div>
+                  <p className={`font-bold text-lg mb-2 ${tHeading}`}>{c.title}</p>
+                  <p className={`text-sm leading-relaxed ${tSub}`}>{c.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* 노출 현황 미니 패널 + CTA */}
+            <div
+              className={`relative overflow-hidden rounded-2xl border p-6 sm:p-8 ${
+                dark
+                  ? 'bg-violet-950/40 border-violet-500/30'
+                  : 'bg-white border-violet-100 shadow-sm'
+              }`}
+            >
+              <div
+                className="absolute -top-16 -right-16 w-64 h-64 bg-violet-500 rounded-full filter blur-[100px] opacity-20"
+                aria-hidden="true"
+              />
+              <div className="relative grid lg:grid-cols-2 gap-6 items-center">
+                <div>
+                  <p className={`font-bold text-lg mb-3 ${tHeading}`}>
+                    지금 AI는 경쟁사를 추천하고 있습니다
+                  </p>
+                  <div className="space-y-2">
+                    {['ChatGPT', '제미나이', '퍼플렉시티'].map(p => (
+                      <div
+                        key={p}
+                        className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm ${
+                          dark ? 'bg-slate-800/70' : 'bg-violet-50/70'
+                        }`}
+                      >
+                        <span className={`font-medium ${tBody}`}>{p}</span>
+                        <span className="flex items-center gap-4 text-xs font-semibold">
+                          <span className="text-red-500">내 브랜드 ✕</span>
+                          <span className="text-green-500">경쟁사 ✓</span>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <p className={`text-sm mb-4 ${tSub}`}>
+                    내 브랜드가 AI 답변에 어떻게 노출되는지, 경쟁사와 비교해 지금 무료로 확인하세요.
+                  </p>
+                  <Link
+                    href="/lp/ai"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-base font-bold rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:shadow-xl hover:shadow-violet-500/25 hover:scale-[1.02] transition-all"
+                  >
+                    내 브랜드 AI 노출 무료 진단
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2.5}
-                        d="M5 13l4 4L19 7"
+                        d="M13 7l5 5m0 0l-5 5m5-5H6"
                       />
                     </svg>
-                    {label}
-                  </span>
-                )
-              )}
+                  </Link>
+                </div>
+              </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── SECTION 2.5: "왜 무료냐" 안심 (카드형) ── */}
+      <section className={`py-16 sm:py-20 px-4 ${dark ? 'bg-slate-900' : 'bg-orange-50/50'}`}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-orange-600 font-semibold text-sm mb-2">자주 받는 질문</p>
+            <h2 className={`text-2xl sm:text-4xl font-bold ${tHeading}`}>왜 무료로 제공하나요?</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4 mb-8">
+            {[
+              {
+                step: '01',
+                icon: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z',
+                title: "진단은 '어디가 막혔나'를 짚는 일",
+                desc: '결과를 보면 직접 적용해 해결되는 경우와, 구조적으로 도움이 필요한 경우로 나뉩니다.',
+              },
+              {
+                step: '02',
+                icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
+                title: '저희는 후자와만 함께합니다',
+                desc: '그래서 진단 자체는 비용을 받지 않습니다. 결과만 받아 직접 적용하셔도 됩니다.',
+              },
+              {
+                step: '03',
+                icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+                title: '부담 장치가 전혀 없습니다',
+                desc: '회원가입·카드 등록·자동 결제 없음. 원치 않으시면 연락도 가지 않습니다.',
+              },
+            ].map(c => (
+              <div
+                key={c.step}
+                className={`rounded-2xl border p-6 transition hover:-translate-y-1 hover:shadow-lg ${
+                  dark
+                    ? 'bg-slate-800/60 border-slate-700 hover:border-orange-500/40'
+                    : 'bg-white border-orange-100 hover:border-orange-300'
+                }`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-11 h-11 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d={c.icon}
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-2xl font-extrabold text-orange-200">{c.step}</span>
+                </div>
+                <p className={`font-bold text-lg mb-2 ${tHeading}`}>{c.title}</p>
+                <p className={`text-sm leading-relaxed ${tSub}`}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-2">
+            {['회원가입 없음', '카드 등록 없음', '자동 결제 없음', '원치 않으면 연락 없음'].map(
+              label => (
+                <span
+                  key={label}
+                  className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold border ${
+                    dark
+                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                      : 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                  {label}
+                </span>
+              )
+            )}
           </div>
         </div>
       </section>
@@ -660,12 +585,12 @@ export function LandingBody({
                     종합 SEO 점수
                   </p>
                   <p className="text-5xl font-extrabold text-orange-500">
-                    72<span className="text-2xl text-gray-400">/100</span>
+                    98<span className="text-2xl text-gray-400">/100</span>
                   </p>
                   <div className="w-48 mx-auto mt-3 bg-gray-100 rounded-full h-2.5">
                     <div
                       className="bg-gradient-to-r from-orange-400 to-red-500 h-2.5 rounded-full"
-                      style={{ width: '72%' }}
+                      style={{ width: '98%' }}
                     />
                   </div>
                 </div>
@@ -677,12 +602,12 @@ export function LandingBody({
                   </p>
                   <div className="space-y-2">
                     {[
-                      { ok: false, text: '메타 디스크립션이 설정되지 않았습니다' },
-                      { ok: false, text: 'H1 태그가 2개 이상 사용되고 있습니다' },
-                      { ok: true, text: 'SSL 인증서가 정상 적용되어 있습니다' },
-                      { ok: false, text: '이미지 alt 태그 누락 12건' },
-                      { ok: false, text: '페이지 로딩 속도 2.4초 (권장: 1.5초 이하)' },
-                      { ok: true, text: '모바일 반응형 정상 작동' },
+                      { ok: true, text: '메타태그·제목 구조 SEO 기준 충족' },
+                      { ok: true, text: 'H1 단일 태그 정상 적용' },
+                      { ok: true, text: 'SSL·모바일 반응형 정상 작동' },
+                      { ok: true, text: '페이지 로딩 속도 0.9초 (우수)' },
+                      { ok: false, text: '이미지 alt 태그 3건 보완 권장' },
+                      { ok: false, text: '내부 링크 2곳 추가 시 색인 강화' },
                     ].map(item => (
                       <div key={item.text} className="flex items-start gap-2 text-sm">
                         <span
@@ -717,6 +642,135 @@ export function LandingBody({
                       <p className="text-lg font-bold text-red-500">-24</p>
                     </div>
                   </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    카테고리별 정밀 점수
+                  </p>
+                  <div className="space-y-2.5">
+                    {[
+                      { label: '기술 SEO', v: 96 },
+                      { label: '콘텐츠 품질', v: 94 },
+                      { label: '백링크 권위도', v: 92 },
+                      { label: '페이지 속도', v: 99 },
+                    ].map(c => (
+                      <div key={c.label} className="flex items-center gap-3">
+                        <span className="text-xs text-gray-600 w-20 flex-shrink-0">{c.label}</span>
+                        <div className="flex-1 bg-gray-100 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-orange-400 to-red-500 h-2 rounded-full"
+                            style={{ width: `${c.v}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-gray-900 w-7 text-right">
+                          {c.v}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    매출 키워드 분석 (실시간 데이터)
+                  </p>
+                  <div className="overflow-hidden rounded-lg border border-gray-100">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="py-1.5 px-2 text-left text-gray-500 font-semibold">
+                            키워드
+                          </th>
+                          <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">
+                            월 검색량
+                          </th>
+                          <th className="py-1.5 px-2 text-right text-gray-500 font-semibold">
+                            진입 난이도
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {[
+                          {
+                            kw: '강남 인테리어 시공',
+                            vol: '2,400',
+                            diff: '보통',
+                            color: 'text-orange-500',
+                          },
+                          {
+                            kw: '인테리어 견적 비교',
+                            vol: '5,900',
+                            diff: '쉬움',
+                            color: 'text-green-500',
+                          },
+                          {
+                            kw: '아파트 리모델링 추천',
+                            vol: '1,800',
+                            diff: '보통',
+                            color: 'text-orange-500',
+                          },
+                        ].map(r => (
+                          <tr key={r.kw}>
+                            <td className="py-1.5 px-2 text-gray-700">{r.kw}</td>
+                            <td className="py-1.5 px-2 text-right text-gray-900 font-semibold">
+                              {r.vol}
+                            </td>
+                            <td className={`py-1.5 px-2 text-right font-bold ${r.color}`}>
+                              {r.diff}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-[11px] text-gray-400 mt-2">
+                    * VebAPI·RapidAPI 실시간 데이터 기반 · 진입 가능 키워드 12개 추가 포함
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+                    생성형 AI 노출 현황
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { p: 'ChatGPT', s: '노출', tone: 'good' },
+                      { p: '제미나이', s: '노출', tone: 'good' },
+                      { p: '퍼플렉시티', s: '부분', tone: 'warn' },
+                    ].map(a => (
+                      <div key={a.p} className="text-center p-2.5 rounded-lg bg-gray-50">
+                        <p className="text-xs text-gray-600 mb-1">{a.p}</p>
+                        <span
+                          className={`inline-block text-xs font-bold px-2 py-0.5 rounded-full ${
+                            a.tone === 'good'
+                              ? 'bg-green-50 text-green-600'
+                              : 'bg-orange-50 text-orange-600'
+                          }`}
+                        >
+                          {a.s}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3 flex items-start gap-2.5">
+                  <svg
+                    className="w-5 h-5 flex-shrink-0 text-emerald-500 mt-0.5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
+                  </svg>
+                  <p className="text-xs text-gray-700 leading-relaxed">
+                    더 정밀한 키워드 전략과 맞춤 견적은{' '}
+                    <b className="text-emerald-700">텔레그램 1:1 상담</b>으로 바로 연결됩니다.
+                    리포트 하단 버튼에서 시작하세요.
+                  </p>
                 </div>
 
                 <div>

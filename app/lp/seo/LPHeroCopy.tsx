@@ -47,30 +47,50 @@ const DEFAULT: Variant = VARIANTS.rank
 /**
  * variantKey가 주어지면 그것을 우선 사용(개별 키워드 페이지),
  * 없으면 ?ref= 쿼리로 결정(/lp/seo 통합 페이지 하위호환).
+ * 잘 안 읽히는 sub 단락은 렌더하지 않는다(데이터는 보존). 대신 hero가 값 리스트를 노출.
  */
-export function LPHeroCopy({ variantKey }: { variantKey?: string }) {
+export function LPHeroCopy({
+  variantKey,
+  theme = 'dark',
+}: {
+  variantKey?: string
+  theme?: 'light' | 'dark'
+}) {
   const params = useSearchParams()
   const ref = variantKey || params?.get('ref') || ''
   const variant = VARIANTS[ref] || DEFAULT
+  const dark = theme === 'dark'
 
   return (
     <>
-      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/20 backdrop-blur-md border border-orange-400/30 text-orange-400 text-sm font-semibold mb-6">
-        <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+      <div
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border text-sm font-semibold mb-5 ${
+          dark
+            ? 'bg-orange-500/20 border-orange-400/30 text-orange-400'
+            : 'bg-orange-100 border-orange-200 text-orange-700'
+        }`}
+      >
+        <span
+          className={`w-2 h-2 rounded-full animate-pulse ${dark ? 'bg-orange-400' : 'bg-orange-500'}`}
+        />
         {variant.badge}
       </div>
 
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+      <h1
+        className={`text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 ${
+          dark ? 'text-white' : 'text-gray-900'
+        }`}
+      >
         {variant.h1a}
         <br />
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-400">
+        <span
+          className={`text-transparent bg-clip-text bg-gradient-to-r ${
+            dark ? 'from-orange-400 to-red-400' : 'from-orange-500 to-red-500'
+          }`}
+        >
           {variant.h1b}
         </span>
       </h1>
-
-      <p className="text-gray-300 text-lg sm:text-xl mb-8 leading-relaxed max-w-2xl mx-auto">
-        {variant.sub}
-      </p>
     </>
   )
 }

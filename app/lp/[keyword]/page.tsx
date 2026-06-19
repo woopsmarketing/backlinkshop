@@ -35,6 +35,11 @@ const META: Record<string, { title: string; description: string }> = {
     description:
       '광고가 막히는 업종일수록 검색 상위노출이 매출을 좌우합니다. 어떤 키워드가 가능한지, 내 사이트가 어디서 막혔는지 10분 무료로 확인하세요.',
   },
+  ai: {
+    title: '생성형 AI 노출 무료 진단 (GEO) | 백링크샵',
+    description:
+      'ChatGPT·제미나이 답변에 경쟁사는 이미 노출되고 있습니다. 내 브랜드의 AI 노출 현황과 개선 우선순위를 10분 무료로 확인하세요.',
+  },
 }
 
 export async function generateMetadata({
@@ -57,6 +62,8 @@ export default async function LPKeywordPage({
   const { keyword } = await params
   if (!META[keyword]) notFound()
   const sp = await searchParams
-  const theme: LPTheme = sp?.theme === 'dark' ? 'dark' : 'light'
-  return <LandingBody variantKey={keyword} theme={theme} />
+  // 기본 테마는 키워드(heroes 레지스트리)가 결정. ?theme= 는 테스트용 오버라이드.
+  const themeOverride: LPTheme | undefined =
+    sp?.theme === 'dark' ? 'dark' : sp?.theme === 'light' ? 'light' : undefined
+  return <LandingBody variantKey={keyword} themeOverride={themeOverride} />
 }

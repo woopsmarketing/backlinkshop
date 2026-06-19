@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 }
 
 // variantKey 미지정 → LPHeroCopy가 ?ref= 쿼리로 카피를 결정(기존 동작 유지).
+// 통합 페이지는 라이트 고정.
 export default function LPSeoPage() {
-  return <LandingBody theme="light" />
+  return <LandingBody themeOverride="light" />
 }

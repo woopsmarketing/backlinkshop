@@ -149,17 +149,29 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
 
   return (
     <>
-      {/* 런처 버튼 */}
+      {/* 런처 버튼 — 시선을 끄는 ping 헤일로 + 알림 점 */}
       {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="상담 AI 열기"
-          className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full bg-purple-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-purple-600/30 transition hover:bg-purple-700"
-        >
-          <span className="text-lg">💬</span>
-          <span className="hidden sm:inline">{cfg.launcherLabel}</span>
-          <span className="sm:hidden">{cfg.launcherLabelShort}</span>
-        </button>
+        <div className="fixed bottom-4 right-4 z-50">
+          {/* 뒤에서 퍼지는 보라색 헤일로 */}
+          <span
+            className="absolute inset-0 rounded-full bg-purple-500/50 animate-ping"
+            aria-hidden="true"
+          />
+          <button
+            onClick={() => setOpen(true)}
+            aria-label="상담 AI 열기"
+            className="relative flex items-center gap-2 rounded-full bg-purple-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-purple-600/40 transition hover:bg-purple-700 hover:scale-105"
+          >
+            <span className="text-lg">💬</span>
+            <span className="hidden sm:inline">{cfg.launcherLabel}</span>
+            <span className="sm:hidden">{cfg.launcherLabelShort}</span>
+            {/* 우상단 알림 점 (자체 ping) */}
+            <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-red-500" />
+            </span>
+          </button>
+        </div>
       )}
 
       {/* 채팅 패널 */}

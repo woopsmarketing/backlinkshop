@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toDomainSlug } from '@/lib/domain'
 import { sha256Email, normalizeEmail } from '@/lib/hash'
 import { trackLpSubmit, trackSetUser, LP_EMAIL_STORAGE_KEY } from '@/lib/gtag'
@@ -16,6 +16,48 @@ export function LPHeroForm() {
   const [email, setEmail] = useState('')
   const [step, setStep] = useState<Step>('form')
   const [errorMsg, setErrorMsg] = useState('')
+  const [showTip, setShowTip] = useState(false)
+  const [phUrl, setPhUrl] = useState('')
+
+  // URL 입력칸 placeholder 타이핑 순환 — 시선 유도 + 입력 가이드
+  useEffect(() => {
+    const EX = [
+      'example.com',
+      '내쇼핑몰.com',
+      'blog.naver.com',
+      'smartstore.naver.com',
+      'mybrand.co.kr',
+    ]
+    let word = 0
+    let char = 0
+    let deleting = false
+    let timer: ReturnType<typeof setTimeout>
+    const tick = () => {
+      const cur = EX[word]
+      if (!deleting) {
+        char++
+        setPhUrl(cur.slice(0, char))
+        if (char >= cur.length) {
+          deleting = true
+          timer = setTimeout(tick, 1500)
+          return
+        }
+        timer = setTimeout(tick, 100)
+      } else {
+        char--
+        setPhUrl(cur.slice(0, Math.max(char, 0)))
+        if (char <= 0) {
+          deleting = false
+          word = (word + 1) % EX.length
+          timer = setTimeout(tick, 400)
+          return
+        }
+        timer = setTimeout(tick, 50)
+      }
+    }
+    timer = setTimeout(tick, 600)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -94,193 +136,193 @@ export function LPHeroForm() {
 
   const busy = step === 'loading' || step === 'redirecting'
 
+  // 입력칸 공통 클래스 — 적정 크기(py-3 text-base)로 압축, 한 화면에 더 들어오게
+  const inputCls =
+    'w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 text-base transition focus:outline-none focus:bg-white focus:ring-2 focus:ring-orange-500 focus:border-transparent focus:shadow-lg focus:shadow-orange-500/10 disabled:opacity-50'
+
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-2xl">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-400" />
-              <div className="w-3 h-3 rounded-full bg-yellow-400" />
-              <div className="w-3 h-3 rounded-full bg-green-400" />
-              <span className="text-xs text-gray-500 ml-2">SEO 진단 도구</span>
-            </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              30초면 끝
-            </span>
+    <form onSubmit={handleSubmit}>
+      <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-2xl shadow-orange-500/20 ring-1 ring-orange-200/70">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-400" />
+            <div className="w-3 h-3 rounded-full bg-yellow-400" />
+            <div className="w-3 h-3 rounded-full bg-green-400" />
+            <span className="text-xs text-gray-500 ml-2">SEO 진단 도구</span>
           </div>
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-semibold">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            30초면 끝
+          </span>
+        </div>
 
-          {/* 폼 전체 플로우 안내 (헤더 알약과 역할 분리: 알약=입력시간, 이 줄=전체플로우) */}
-          <p className="text-xs text-gray-500 text-center mb-5 leading-relaxed">
-            이메일 입력 <span className="text-gray-300">→</span> 즉시 요약 결과 화면{' '}
-            <span className="text-gray-300">→</span> 10분 안에 상세 리포트 메일 발송
-          </p>
-
-          {/* 에러 메시지 */}
-          {step === 'error' && errorMsg && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
-              {errorMsg}
-            </div>
-          )}
-
-          {/* URL 입력 */}
-          <label
-            htmlFor="site-url"
-            className="block text-left text-sm text-gray-700 mb-2 font-semibold"
-          >
-            진단할 사이트 URL
-          </label>
-          <div className="relative mb-4">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
-                />
-              </svg>
-            </div>
-            <input
-              id="site-url"
-              type="text"
-              value={url}
-              onChange={e => setUrl(e.target.value)}
-              placeholder="example.com"
-              required
-              disabled={busy}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
-            />
+        {/* 에러 메시지 */}
+        {step === 'error' && errorMsg && (
+          <div className="mb-3 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+            {errorMsg}
           </div>
+        )}
 
-          {/* 키워드 입력 */}
-          <label
-            htmlFor="keyword"
-            className="block text-left text-sm text-gray-700 mb-2 font-semibold"
-          >
+        {/* URL 입력 */}
+        <label
+          htmlFor="site-url"
+          className="block text-left text-sm text-gray-700 mb-1.5 font-semibold"
+        >
+          진단할 사이트 URL
+        </label>
+        <div className="relative mb-3">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+              />
+            </svg>
+          </div>
+          <input
+            id="site-url"
+            type="text"
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            placeholder={phUrl || 'example.com'}
+            required
+            disabled={busy}
+            className={inputCls}
+          />
+        </div>
+
+        {/* 키워드 입력 */}
+        <div className="flex items-center justify-between mb-1.5">
+          <label htmlFor="keyword" className="text-left text-sm text-gray-700 font-semibold">
             상위노출 노리는 메인 키워드 1개
           </label>
-
-          {/* 키워드 작성 가이드 — 광범위 키워드 입력 방지 */}
-          <div className="mb-3 rounded-xl bg-orange-50 border border-orange-200 p-3 text-xs leading-relaxed">
-            <p className="text-orange-800 font-semibold mb-2 flex items-center gap-1.5">
-              <svg
-                className="w-3.5 h-3.5 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              실제로 검색될 만한 구체적인 키워드를 적어주세요
-            </p>
-            <div className="space-y-1.5 text-gray-700">
-              <div className="flex items-start gap-2">
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex-shrink-0 mt-0.5">
-                  O
-                </span>
-                <span>
-                  <b className="text-gray-900">좋은 예:</b> 강남 인테리어 시공, 무직자 소액대출,
-                  30대 남성 다이어트, 부산 카드결제 단말기
-                </span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex-shrink-0 mt-0.5">
-                  X
-                </span>
-                <span>
-                  <b className="text-gray-900">피해주세요:</b> 대출, 스포츠, 축구, 카드, 정치
-                  <span className="text-gray-500"> (너무 광범위해서 분석 정확도가 떨어집니다)</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative mb-4">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <input
-              id="keyword"
-              type="text"
-              value={keyword}
-              onChange={e => setKeyword(e.target.value)}
-              placeholder="예: 강남 인테리어 시공"
-              required
-              disabled={busy}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
-            />
-          </div>
-
-          {/* 이메일 입력 */}
-          <label
-            htmlFor="email"
-            className="block text-left text-sm text-gray-700 mb-2 font-semibold"
+          <button
+            type="button"
+            onClick={() => setShowTip(t => !t)}
+            className="text-xs font-semibold text-orange-600 hover:text-orange-700"
           >
-            리포트 받을 이메일
-          </label>
-          <div className="relative mb-6">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              disabled={busy}
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-lg disabled:opacity-50"
-            />
-          </div>
+            {showTip ? '예시 접기 ▲' : '작성 팁·예시 ▼'}
+          </button>
+        </div>
 
+        {/* 항상 보이는 한 줄 힌트 (광범위 키워드 방지 최소 가이드) */}
+        <p className="text-xs text-gray-400 mb-2 leading-relaxed">
+          구체적일수록 정확해요 — <span className="text-gray-500">예: 강남 인테리어 시공</span>
+        </p>
+
+        {/* 접히는 상세 예시 */}
+        {showTip && (
+          <div className="mb-3 rounded-xl bg-orange-50 border border-orange-200 p-3 text-xs leading-relaxed space-y-1.5 text-gray-700">
+            <div className="flex items-start gap-2">
+              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] font-bold flex-shrink-0 mt-0.5">
+                O
+              </span>
+              <span>
+                <b className="text-gray-900">좋은 예:</b> 강남 인테리어 시공, 무직자 소액대출, 30대
+                남성 다이어트, 부산 카드결제 단말기
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex-shrink-0 mt-0.5">
+                X
+              </span>
+              <span>
+                <b className="text-gray-900">피해주세요:</b> 대출, 스포츠, 축구, 카드, 정치
+                <span className="text-gray-500"> (너무 광범위해서 분석 정확도가 떨어집니다)</span>
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div className="relative mb-3">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <input
+            id="keyword"
+            type="text"
+            value={keyword}
+            onChange={e => setKeyword(e.target.value)}
+            placeholder="예: 강남 인테리어 시공"
+            required
+            disabled={busy}
+            className={inputCls}
+          />
+        </div>
+
+        {/* 이메일 입력 */}
+        <label
+          htmlFor="email"
+          className="block text-left text-sm text-gray-700 mb-1.5 font-semibold"
+        >
+          리포트 받을 이메일
+        </label>
+        <div className="relative mb-4">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="your@email.com"
+            required
+            disabled={busy}
+            className={inputCls}
+          />
+        </div>
+
+        <div className="relative">
+          {/* 펄스 글로우 — 시선을 버튼으로 (opacity+scale 함께 변해 또렷) */}
+          <div
+            className={`absolute -inset-1 rounded-xl bg-gradient-to-r from-orange-500 via-amber-400 to-red-500 blur-md ${
+              busy ? 'hidden' : 'animate-glow'
+            }`}
+            aria-hidden="true"
+          />
           <button
             type="submit"
             disabled={busy}
-            className="w-full px-8 py-4 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-xl hover:shadow-orange-500/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
+            className="relative w-full px-8 py-3.5 text-lg font-bold rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:shadow-xl hover:shadow-orange-500/25 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
           >
             {busy ? (
               <>
@@ -301,86 +343,35 @@ export function LPHeroForm() {
               </>
             )}
           </button>
-
-          <p className="text-center text-xs text-gray-500 mt-3 leading-relaxed">
-            광고·자동 결제·영업 전화 없습니다.
-            <br />
-            도움이 필요하다고 직접 알려주신 분에게만 연락드립니다.
-          </p>
-
-          {/* 구분선 */}
-          <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-3 bg-white text-gray-400">또는</span>
-            </div>
-          </div>
-
-          {/* 텔레그램 1:1 문의 */}
-          <p className="text-center text-xs text-gray-500 mb-3">지금 바로 상담받고 싶으시다면</p>
-          <a
-            href="https://t.me/goat82"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-emerald-500/25 transition-all"
-          >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
-            </svg>
-            1:1 전문가 상담 신청
-          </a>
         </div>
-      </form>
 
-      {/* 진단 후 우리 사이트에서 더 확인할 수 있는 것들 (텔레그램 언급 없이 가치만 노출) */}
-      <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-5 text-left">
-        <p className="flex items-center gap-2 text-sm font-semibold text-white mb-3">
-          <svg
-            className="w-4 h-4 flex-shrink-0 text-emerald-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+        <p className="text-center text-xs text-gray-500 mt-2.5 leading-relaxed">
+          광고·자동 결제·영업 전화 없습니다. 도움이 필요하다고 알려주신 분에게만 연락드립니다.
+        </p>
+
+        {/* 구분선 */}
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-3 bg-white text-gray-400">또는</span>
+          </div>
+        </div>
+
+        {/* 텔레그램 1:1 문의 */}
+        <a
+          href="https://t.me/goat82"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-3 py-3 px-6 bg-emerald-500 hover:bg-emerald-600 rounded-xl font-semibold text-white shadow-lg hover:shadow-emerald-500/25 transition-all"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z" />
           </svg>
-          진단을 받으면 이런 것까지 확인할 수 있어요
-        </p>
-        <ul className="space-y-2 text-sm text-gray-300">
-          {[
-            '경쟁사 TOP5의 백링크 수·도메인 등급 상세',
-            '내 사이트에 빠진 핵심 백링크 출처 목록',
-            '메인 키워드의 현재 순위와 진입 난이도',
-            '50개 항목별 점수 + 먼저 고쳐야 할 우선순위',
-          ].map(t => (
-            <li key={t} className="flex items-start gap-2">
-              <svg
-                className="w-4 h-4 flex-shrink-0 mt-0.5 text-orange-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-              <span>{t}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 text-xs text-gray-500">
-          일부 상세 데이터는 진단 리포트와 분석 페이지에서 단계적으로 열립니다.
-        </p>
+          1:1 전문가 상담 신청
+        </a>
       </div>
-    </div>
+    </form>
   )
 }
