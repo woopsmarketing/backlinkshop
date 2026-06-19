@@ -8,7 +8,8 @@ import { LPHeroPreview } from './LPHeroPreview'
 
 // 키워드별 값 리스트 — 헤드라인이 던진 상상을 받아주는 '최종적으로 얻는 결과'.
 // 아직 카피 미확정 키워드는 DEFAULT를 사용.
-type ValueList = { headline: string; items: string[] }
+// tone='negative'면 체크 대신 경고/✕ 아이콘으로 렌더(경쟁사 폭로형 리스트용).
+type ValueList = { headline: string; items: string[]; tone?: 'positive' | 'negative' }
 
 const DEFAULT_VALUE_LIST: ValueList = {
   headline: '구글 상위노출의 핵심, 진단 한 번에 전부 드러납니다',
@@ -43,6 +44,18 @@ const VALUE_LISTS: Record<string, ValueList> = {
       '순위 상승 → 꾸준한 자연 방문자와 매출',
     ],
   },
+  agency: {
+    tone: 'negative',
+    headline: '국내 상위노출 대행사 95%는, 이 중 하나입니다',
+    items: [
+      '해외에서 싸게 산 백링크를 비싸게 되파는 업체',
+      '백링크의 품질조차 구분하지 못하는 업체',
+      '내부 최적화가 뭔지도 모르고 손도 못 대는 업체',
+      '고객 문의를 그대로 GPT에 붙여넣고 답하는 업체',
+      '고객이 모른다는 걸 이용해 전문가인 척하는 업체',
+      '자기 실력을 끝내 보여주지 못하는 업체',
+    ],
+  },
   rank: {
     headline: '구글 1위가 만들어주는, 일하지 않아도 굴러가는 사업',
     items: [
@@ -70,6 +83,7 @@ const TRUST_ITEMS = [
 export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; theme?: LPTheme }) {
   const dark = theme === 'dark'
   const valueList = getValueList(variantKey)
+  const negative = valueList.tone === 'negative'
 
   return (
     <section className={`relative overflow-hidden ${dark ? 'text-white' : 'text-gray-900'}`}>
@@ -123,7 +137,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
               }`}
             >
               <svg
-                className="w-5 h-5 flex-shrink-0 text-emerald-500"
+                className={`w-5 h-5 flex-shrink-0 ${negative ? 'text-amber-500' : 'text-emerald-500'}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -133,7 +147,11 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                  d={
+                    negative
+                      ? 'M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.71-3.01l-6.93-12a2 2 0 00-3.42 0l-6.93 12A2 2 0 005.07 19z'
+                      : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
+                  }
                 />
               </svg>
               {valueList.headline}
@@ -145,7 +163,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                   className={`flex items-start gap-2 text-sm ${dark ? 'text-gray-200' : 'text-gray-700'}`}
                 >
                   <svg
-                    className="w-4 h-4 flex-shrink-0 mt-0.5 text-orange-500"
+                    className={`w-4 h-4 flex-shrink-0 mt-0.5 ${negative ? 'text-red-500' : 'text-orange-500'}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -155,7 +173,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                      d={negative ? 'M6 18L18 6M6 6l12 12' : 'M13 7l5 5m0 0l-5 5m5-5H6'}
                     />
                   </svg>
                   <span>{t}</span>
