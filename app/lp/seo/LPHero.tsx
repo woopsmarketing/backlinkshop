@@ -67,11 +67,48 @@ const VALUE_LISTS: Record<string, ValueList> = {
       '시간과 장소에 묶이지 않는 자유로운 삶',
     ],
   },
+  black: {
+    tone: 'question',
+    headline: '혹시, 이런 적 있으셨나요?',
+    items: [
+      '업체가 시키는 대로 했는데 효과가 없었나요?',
+      '잠깐 올랐다가 금세 다시 떨어졌나요?',
+      '몇 달을 꾸준히 했는데 매출은 그대로였나요?',
+      '안 되니까 사이트를 새로 만들어보기까지 했나요?',
+      '매달 수백만 원을 쓰며 버리기만 했나요?',
+      '결국 시간도 돈도 둘 다 잃고 계셨나요?',
+    ],
+  },
 }
 
 function getValueList(key?: string): ValueList {
   return (key && VALUE_LISTS[key]) || DEFAULT_VALUE_LIST
 }
+
+// 값 리스트 톤별 아이콘 (positive=화살표/체크, negative=경고/✕, question=물음표)
+const VALUE_ICONS = {
+  positive: {
+    header: { color: 'text-emerald-500', d: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+    item: { color: 'text-orange-500', d: 'M13 7l5 5m0 0l-5 5m5-5H6' },
+  },
+  negative: {
+    header: {
+      color: 'text-amber-500',
+      d: 'M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.71-3.01l-6.93-12a2 2 0 00-3.42 0l-6.93 12A2 2 0 005.07 19z',
+    },
+    item: { color: 'text-red-500', d: 'M6 18L18 6M6 6l12 12' },
+  },
+  question: {
+    header: {
+      color: 'text-indigo-400',
+      d: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    },
+    item: {
+      color: 'text-indigo-400',
+      d: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    },
+  },
+} as const
 
 const TRUST_ITEMS = [
   '50개 항목 정밀 진단',
@@ -83,7 +120,7 @@ const TRUST_ITEMS = [
 export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; theme?: LPTheme }) {
   const dark = theme === 'dark'
   const valueList = getValueList(variantKey)
-  const negative = valueList.tone === 'negative'
+  const icons = VALUE_ICONS[valueList.tone ?? 'positive']
 
   return (
     <section className={`relative overflow-hidden ${dark ? 'text-white' : 'text-gray-900'}`}>
@@ -137,7 +174,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
               }`}
             >
               <svg
-                className={`w-5 h-5 flex-shrink-0 ${negative ? 'text-amber-500' : 'text-emerald-500'}`}
+                className={`w-5 h-5 flex-shrink-0 ${icons.header.color}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -147,11 +184,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d={
-                    negative
-                      ? 'M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.71-3.01l-6.93-12a2 2 0 00-3.42 0l-6.93 12A2 2 0 005.07 19z'
-                      : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                  }
+                  d={icons.header.d}
                 />
               </svg>
               {valueList.headline}
@@ -163,7 +196,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                   className={`flex items-start gap-2 text-sm ${dark ? 'text-gray-200' : 'text-gray-700'}`}
                 >
                   <svg
-                    className={`w-4 h-4 flex-shrink-0 mt-0.5 ${negative ? 'text-red-500' : 'text-orange-500'}`}
+                    className={`w-4 h-4 flex-shrink-0 mt-0.5 ${icons.item.color}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -173,7 +206,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d={negative ? 'M6 18L18 6M6 6l12 12' : 'M13 7l5 5m0 0l-5 5m5-5H6'}
+                      d={icons.item.d}
                     />
                   </svg>
                   <span>{t}</span>
