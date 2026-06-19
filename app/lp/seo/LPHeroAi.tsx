@@ -1,7 +1,19 @@
+'use client'
+
 // 생성형 AI 노출(GEO) 전용 hero — 다크. 손실 회피 훅 + AI 노출 현황 증거카드.
-// 폼은 공용 LPHeroForm 재사용. 카피는 추후 키워드별로 다듬을 예정(현재는 초기안).
+// 폼은 공용 LPHeroForm 재사용. 헤드라인은 ?ref= 로 A/B(폼이 ref를 전환추적에 기록).
 // 항상 다크 고정이라 variantKey·theme prop은 받지 않는다(registry는 props 적은 컴포넌트도 허용).
+import { useSearchParams } from 'next/navigation'
 import { LPHeroForm } from './LPHeroForm'
+
+// 헤드라인 A/B 변형 — /lp/ai?ref=loss 처럼 선택. 없으면 default.
+const AI_HEADLINES: Record<string, { h1a: string; h1b: string }> = {
+  default: { h1a: 'AI 답변에 내 비즈니스가', h1b: '노출되고 있나요?' },
+  loss: { h1a: '고객이 AI에게 물을 때마다,', h1b: '매출이 경쟁사로 흘러가고 있습니다' },
+  risk: { h1a: '구글만 신경 쓰는 사이,', h1b: 'AI가 시장을 다시 짜고 있습니다' },
+  provoke: { h1a: 'AI에게 물어보세요.', h1b: '당신 업종 1등으로 누가 나오는지' },
+  empathy: { h1a: '열심히 키운 브랜드인데,', h1b: 'AI는 왜 경쟁사만 말할까요?' },
+}
 
 const AI_VALUE_HEADLINE = 'AI 답변이 비즈니스 성장에 얼마나 도움 되는지 알고 계신가요?'
 const AI_VALUE_ITEMS = [
@@ -23,6 +35,8 @@ const TRUST_ITEMS = [
 const PLATFORMS = ['ChatGPT', '제미나이', '퍼플렉시티', 'Claude']
 
 export function LPHeroAi() {
+  const ref = (useSearchParams()?.get('ref') || '').trim().toLowerCase()
+  const h = AI_HEADLINES[ref] || AI_HEADLINES.default
   return (
     <section className="relative overflow-hidden text-white">
       {/* 배경 — AI/미래지향 다크 (보라·청록 그라데이션) */}
@@ -49,10 +63,10 @@ export function LPHeroAi() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-5 text-white">
-            AI 답변에 내 비즈니스가
+            {h.h1a}
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
-              노출되고 있나요?
+              {h.h1b}
             </span>
           </h1>
 
