@@ -6,14 +6,44 @@ import { LPHeroForm } from './LPHeroForm'
 import { LPHeroCopy } from './LPHeroCopy'
 import { LPHeroPreview } from './LPHeroPreview'
 
-// 진단으로 얻는 것 — 상위노출 '핵심 열쇠'를 손에 쥐는 것처럼 강하게.
-const VALUE_HEADLINE = '구글 상위노출의 핵심, 진단 한 번에 전부 드러납니다'
-const VALUE_ITEMS = [
-  '경쟁사 TOP5를 1페이지에 올린 백링크 출처 — 그대로 따라갈 목록',
-  '내 사이트 순위를 막고 있는 결정적 구멍을 콕 집어서',
-  '메인 키워드, 1페이지까지 남은 거리와 진입 난이도',
-  '딱 몇 개만 고치면 순위가 뛰는 우선순위 리스트',
-]
+// 키워드별 값 리스트 — 헤드라인이 던진 상상을 받아주는 '최종적으로 얻는 결과'.
+// 아직 카피 미확정 키워드는 DEFAULT를 사용.
+type ValueList = { headline: string; items: string[] }
+
+const DEFAULT_VALUE_LIST: ValueList = {
+  headline: '구글 상위노출의 핵심, 진단 한 번에 전부 드러납니다',
+  items: [
+    '경쟁사 TOP5를 1페이지에 올린 백링크 출처 — 그대로 따라갈 목록',
+    '내 사이트 순위를 막고 있는 결정적 구멍을 콕 집어서',
+    '메인 키워드, 1페이지까지 남은 거리와 진입 난이도',
+    '딱 몇 개만 고치면 순위가 뛰는 우선순위 리스트',
+  ],
+}
+
+const VALUE_LISTS: Record<string, ValueList> = {
+  backlink: {
+    headline: '광고 없이도 매출이 알아서 들어오는 삶이 시작됩니다',
+    items: [
+      '꾸준히 우상향하는 매출 그래프',
+      '광고비 없이도 매달 고정으로 들어오는 매출',
+      '브랜드 가치 상승 → 입소문·바이럴 확산',
+      '사람을 더 뽑아야 할 만큼 커지는 매출 (월 1억+ 사례)',
+    ],
+  },
+  rank: {
+    headline: '구글 1위가 만들어주는, 일하지 않아도 굴러가는 사업',
+    items: [
+      '자연검색 방문자 폭발 → 멈추지 않는 매출 상승',
+      '광고비 없이도 매달 고정으로 꽂히는 매출',
+      '365일 휴가를 떠나도 꾸준히 들어오는 문의',
+      '월 1억 매출도 현실이 되는 장기 자산',
+    ],
+  },
+}
+
+function getValueList(key?: string): ValueList {
+  return (key && VALUE_LISTS[key]) || DEFAULT_VALUE_LIST
+}
 
 const TRUST_ITEMS = [
   '50개 항목 정밀 진단',
@@ -24,6 +54,7 @@ const TRUST_ITEMS = [
 
 export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; theme?: LPTheme }) {
   const dark = theme === 'dark'
+  const valueList = getValueList(variantKey)
 
   return (
     <section className={`relative overflow-hidden ${dark ? 'text-white' : 'text-gray-900'}`}>
@@ -90,10 +121,10 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              {VALUE_HEADLINE}
+              {valueList.headline}
             </p>
             <ul className="grid sm:grid-cols-2 gap-x-5 gap-y-2.5">
-              {VALUE_ITEMS.map(t => (
+              {valueList.items.map(t => (
                 <li
                   key={t}
                   className={`flex items-start gap-2 text-sm ${dark ? 'text-gray-200' : 'text-gray-700'}`}
