@@ -252,7 +252,7 @@ export function LPHero({ variantKey, theme = 'dark' }: { variantKey?: string; th
               aria-hidden="true"
             />
             <div className="relative">
-              <LPHeroForm />
+              <LPHeroForm defaultRef={variantKey} />
 
               {/* 모바일 미리보기 — 폼 바로 아래 (데스크탑은 우측 컬럼) */}
               <div className="lg:hidden mt-5">

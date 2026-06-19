@@ -149,7 +149,7 @@ export function LPHeroAi() {
               aria-hidden="true"
             />
             <div className="relative">
-              <LPHeroForm />
+              <LPHeroForm defaultRef={ref || 'ai'} />
               <div className="lg:hidden mt-5">
                 <AIVisibilityCard />
               </div>

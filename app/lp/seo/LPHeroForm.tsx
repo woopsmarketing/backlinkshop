@@ -8,7 +8,8 @@ import { trackLpSubmit, trackSetUser, LP_EMAIL_STORAGE_KEY } from '@/lib/gtag'
 
 type Step = 'form' | 'loading' | 'redirecting' | 'error'
 
-export function LPHeroForm() {
+// defaultRef: ?ref가 없을 때 쓸 기본 ref(키워드명). 광고 URL에 ref를 깜빡해도 전환 귀속됨.
+export function LPHeroForm({ defaultRef }: { defaultRef?: string } = {}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [url, setUrl] = useState('')
@@ -65,7 +66,7 @@ export function LPHeroForm() {
 
     const cleanedEmail = normalizeEmail(email)
     const submittedDomain = toDomainSlug(url.trim())
-    const ref = (searchParams?.get('ref') || '').trim().toLowerCase() || '(none)'
+    const ref = (searchParams?.get('ref') || defaultRef || '').trim().toLowerCase() || '(none)'
 
     // analyze 페이지의 텔레그램 CTA EC용으로 이메일을 세션에 보존 (탭 종료 시 자동 소멸)
     if (typeof window !== 'undefined' && cleanedEmail) {
