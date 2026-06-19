@@ -3,11 +3,14 @@
 // 항상 다크 고정이라 variantKey·theme prop은 받지 않는다(registry는 props 적은 컴포넌트도 허용).
 import { LPHeroForm } from './LPHeroForm'
 
+const AI_VALUE_HEADLINE = 'AI 답변이 비즈니스 성장에 얼마나 도움 되는지 알고 계신가요?'
 const AI_VALUE_ITEMS = [
-  'ChatGPT·제미나이·퍼플렉시티에서 내 브랜드 노출 현황',
-  '경쟁사는 AI 답변에 얼마나 등장하는지 직접 비교',
-  'AI가 내 사이트를 어떻게 읽고 이해하는지 진단',
-  'AI 검색 최적화(GEO) 먼저 손볼 우선순위 리스트',
+  '검색 점유율을 넘어 AI 답변 점유율까지 대폭 확대',
+  '아직 늦지 않은 시장, 지금이 가장 빠르게 점유할 때',
+  '쭉쭉 오르는 브랜드 인지도 + 유입률',
+  'AI 추천으로 이어지는 눈에 보이는 매출 상승',
+  '검증된 링크 구축 + 인용 로직으로 AI가 신뢰하는 출처화',
+  '검색이 흔들려도 AI에서 들어오는 새 유입 채널',
 ]
 
 const TRUST_ITEMS = [
@@ -42,7 +45,7 @@ export function LPHeroAi() {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/20 backdrop-blur-md border border-violet-400/30 text-violet-300 text-sm font-semibold mb-5">
             <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
-            생성형 AI 노출 · GEO
+            AEO/GEO AI 답변 노출 최적화
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-5 text-white">
@@ -75,7 +78,7 @@ export function LPHeroAi() {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              진단하면 이런 것까지 확인할 수 있어요
+              {AI_VALUE_HEADLINE}
             </p>
             <ul className="grid sm:grid-cols-2 gap-x-5 gap-y-2.5">
               {AI_VALUE_ITEMS.map(t => (
