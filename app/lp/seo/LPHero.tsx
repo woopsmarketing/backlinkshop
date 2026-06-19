@@ -9,7 +9,7 @@ import { LPHeroPreview } from './LPHeroPreview'
 // 키워드별 값 리스트 — 헤드라인이 던진 상상을 받아주는 '최종적으로 얻는 결과'.
 // 아직 카피 미확정 키워드는 DEFAULT를 사용.
 // tone='negative'면 체크 대신 경고/✕ 아이콘으로 렌더(경쟁사 폭로형 리스트용).
-type ValueList = { headline: string; items: string[]; tone?: 'positive' | 'negative' }
+type ValueList = { headline: string; items: string[]; tone?: 'positive' | 'negative' | 'question' }
 
 const DEFAULT_VALUE_LIST: ValueList = {
   headline: '구글 상위노출의 핵심, 진단 한 번에 전부 드러납니다',
