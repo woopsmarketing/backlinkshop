@@ -69,3 +69,17 @@ export function trackAnalyzePageView(params: { domain: string }): void {
   if (!gtag) return
   gtag('event', 'analyze_page_view', { domain: params.domain })
 }
+
+/** AI 챗봇 위젯 열기(런처 클릭). 위젯 노출 대비 오픈율 관찰용 — 관찰 전용. */
+export function trackChatWidgetOpen(params: { domain?: string } = {}): void {
+  const gtag = getGtag()
+  if (!gtag) return
+  gtag('event', 'chat_widget_open', { domain: params.domain || '' })
+}
+
+/** AI 챗봇에 사용자가 메시지 전송. '열기만 하고 마는지 vs 실사용' 깊이 관찰용 — 관찰 전용. */
+export function trackChatMessageSent(params: { domain?: string } = {}): void {
+  const gtag = getGtag()
+  if (!gtag) return
+  gtag('event', 'chat_message_sent', { domain: params.domain || '' })
+}

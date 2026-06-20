@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { trackAnalyzePageView, trackLpSubmit, trackSetUser, trackTelegramClick } from './gtag'
+import {
+  trackAnalyzePageView,
+  trackChatMessageSent,
+  trackChatWidgetOpen,
+  trackLpSubmit,
+  trackSetUser,
+  trackTelegramClick,
+} from './gtag'
 
 type Call = unknown[]
 
@@ -86,6 +93,30 @@ describe('trackAnalyzePageView', () => {
   })
 })
 
+describe('trackChatWidgetOpen', () => {
+  it('emits chat_widget_open with domain', () => {
+    trackChatWidgetOpen({ domain: 'example.com' })
+    expect(calls[0]).toEqual(['event', 'chat_widget_open', { domain: 'example.com' }])
+  })
+
+  it('defaults missing domain to empty string', () => {
+    trackChatWidgetOpen()
+    expect(calls[0]).toEqual(['event', 'chat_widget_open', { domain: '' }])
+  })
+})
+
+describe('trackChatMessageSent', () => {
+  it('emits chat_message_sent with domain', () => {
+    trackChatMessageSent({ domain: 'example.com' })
+    expect(calls[0]).toEqual(['event', 'chat_message_sent', { domain: 'example.com' }])
+  })
+
+  it('defaults missing domain to empty string', () => {
+    trackChatMessageSent()
+    expect(calls[0]).toEqual(['event', 'chat_message_sent', { domain: '' }])
+  })
+})
+
 describe('no-op when window or gtag missing', () => {
   it('all helpers do nothing when window is undefined', () => {
     delete (globalThis as unknown as Record<string, unknown>).window
@@ -93,6 +124,8 @@ describe('no-op when window or gtag missing', () => {
     trackLpSubmit({ ref: 'backlink' })
     trackTelegramClick({ placement: 'x' })
     trackAnalyzePageView({ domain: 'example.com' })
+    trackChatWidgetOpen({ domain: 'example.com' })
+    trackChatMessageSent({ domain: 'example.com' })
     expect(calls).toHaveLength(0)
   })
 
@@ -102,6 +135,8 @@ describe('no-op when window or gtag missing', () => {
     trackLpSubmit({ ref: 'backlink' })
     trackTelegramClick({ placement: 'x' })
     trackAnalyzePageView({ domain: 'example.com' })
+    trackChatWidgetOpen({ domain: 'example.com' })
+    trackChatMessageSent({ domain: 'example.com' })
     expect(calls).toHaveLength(0)
   })
 })
