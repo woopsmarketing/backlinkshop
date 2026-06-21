@@ -56,3 +56,5 @@ desktop.ini
 
 # Cursor IDE (개발용 - 배포 불필요)
 .cursor/
+.promo-sent.txt
+promo-preview-*.html
