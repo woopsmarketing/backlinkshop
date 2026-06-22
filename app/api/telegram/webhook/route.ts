@@ -12,7 +12,7 @@
 
 import { NextResponse, type NextRequest } from 'next/server'
 import { createAdminSupabaseClient } from '@/server/supabase/admin'
-import { sendMessage, answerCallbackQuery, getAdminChatId } from '@/lib/telegram'
+import { sendMessage, answerCallbackQuery, getAdminChatId, escapeHtml } from '@/lib/telegram'
 import {
   buildUserWelcomeWithReport,
   buildUserWelcomeNoReport,
@@ -55,6 +55,7 @@ type TgMessage = {
   chat: { id: number; type: string }
   date: number
   text?: string
+  reply_to_message?: TgMessage
 }
 
 type TgCallbackQuery = {
@@ -104,6 +105,14 @@ async function handleMessage(msg: TgMessage) {
   if (!msg.from || msg.from.is_bot) return
   const chatId = msg.chat.id
   const text = msg.text?.trim() || ''
+
+  // ── 관리자가 봇 알림에 "답장(Reply)"하면 → 봇이 해당 고객에게 그대로 중계.
+  //    (유저네임 없는 고객에게도 텔레그램 안에서 바로 답장 가능. CLI 불필요.)
+  const adminId = getAdminChatIdSafe()
+  if (adminId && String(chatId) === adminId) {
+    await handleAdminReply(msg, text)
+    return // 관리자 메시지는 telegram_users 로 저장/포워딩하지 않음 (자기 자신 알림 루프 방지)
+  }
 
   const supabase = createAdminSupabaseClient()
   const user = await upsertTelegramUser(supabase, msg.from)
@@ -504,6 +513,58 @@ async function safeSendToAdmin(text: string) {
     await sendMessage({ chatId: adminId, text, disableWebPagePreview: true })
   } catch (err) {
     console.error('[telegram/webhook] admin 알림 실패:', err)
+  }
+}
+
+function getAdminChatIdSafe(): string | null {
+  try {
+    return getAdminChatId()
+  } catch {
+    return null
+  }
+}
+
+/**
+ * 관리자가 봇 알림 메시지에 "답장(Reply)"하면, 그 알림에 적힌 chat_id 의
+ * 고객에게 답장 텍스트를 그대로 중계한다.
+ *
+ * - 알림 메시지에는 항상 `chat_id: <숫자>` 가 들어있어, 대상 식별에 추가 저장이 필요 없다.
+ * - 답장이 아닌 일반 메시지(또는 chat_id 를 못 찾는 답장)는 사용법을 안내한다.
+ */
+async function handleAdminReply(msg: TgMessage, text: string) {
+  if (!msg.reply_to_message) {
+    await safeSendToAdmin(
+      'ℹ️ 고객에게 보내려면 <b>해당 고객 알림 메시지에 "답장(Reply)"</b> 후 내용을 입력하세요.\n' +
+        '답장한 알림의 chat_id 로 자동 전달됩니다.'
+    )
+    return
+  }
+
+  const repliedText = msg.reply_to_message.text || ''
+  const match = repliedText.match(/chat_id:\s*(\d+)/)
+  if (!match) {
+    await safeSendToAdmin(
+      '⚠️ 답장 대상의 chat_id 를 찾지 못했어요.\n' +
+        '<b>고객 알림 메시지</b>(chat_id 가 적힌 알림)에 직접 답장해 주세요.'
+    )
+    return
+  }
+
+  if (!text) {
+    await safeSendToAdmin('⚠️ 보낼 텍스트가 없어요. (현재 텍스트 메시지만 중계됩니다.)')
+    return
+  }
+
+  const targetChatId = match[1]
+  const ok = await sendMessage({ chatId: targetChatId, text: escapeHtml(text) })
+
+  if (ok) {
+    await safeSendToAdmin(`✅ 고객(<code>${targetChatId}</code>)에게 전달했어요.`)
+  } else {
+    await safeSendToAdmin(
+      `❌ 고객(<code>${targetChatId}</code>) 전달 실패.\n` +
+        '고객이 봇을 차단/삭제했을 수 있어요. 이메일 등 다른 경로로 연락하세요.'
+    )
   }
 }
 
