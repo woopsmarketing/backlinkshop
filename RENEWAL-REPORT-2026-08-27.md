@@ -1,6 +1,8 @@
 # backlinkshop.co.kr 전면 리뉴얼 — 작업 결과 보고
 
-**작업일 2026-08-27** (후속 수정 2026-08-28) · 기준 커밋 `f773f8d` · 근거 자료 [seo-audit-2026-08-27/](seo-audit-2026-08-27/)
+**작업일 2026-08-27** (후속 수정 · 배포 2026-08-28) · 기준 커밋 `f773f8d` · 근거 자료 [seo-audit-2026-08-27/](seo-audit-2026-08-27/)
+
+**배포 완료** — 리뉴얼 `4a6a904` · 병합 `1c439d5` → `origin/main` push · Vercel Production 반영 확인
 
 리뉴얼 전 사이트의 병목은 콘텐츠 경쟁력이 아니라 **사이트 구조**였습니다. 색인 가능한 실질 페이지가 홈 1개뿐이었고, 존재하던 4개 정적 페이지는 canonical·사이트맵·내부링크 3중으로 차단되어 있었습니다. 이번 작업은 그 구조를 해체하고 의도별 랜딩 17개 + 아티클 5편으로 재구성한 것입니다.
 
@@ -13,12 +15,43 @@
 | `next build`              | 통과 (오류 0)                              |
 | `tsc --noEmit`            | 통과 (오류 0)                              |
 | `next lint`               | 신규 코드 경고 0 (기존 파일 경고 1건 유지) |
-| `vitest run`              | 128/128 통과                               |
+| `vitest run`              | 132/132 통과                               |
 | `node scripts/seo-qa.mjs` | 실패 0 · 경고 1 (21개 페이지 전수)         |
 | 브라우저 콘솔 에러        | 데스크톱·모바일 10개 페이지 0건            |
 | 모바일 가로 오버플로      | 0건 (390px 뷰포트)                         |
 
 색인 가능 페이지 **1개 → 21개**.
+
+### 배포 (2026-08-28)
+
+리뉴얼 작업 중 `origin/main` 에 8개 커밋(텔레그램 중계 · 프로모션 스크립트 · 챗봇 GA4 이벤트)이 먼저 올라와 있었습니다. **force push 와 history rewrite 없이 merge 로 통합**했습니다.
+
+| 항목        | 값                                                      |
+| ----------- | ------------------------------------------------------- |
+| 리뉴얼 커밋 | `4a6a904` feat: launch SEO-focused backlinkshop renewal |
+| 병합 커밋   | `1c439d5` merge: origin/main 통합                       |
+| 원격        | `origin` (woopsmarketing/backlinkshop) · branch `main`  |
+| 배포        | Vercel 자동 배포 · Production 반영 확인 완료            |
+
+충돌 2건은 다음과 같이 해소했습니다.
+
+- **`lib/gtag.ts`** — 양쪽이 모두 파일 끝에 함수를 추가해 충돌했습니다. **둘 다 남겼습니다.** `trackTelegramCtaClick`(리뉴얼)과 `trackChatWidgetOpen`·`trackChatMessageSent`(원격)이 공존하며, `telegram_click` 이벤트 이름은 바뀌지 않았습니다.
+- **`general.md`** — 작업 지시 메모 파일입니다. 원격 버전은 이전 메모이고 로컬이 현재 지시문이라 로컬을 택했습니다.
+
+**Production 실측** (전부 `curl` 확인)
+
+| 검사                                            | 결과                              |
+| ----------------------------------------------- | --------------------------------- |
+| 공개 페이지 18종 + `robots.txt` + `sitemap.xml` | 전부 200                          |
+| `/blog/what-is-backlink` → `/backlink`          | 301 · 1홉                         |
+| `/signup` → `/`                                 | 301 · 1홉                         |
+| `/products*` → `/services*`                     | 301 · 1홉                         |
+| 존재하지 않는 URL                               | 404                               |
+| 사이트맵                                        | 21개 URL · `what-is-backlink` 0건 |
+| GA4 `G-J142ZFLQX4` · GSC verification           | 홈에서 정상 로드                  |
+| 홈 canonical · title · H1                       | 의도한 값 그대로                  |
+
+`vercel-repo` 라는 두 번째 원격이 등록되어 있으나 `a41924d` 에 머물러 있는 오래된 미러이고 `origin/main` 의 조상입니다. 지시대로 `origin` 에만 push 했습니다.
 
 ---
 
