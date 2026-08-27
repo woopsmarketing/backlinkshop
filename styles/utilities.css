@@ -1,0 +1,277 @@
+/**
+ * 유틸리티
+ * - 신규 공개 사이트용 레이아웃/타이포 유틸 (bl- 접두사)
+ * - 하단은 기존 페이지(LP·상품 폼·CTA)가 사용 중인 애니메이션. 제거하면 광고 LP가 깨지므로 보존한다.
+ */
+
+/* ---------- Layout ---------- */
+.bl-container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.bl-container--narrow {
+  max-width: var(--container-narrow);
+}
+
+.bl-section {
+  padding-block: var(--space-section);
+}
+
+.bl-section--sm {
+  padding-block: var(--space-section-sm);
+}
+
+.bl-section--lg {
+  padding-block: var(--space-section-lg);
+}
+
+.bl-section--subtle {
+  background: var(--surface-subtle);
+}
+
+.bl-section--bordered {
+  border-top: 1px solid var(--border);
+}
+
+.bl-stack > * + * {
+  margin-top: 1rem;
+}
+
+.bl-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 720px) {
+  .bl-grid--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bl-grid--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .bl-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .bl-grid--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .bl-grid--5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Typography ---------- */
+.bl-eyebrow {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.bl-h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.bl-h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+}
+
+.bl-h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.32;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.bl-h4 {
+  font-size: var(--fs-h4);
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bl-lead {
+  font-size: var(--fs-lead);
+  line-height: 1.68;
+  color: var(--text-secondary);
+}
+
+.bl-body {
+  color: var(--text-secondary);
+}
+
+.bl-muted {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.bl-measure {
+  max-width: 62ch;
+}
+
+.bl-center {
+  text-align: center;
+}
+
+.bl-center .bl-measure {
+  margin-inline: auto;
+}
+
+/* 헤딩 안에서 의미 단위로만 줄바꿈 — <br> 대신 사용해 단어 병합을 막는다 */
+.bl-break {
+  display: block;
+}
+
+@media (max-width: 719px) {
+  .bl-break--desktop {
+    display: inline;
+  }
+}
+
+/* ---------- Section header ---------- */
+.bl-section-head {
+  max-width: 46rem;
+  margin-bottom: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+}
+
+.bl-section-head--center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.bl-section-head .bl-lead {
+  margin-top: 1rem;
+}
+
+/* ---------- Misc ---------- */
+.bl-hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin-block: var(--space-section-sm);
+}
+
+.bl-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 섹션 앵커 이동 시 sticky 헤더에 제목이 가리지 않게 한다.
+   마케팅 섹션과 블로그 본문 양쪽에서 쓴다. 헤더 높이가 바뀌면 이 값만 고치면 된다. */
+.bl-anchor {
+  scroll-margin-top: 92px;
+}
+
+.bl-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* grid/flex 자식의 기본 min-width 는 auto 라서, 안에 넓은 표가 있으면 자식이 줄어들지 않고
+   페이지 전체가 가로로 밀린다. 표는 .bl-scroll-x 안에서만 스크롤되어야 하므로 명시적으로 0 으로 둔다. */
+.bl-grid > *,
+.bl-pricing > *,
+.bl-services > *,
+.bl-doc > *,
+.bl-card > *,
+.bl-hero__grid > *,
+.bl-featured > *,
+.bl-related__list > *,
+.bl-cta > * {
+  min-width: 0;
+}
+
+/* =====================================================================
+   기존 페이지 보존용 애니메이션 (app/globals.css 에서 이관)
+   /lp/*, 상품 구매 폼, 기존 CTA 버튼이 사용 중이다.
+   ===================================================================== */
+
+@keyframes blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+}
+.animate-blob {
+  animation: blob 7s infinite;
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 95%;
+  }
+}
+.animate-progress {
+  animation: progress 1.5s ease-out forwards;
+}
+
+@keyframes progressPulse {
+  0% {
+    width: 5%;
+  }
+  50% {
+    width: 85%;
+  }
+  100% {
+    width: 5%;
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+.animate-glow {
+  animation: glowPulse 2s ease-in-out infinite;
+}

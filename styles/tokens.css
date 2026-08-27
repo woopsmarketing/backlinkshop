@@ -1,0 +1,76 @@
+/**
+ * 디자인 토큰
+ * Theme: Premium Editorial SEO Platform
+ * 배경은 Pure White 중심. 전체 회색 배경을 쓰지 않고, 일부 섹션만 아주 옅은 off-white로 구분한다.
+ */
+
+:root {
+  /* ---- Color ---- */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-subtle: #f8f9fb;
+
+  --text-primary: #111111;
+  --text-secondary: #5f636b;
+  --text-muted: #8b9098;
+
+  --border: #e7e9ed;
+  --border-strong: #d7dbe1;
+
+  --brand: #3157e8;
+  --brand-hover: #2447c9;
+  --brand-soft: #eef2ff;
+
+  --success: #16845b;
+
+  /* ---- Typography ---- */
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+
+  /* Desktop 기준 Hero 64-72px, Section H2 44-52px, H3 24-30px. 모바일은 fluid로 축소. */
+  --fs-h1: clamp(2.25rem, 1.3rem + 3.9vw, 4rem);
+  --fs-h2: clamp(1.75rem, 1.05rem + 2.6vw, 3.25rem);
+  --fs-h3: clamp(1.25rem, 1.06rem + 0.72vw, 1.875rem);
+  --fs-h4: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.42vw, 1.25rem);
+  --fs-body: 1.0625rem;
+  --fs-sm: 0.9375rem;
+  --fs-xs: 0.8125rem;
+
+  --lh-h1: 1.08;
+  --lh-h2: 1.16;
+  --lh-body: 1.75;
+
+  --tracking-eyebrow: 0.12em;
+
+  /* ---- Layout ---- */
+  --container: 1240px;
+  --container-narrow: 780px;
+  --gutter: 1.25rem;
+
+  /* 섹션 리듬 — 모든 섹션 간격을 동일하게 만들지 않기 위해 3단계를 둔다 */
+  --space-section: clamp(4.5rem, 2.6rem + 6vw, 10rem);
+  --space-section-sm: clamp(3rem, 2rem + 3.4vw, 5.5rem);
+  --space-section-lg: clamp(5.5rem, 3rem + 8vw, 12rem);
+
+  /* ---- Shape ---- */
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  --shadow-subtle: 0 1px 2px rgba(17, 17, 17, 0.04);
+  --shadow-hover: 0 6px 20px rgba(17, 17, 17, 0.07);
+
+  /* ---- Motion ---- */
+  --dur-fast: 180ms;
+  --dur: 220ms;
+  --dur-slow: 280ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 2rem;
+  }
+}

@@ -5,7 +5,8 @@ import { LandingBody } from './LandingBody'
 export const dynamic = 'force-static'
 
 export const metadata: Metadata = {
-  title: '무료 SEO 진단 | 백링크샵 - 구글 상위노출 전문',
+  // absolute: 루트 title 템플릿의 브랜드 중복 방지
+  title: { absolute: '무료 SEO 진단 | 백링크샵 - 구글 상위노출 전문' },
   description:
     '구글 검색 순위가 낮은 진짜 이유, 10분 안에 무료로 확인하세요. 이메일만 입력하면 경쟁사 비교 분석까지 포함된 정밀 리포트를 보내드립니다.',
   robots: { index: false, follow: false },

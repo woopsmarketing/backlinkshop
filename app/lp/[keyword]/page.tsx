@@ -49,7 +49,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { keyword } = await params
   const m = META[keyword] ?? META.rank
-  return { title: m.title, description: m.description, robots: { index: false, follow: false } }
+  // title.absolute: 루트 레이아웃의 '%s | 백링크샵' 템플릿이 브랜드를 중복으로 붙이지 않게 한다.
+  return {
+    title: { absolute: m.title },
+    description: m.description,
+    robots: { index: false, follow: false },
+  }
 }
 
 export default async function LPKeywordPage({

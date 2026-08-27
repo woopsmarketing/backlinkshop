@@ -70,8 +70,11 @@ export async function middleware(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser()
 
-    // 로그인 필요한 페이지 (dashboard, credits, products, orders, admin 등)
-    const protectedPaths = ['/dashboard', '/credits', '/products', '/orders', '/admin']
+    // 로그인 필요한 페이지
+    // 주의: '/products' 는 신규 공개 사이트에서 /services 로 301 이전했고(next.config.mjs),
+    // 회원용 상품 화면은 '/shop' 으로 옮겼다. 여기에 '/products' 를 다시 넣으면
+    // 리다이렉트보다 미들웨어가 먼저 걸려 크롤러가 다시 /login 으로 튕긴다.
+    const protectedPaths = ['/dashboard', '/credits', '/shop', '/orders', '/admin']
     const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
 
     // 비로그인 상태에서 보호된 페이지 접근 시 로그인으로 리디렉션

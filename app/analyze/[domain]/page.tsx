@@ -8,7 +8,8 @@ import { isVisibleReport } from '@/lib/lp-metrics'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'SEO 진단 결과 | 백링크샵',
+  // absolute: 루트 title 템플릿의 브랜드 중복 방지
+  title: { absolute: 'SEO 진단 결과 | 백링크샵' },
   description: '요청하신 사이트의 SEO 진단 결과를 실시간으로 확인하세요.',
   robots: { index: false, follow: false, nocache: true },
 }

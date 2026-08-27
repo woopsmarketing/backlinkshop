@@ -1,48 +1,29 @@
 /**
- * 사이트맵 생성 - SEO 최적화
+ * sitemap.xml
+ *
+ * 규칙
+ * - 200 + indexable + self canonical URL 만 넣는다. 리다이렉트되는 URL 을 넣지 않는다.
+ * - lastmod 는 빌드 시각이 아니라 실제 콘텐츠 수정일을 쓴다 (config/routes.ts, 각 글의 updatedAt).
  */
 import type { MetadataRoute } from 'next'
+import { absoluteUrl } from '@/config/site'
+import { PUBLIC_ROUTES } from '@/config/routes'
+import { BLOG_POSTS } from '@/content/blog'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.backlinkshop.co.kr'
-  const now = new Date()
+  const pages: MetadataRoute.Sitemap = PUBLIC_ROUTES.map(route => ({
+    url: absoluteUrl(route.path),
+    lastModified: new Date(route.lastModified),
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }))
 
-  return [
-    {
-      url: siteUrl,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/products`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${siteUrl}/products/category/plan`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/products/category/pbn`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/products/category/seo`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/products/category/content`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-  ]
+  const posts: MetadataRoute.Sitemap = BLOG_POSTS.map(post => ({
+    url: absoluteUrl(`/blog/${post.slug}`),
+    lastModified: new Date(post.updatedAt),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
+
+  return [...pages, ...posts]
 }

@@ -7,6 +7,7 @@
 // v1.1 - 로그아웃 버튼 추가 (2026-02-05)
 import Link from 'next/link'
 import { signOut } from '@/server/actions/auth'
+import { TELEGRAM_URL } from '@/config/site'
 
 type TopNavProps = {
   userEmail?: string | null
@@ -18,7 +19,7 @@ type TopNavProps = {
 export default function TopNav({ userEmail, isAdmin, title, balance }: TopNavProps) {
   const links = [
     { href: '/dashboard', label: '대시보드' },
-    { href: '/products', label: '상품' },
+    { href: '/shop', label: '상품' },
     { href: '/credits', label: '크레딧' },
     { href: '/orders', label: '주문' },
   ]
@@ -61,7 +62,7 @@ export default function TopNav({ userEmail, isAdmin, title, balance }: TopNavPro
           <span className="hidden sm:inline">{userEmail}</span>
           {/* 문의하기 버튼 */}
           <a
-            href="https://t.me/@goat82"
+            href={TELEGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -94,7 +95,7 @@ export default function TopNav({ userEmail, isAdmin, title, balance }: TopNavPro
         </nav>
         <div className="px-4 pb-3 flex flex-col gap-2">
           <a
-            href="https://t.me/@goat82"
+            href={TELEGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-center"

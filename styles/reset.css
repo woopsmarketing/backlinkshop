@@ -1,0 +1,43 @@
+/**
+ * Reset — Tailwind preflight 위에 신규 공개 사이트가 필요로 하는 기본값만 얹는다.
+ * 레거시 페이지(admin/dashboard/lp/analyze)의 Tailwind 스타일을 깨뜨리지 않도록
+ * 요소 선택자 재정의는 최소한으로 유지한다.
+ */
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+/* 키보드 포커스는 항상 보이게 한다 */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* 모션을 줄이도록 설정한 사용자에게는 전환·애니메이션을 사실상 제거한다 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

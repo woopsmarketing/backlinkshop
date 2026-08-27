@@ -18,6 +18,7 @@ import ReportDownloadButton from '@/app/components/ReportDownloadButton'
 import { getActiveProducts } from '@/server/queries/products'
 import OnboardingChecklist from './components/OnboardingChecklist'
 import FirstChargeBonusTimer from './components/FirstChargeBonusTimer'
+import { TELEGRAM_URL } from '@/config/site'
 
 type Props = {
   searchParams: Promise<{ from?: string; site?: string }>
@@ -41,8 +42,8 @@ export default async function DashboardPage(props: Props) {
     const seoProduct = allProductsForRedirect.find((p: any) => p.name === '온페이지 SEO 점검')
     if (seoProduct) {
       const redirectPath = searchParams.site
-        ? `/products/${seoProduct.id}?site=${encodeURIComponent(searchParams.site)}`
-        : `/products/${seoProduct.id}`
+        ? `/shop/${seoProduct.id}?site=${encodeURIComponent(searchParams.site)}`
+        : `/shop/${seoProduct.id}`
       redirect(redirectPath)
     }
   }
@@ -166,7 +167,7 @@ export default async function DashboardPage(props: Props) {
             <h3 className="text-gray-600 dark:text-gray-400 text-sm font-medium mb-4">빠른 액션</h3>
             <div className="space-y-2">
               <Link
-                href="/products"
+                href="/shop"
                 className="block w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg transition-colors text-sm font-medium"
               >
                 상품 보기
@@ -242,7 +243,7 @@ export default async function DashboardPage(props: Props) {
                       {formatCredits(Number(product.price))} 크레딧
                     </p>
                     <Link
-                      href={`/products/${product.id}`}
+                      href={`/shop/${product.id}`}
                       className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm font-medium"
                     >
                       무료 체험
@@ -263,7 +264,7 @@ export default async function DashboardPage(props: Props) {
                   백링크, SEO 전략이 궁금하신가요? 전문가가 직접 상담해드립니다
                 </p>
                 <a
-                  href="https://t.me/goat82"
+                  href={TELEGRAM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white hover:bg-gray-100 text-blue-600 rounded-lg transition-colors text-sm font-semibold"
@@ -300,7 +301,7 @@ export default async function DashboardPage(props: Props) {
                     {formatCredits(Number(product.price))}
                   </p>
                   <Link
-                    href={`/products/${product.id}`}
+                    href={`/shop/${product.id}`}
                     className="block w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg transition-colors text-sm font-medium"
                   >
                     구매하기
@@ -324,7 +325,7 @@ export default async function DashboardPage(props: Props) {
               </div>
             </div>
             <a
-              href="https://t.me/goat82"
+              href={TELEGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 py-3 px-6 bg-white hover:bg-gray-100 text-purple-600 rounded-lg transition-colors font-semibold shadow-lg whitespace-nowrap"

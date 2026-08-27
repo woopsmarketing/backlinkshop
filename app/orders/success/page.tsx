@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 import TopNav from '@/app/components/TopNav'
 import { createServerSupabaseClient } from '@/server/supabase/client'
 import Link from 'next/link'
+import { TELEGRAM_URL } from '@/config/site'
 
 type Props = {
   searchParams: Promise<{ product?: string; type?: string }>
@@ -127,7 +128,7 @@ export default async function OrderSuccessPage(props: Props) {
             전문가가 사이트 분석 결과를 바탕으로 최적의 백링크 전략을 무료로 상담해드립니다
           </p>
           <a
-            href="https://t.me/goat82"
+            href={TELEGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-3 bg-white text-blue-600 font-bold rounded-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all"
@@ -148,7 +149,7 @@ export default async function OrderSuccessPage(props: Props) {
             주문 내역 보기
           </Link>
           <Link
-            href="/products"
+            href="/shop"
             className="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-xl text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             다른 상품 보기

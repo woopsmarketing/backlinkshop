@@ -69,3 +69,34 @@ export function trackAnalyzePageView(params: { domain: string }): void {
   if (!gtag) return
   gtag('event', 'analyze_page_view', { domain: params.domain })
 }
+
+/**
+ * 신규 공개 사이트의 텔레그램 CTA 클릭.
+ *
+ * 이벤트 이름은 기존 'telegram_click' 을 그대로 쓴다.
+ * 이유: 이 이벤트가 이미 GA4 주요 이벤트 → Google Ads 전환으로 import 되어 있다.
+ * 새 이름을 쓰면 전환 설정을 다시 해야 하고 그 사이 전환이 유실된다.
+ * 대신 page/source/position/label 파라미터를 추가해 위치별 분석이 가능하게 한다.
+ */
+export function trackTelegramCtaClick(params: {
+  /** 발화한 페이지 경로 */
+  page: string
+  /** 문맥 (pbn-backlink, pricing, google-ranking ...) */
+  source: string
+  /** 위치 (hero, mid, final, header, footer ...) */
+  position: string
+  /** 버튼에 실제로 쓰인 문구 */
+  label: string
+}): void {
+  const gtag = getGtag()
+  if (!gtag) return
+  gtag('event', 'telegram_click', {
+    // 기존 리포트 호환: placement 는 계속 채운다
+    placement: `${params.source}:${params.position}`,
+    domain: '',
+    page: params.page,
+    source: params.source,
+    position: params.position,
+    label: params.label,
+  })
+}

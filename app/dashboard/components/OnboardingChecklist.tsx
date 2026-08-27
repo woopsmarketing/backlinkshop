@@ -24,7 +24,7 @@ export default function OnboardingChecklist({
       description: '가입 보너스 20만 크레딧으로 내 사이트의 SEO 상태를 무료로 진단받으세요.',
       done: hasSeoOrder,
       cta: '무료 SEO 점검 신청하기',
-      href: '/products/category/seo',
+      href: '/shop/category/seo',
       color: 'blue',
     },
     {

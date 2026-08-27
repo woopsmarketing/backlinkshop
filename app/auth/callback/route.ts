@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
           .single()
 
         if (seoProduct) {
-          const redirectUrl = new URL(`/products/${seoProduct.id}`, origin)
+          const redirectUrl = new URL(`/shop/${seoProduct.id}`, origin)
           if (site) {
             redirectUrl.searchParams.set('site', site)
           }

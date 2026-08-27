@@ -52,7 +52,7 @@ export async function createProductAction(input: {
     }
 
     revalidatePath('/admin/products')
-    revalidatePath('/products')
+    revalidatePath('/shop')
 
     return { success: true, message: '상품이 생성되었습니다' }
   } catch (error) {
@@ -87,7 +87,7 @@ export async function toggleProductStatusAction(productId: string, status: strin
     }
 
     revalidatePath('/admin/products')
-    revalidatePath('/products')
+    revalidatePath('/shop')
 
     return { success: true, message: '상품 상태가 변경되었습니다' }
   } catch (error) {

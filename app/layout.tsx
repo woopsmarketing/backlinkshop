@@ -1,63 +1,35 @@
 /**
  * 전역 레이아웃
+ *
+ * 주의
+ * - alternates.canonical 을 여기에 두지 않는다. 루트에 절대 canonical 을 두면 모든 하위 페이지가
+ *   홈페이지를 canonical 로 상속해 색인 대상에서 빠진다. canonical 은 각 페이지에서 self-reference 로 지정한다.
+ * - verification.google 은 Search Console 소유 확인용이므로 제거하면 GSC 연결이 끊긴다. 반드시 유지.
+ * - favicon 은 app/icon.svg 를 자동 사용한다 (285KB logo.png 를 favicon 으로 쓰지 않는다).
+ *   logo.png 는 OG 이미지로만 쓴다.
  */
 import type { Metadata } from 'next'
-import './globals.css'
+import '@/styles/master.css'
 import { GoogleTag } from './components/GoogleTag'
+import { SITE_NAME, SITE_URL } from '@/config/site'
 
 export const metadata: Metadata = {
-  title: '백링크샵 - 고품질 백링크로 구글 상위노출 | 구글SEO · PBN백링크 · 검색엔진최적화 전문',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: '백링크 구매 · 고품질 백링크 | 백링크샵',
+    template: `%s | ${SITE_NAME}`,
+  },
   description:
-    '구글SEO 전문 백링크샵. 직접 구축한 PBN 백링크와 10가지 이상 고품질 SEO 백링크로 2~4주 내 구글 상위노출을 실현합니다. 무료 도메인 분석으로 경쟁사 대비 SEO 전략을 수립하세요. 검색엔진최적화(SEO) 전문 업체.',
-  keywords: [
-    '구글SEO',
-    '구글 SEO',
-    '구글상위노출',
-    '구글 상위노출',
-    '백링크',
-    '고품질백링크',
-    'PBN백링크',
-    'SEO백링크',
-    '검색엔진최적화',
-    '백링크 서비스',
-    '백링크 구매',
-    '고품질 백링크 구매',
-    'PBN 백링크 서비스',
-    'SEO 대행',
-    'SEO 컨설팅',
-    '도메인 분석',
-    '백링크샵',
-    '티어 링크',
-    '네이버 SEO',
-  ],
-  icons: {
-    icon: '/logo.png',
-    apple: '/logo.png',
-  },
-  alternates: {
-    canonical: 'https://www.backlinkshop.co.kr',
-  },
+    '백링크 구매 전에 사이트 상황부터 확인합니다. 고품질 백링크와 PBN 백링크가 지금 필요한지 먼저 판단해 드립니다.',
   openGraph: {
-    title: '백링크샵 - 구글SEO · 구글 상위노출 전문 | 고품질 백링크 · 무료 도메인 분석',
-    description:
-      '구글SEO 전문 백링크샵. PBN 백링크와 10가지 이상 SEO 백링크로 구글 상위노출. 무료 도메인 분석으로 경쟁사 비교. 1,247개 프로젝트 검증, 패널티 0건.',
     type: 'website',
     locale: 'ko_KR',
-    siteName: '백링크샵',
-    url: 'https://www.backlinkshop.co.kr',
-    images: [
-      {
-        url: 'https://www.backlinkshop.co.kr/logo.png',
-        alt: '백링크샵 - 고품질 백링크 서비스',
-      },
-    ],
+    siteName: SITE_NAME,
+    images: [{ url: '/logo.png', alt: `${SITE_NAME} 로고` }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '백링크샵 - 구글SEO · 구글 상위노출 전문 | 고품질 백링크',
-    description:
-      '구글SEO 전문 백링크샵. PBN 백링크와 고품질 SEO 백링크로 구글 상위노출. 무료 도메인 분석 제공. 무료 20만 크레딧.',
-    images: ['https://www.backlinkshop.co.kr/logo.png'],
+    images: ['/logo.png'],
   },
   robots: {
     index: true,
