@@ -13,6 +13,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { chatbotConfig, type ChatContext } from '@/lib/chatbot'
+import { trackChatWidgetOpen, trackChatMessageSent } from '@/lib/gtag'
 
 export type { ChatContext }
 
@@ -82,6 +83,7 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
   const send = async (text: string) => {
     const trimmed = text.trim()
     if (!trimmed || loading) return
+    trackChatMessageSent({ domain: context?.domain ?? undefined })
     const next: Msg[] = [...messages, { role: 'user', content: trimmed }]
     setMessages(next)
     setInput('')
@@ -158,7 +160,10 @@ export function AiChatWidget({ context }: { context?: ChatContext }) {
             aria-hidden="true"
           />
           <button
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true)
+              trackChatWidgetOpen({ domain: context?.domain ?? undefined })
+            }}
             aria-label="상담 AI 열기"
             className="relative flex items-center gap-2 rounded-full bg-purple-600 px-4 py-3 text-sm font-bold text-white shadow-xl shadow-purple-600/40 transition hover:bg-purple-700 hover:scale-105"
           >
