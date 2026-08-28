@@ -23,10 +23,12 @@ import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { CaseStudyCard } from '@/components/marketing/CaseStudyCard'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardTitle, BulletList } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { RelatedContent } from '@/components/content/RelatedContent'
 import { RelatedArticles } from '@/components/content/RelatedArticles'
 
 import { PRICING, formatKrw } from '@/config/pricing'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH, resolveArticles } from '@/config/seo-graph'
 import { PUBLISHED_CASES, CASE_DISCLOSURE_RULES } from '@/config/cases'
 
@@ -64,7 +66,7 @@ export default function ServicesPage() {
       <Breadcrumb trail={[{ href: '/services', label: '서비스' }]} />
 
       <Hero
-        eyebrow="SERVICES"
+        eyebrow="서비스"
         title={
           <>
             <span className="bl-break">문제에 맞는</span>
@@ -74,23 +76,18 @@ export default function ServicesPage() {
         support="백링크와 온페이지, 콘텐츠는 서로 다른 문제를 담당하는 작업입니다. 지금 어디가 막혀 있는지에 따라 시작점이 달라지기 때문에, 상품을 먼저 고르기보다 상황을 먼저 정리하는 쪽이 결과적으로 빠릅니다."
         actions={
           <>
-            <TelegramCTA
-              source="services"
-              position="hero"
-              size="lg"
-              label="어떤 작업이 맞는지 상담하기"
-            />
+            <TelegramCTA source="services" position="hero" size="lg" label={ctaLabel('services')} />
             <Button href="/pricing" variant="secondary" size="lg">
               작업별 시작가 확인하기
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 지금까지 해보신 작업만 알려주셔도 됩니다"
+        note="지금까지 해보신 작업만 알려주셔도 됩니다"
       />
 
       <Section ariaLabelledBy="services-why-title">
         <SectionHead
-          eyebrow="01 / WHY"
+          eyebrow="01 / 판단 기준"
           id="services-why-title"
           title="같은 작업이 모든 사이트에서 같은 결과를 만들지는 않습니다."
           lead="서비스를 고르는 일은 상품을 고르는 일보다, 지금 무엇이 막혀 있는지를 정하는 일에 가깝습니다."
@@ -121,7 +118,7 @@ export default function ServicesPage() {
 
       <Section subtle size="sm" ariaLabelledBy="services-situation-title">
         <SectionHead
-          eyebrow="02 / START HERE"
+          eyebrow="02 / 상황 선택"
           id="services-situation-title"
           title="지금 상황과 가장 가까운 문장을 고르세요."
           lead="선택한 문장에 맞는 설명 페이지로 이동합니다. 상담하지 않고 먼저 읽어보셔도 됩니다."
@@ -131,12 +128,12 @@ export default function ServicesPage() {
 
       <Section ariaLabelledBy="services-list-title">
         <SectionHead
-          eyebrow="03 / SERVICES"
+          eyebrow="03 / 서비스"
           id="services-list-title"
           title="네 가지 작업은 각각 다른 층을 담당합니다."
           lead="외부 신호, 페이지 상태, 문서 내용은 서로 다른 층위입니다. 카드마다 어떤 상황에 쓰는 작업인지와 시작가를 함께 표시했습니다."
         />
-        <ServiceGrid />
+        <ServiceGrid showPrice />
         <p className="bl-closing">
           표시된 금액은 각 작업의 시작가이며, 그중 가장 낮은 값은 {formatKrw(lowestFrom)}입니다.
           실제 금액은 키워드 경쟁 강도와 목표 페이지, 지금까지 쌓인 링크 상태에 따라 달라지므로{' '}
@@ -146,7 +143,7 @@ export default function ServicesPage() {
 
       <Section subtle ariaLabelledBy="services-mix-title">
         <SectionHead
-          eyebrow="04 / COMBINATION"
+          eyebrow="04 / 작업 조합"
           id="services-mix-title"
           title={
             <>
@@ -221,6 +218,7 @@ export default function ServicesPage() {
 
         <div className="bl-grid bl-grid--3" style={{ marginTop: '2.5rem' }}>
           <Card>
+            <IconSurface name="compass" />
             <CardTitle>순서를 바꾸면 판단이 어려워집니다</CardTitle>
             <CardBody>
               링크를 먼저 늘리고 나서 페이지를 손보면, 순위가 움직였을 때 무엇이 작용했는지 구분할
@@ -228,6 +226,7 @@ export default function ServicesPage() {
             </CardBody>
           </Card>
           <Card>
+            <IconSurface name="chart" />
             <CardTitle>예산을 한 번에 쓰지 않습니다</CardTitle>
             <CardBody>
               필요해 보이는 작업을 전부 나열해 한 번에 집행하기보다, 먼저 확인해야 할 구간을 좁은
@@ -235,6 +234,7 @@ export default function ServicesPage() {
             </CardBody>
           </Card>
           <Card>
+            <IconSurface name="layers" />
             <CardTitle>판단이 서지 않으면 조합부터 설계합니다</CardTitle>
             <CardBody>
               어느 층이 문제인지 스스로 정하기 어려울 때는{' '}
@@ -247,7 +247,7 @@ export default function ServicesPage() {
 
       <Section ariaLabelledBy="services-process-title">
         <SectionHead
-          eyebrow="05 / PROCESS"
+          eyebrow="05 / 진행 방식"
           id="services-process-title"
           title="어떤 작업을 고르더라도 진행 방식은 같습니다."
           lead="작업을 시작하기 전에 무엇을 왜 하는지 먼저 맞춥니다. 범위가 정해지지 않은 채로 진행하지 않습니다."
@@ -256,18 +256,12 @@ export default function ServicesPage() {
       </Section>
 
       <Section size="sm">
-        <TelegramCTABlock
-          source="services"
-          position="mid"
-          title="어느 작업이 먼저인지 대신 정리해 드립니다."
-          body="사이트 주소와 목표 키워드, 지금까지 진행해 본 작업을 알려주시면 됩니다. 이미 하신 작업이 있다면 그 결과부터 확인합니다."
-          label="어떤 작업이 맞는지 상담하기"
-        />
+        <TelegramCTABlock source="services" cta="services" position="mid" />
       </Section>
 
       <Section subtle ariaLabelledBy="services-cases-title">
         <SectionHead
-          eyebrow="06 / CASES"
+          eyebrow="06 / 성공 사례"
           id="services-cases-title"
           title="어떤 작업을 골랐는지보다, 왜 그렇게 골랐는지를 공개합니다."
           lead="서비스 선택이 맞았는지는 결과 숫자만으로 판단하기 어렵습니다. 그래서 사례를 게시할 때 조건을 함께 적습니다."
@@ -313,6 +307,7 @@ export default function ServicesPage() {
 
       <FinalCTA
         source="services"
+        cta="services"
         title="어떤 작업이 필요한지부터 같이 정리해 보시죠."
         body="네 가지 중 무엇을 고를지 미리 정하지 않으셔도 됩니다. 사이트 주소와 목표 키워드를 보고 지금 순서가 어떻게 되는지 말씀드리겠습니다."
         label="어떤 작업이 맞는지 상담하기"

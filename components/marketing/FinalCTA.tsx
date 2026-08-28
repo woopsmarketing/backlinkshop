@@ -1,31 +1,38 @@
 import { Section } from '@/components/layout/Container'
+import { ctaCopy, type CtaKey } from '@/config/cta'
 import { TelegramCTA } from './TelegramCTA'
 
 /**
- * 페이지 마지막 CTA. 문맥별로 label 을 바꿔 쓴다.
+ * 페이지 마지막 CTA.
+ * 문구는 config/cta.ts 에서 가져온다 — 모든 페이지가 같은 문장으로 끝나지 않게 하기 위해서다.
  */
 export function FinalCTA({
   source,
-  title = '사이트 주소와 목표 키워드만 알려주세요.',
-  body = '현재 상황을 보고 어떤 방향이 적합한지 이야기하겠습니다.',
+  cta = 'final',
+  title,
+  body,
   label,
 }: {
   source: string
+  /** config/cta.ts 의 키 */
+  cta?: CtaKey
   title?: string
   body?: string
   label?: string
 }) {
+  const copy = ctaCopy(cta)
+
   return (
     <Section className="bl-final-cta" size="sm" ariaLabelledBy={`final-cta-${source}`}>
       <div className="bl-center">
         <h2 id={`final-cta-${source}`} className="bl-h2">
-          {title}
+          {title ?? copy.title ?? '사이트 주소와 목표 키워드를 보내주세요'}
         </h2>
         <p className="bl-lead bl-measure" style={{ marginTop: '1rem' }}>
-          {body}
+          {body ?? copy.body}
         </p>
         <div className="bl-btn-row" style={{ marginTop: '2rem' }}>
-          <TelegramCTA source={source} position="final" label={label} size="lg" showNote />
+          <TelegramCTA source={source} position="final" label={label ?? copy.label} size="lg" />
         </div>
       </div>
     </Section>

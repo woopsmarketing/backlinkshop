@@ -11,10 +11,13 @@ export const post: BlogPost = {
     '백링크 대행을 맡길 때 가장 흔한 순서는 견적부터 비교하는 것입니다. 그런데 백링크에는 표준 단위가 없어서, 같은 개수라도 안에 담긴 것이 전혀 다를 수 있습니다. 이 글은 가격을 보기 전에 확인할 8가지 기준과, 상담 자리에서 그대로 읽어도 되는 질문 문장을 정리했습니다.',
   category: 'BACKLINK',
   publishedAt: '2026-08-27',
-  updatedAt: '2026-08-27',
+  updatedAt: '2026-08-29',
   cluster: 'agency',
   moneyPage: '/backlink-agency',
   supportingPage: '/pricing',
+  thumbnail: '/images/blog/agency-evaluation.svg',
+  heroImage: '/images/blog/agency-evaluation.svg',
+  imageAlt: '백링크 업체를 판단할 때 확인할 6가지 항목을 정리한 체크리스트',
   keyTakeaways: [
     '백링크는 표준 단위가 없는 상품입니다. 개수와 금액만 나란히 놓고 비교하면 서로 다른 것을 같은 것으로 착각하게 됩니다.',
     '업체를 비교하기 전에 목표 키워드·목표 페이지·감당 가능한 리스크 수준을 먼저 내부에서 정해야 견적이 비교 가능한 형태로 돌아옵니다.',
@@ -118,6 +121,7 @@ export const post: BlogPost = {
   </tbody>
 </table>
 </div>
+<figure class="blog-figure"><img src="/images/blog/agency-red-flags.svg" alt="작업 URL 비공개, 순위 보장, 개수만 적힌 견적, 앵커 구성 기준 부재처럼 업체가 설명하지 못할 때 드러나는 위험 신호를 모아 정리한 다이어그램" width="800" height="400" loading="lazy" decoding="async" /><figcaption>하나 걸렸다고 곧바로 탈락시키라는 뜻은 아닙니다. 그 항목만은 문서로 확인하고 넘어가라는 표시입니다.</figcaption></figure>
 <div class="blog-note">
 <p>여덟 개를 모두 만족하는 선택지가 없을 수도 있습니다. 그럴 때는 <strong>과정 투명성과 리포팅</strong>을 먼저 보십시오. 이 두 가지가 확보되면 나머지 여섯 가지를 발주한 쪽에서 직접 확인할 수 있게 됩니다.</p>
 </div>

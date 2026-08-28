@@ -1,0 +1,41 @@
+<svg viewBox="0 0 800 450" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>백링크 가격을 결정하는 다섯 가지 요소와 그 결과로 정해지는 가격</title>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1.5 L9,5 L0,8.5 Z" fill="#3157e8"/>
+    </marker>
+  </defs>
+  <rect width="800" height="450" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="46" font-size="20" font-weight="600" fill="#111111">백링크 가격을 결정하는 요소</text>
+    <text x="48" y="70" font-size="14" fill="#5f636b">가격은 정해진 단가가 아니라 아래 요소의 조합으로 계산됩니다</text>
+    <text x="48" y="98" font-size="13" fill="#8b9098">입력 요소</text>
+
+    <g fill="none" stroke="#b7c4f7" stroke-width="1.5" marker-end="url(#ar)">
+      <path d="M238,134 C296,134 314,236 372,236"/>
+      <path d="M238,200 C296,200 314,251 372,251"/>
+      <path d="M238,266 L372,266"/>
+      <path d="M238,332 C296,332 314,281 372,281"/>
+      <path d="M238,398 C296,398 314,296 372,296"/>
+    </g>
+
+    <g>
+      <rect x="48" y="110" width="190" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="143" y="139" font-size="15" fill="#111111" text-anchor="middle">도메인 품질</text>
+      <rect x="48" y="176" width="190" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="143" y="205" font-size="15" fill="#111111" text-anchor="middle">링크 유형</text>
+      <rect x="48" y="242" width="190" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="143" y="271" font-size="15" fill="#111111" text-anchor="middle">작업 수량</text>
+      <rect x="48" y="308" width="190" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="143" y="337" font-size="15" fill="#111111" text-anchor="middle">앵커 구성</text>
+      <rect x="48" y="374" width="190" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="143" y="403" font-size="15" fill="#111111" text-anchor="middle">유지 기간</text>
+    </g>
+
+    <rect x="372" y="212" width="250" height="108" rx="12" fill="#eef2ff" stroke="#3157e8" stroke-width="2"/>
+    <text x="497" y="256" font-size="22" font-weight="700" fill="#1f3bb3" text-anchor="middle">백링크 가격</text>
+    <text x="497" y="286" font-size="14" fill="#5f636b" text-anchor="middle">여러 요소의 결과</text>
+
+    <text x="497" y="358" font-size="14" fill="#8b9098" text-anchor="middle">조건이 다르면 견적도 달라집니다</text>
+  </g>
+</svg>

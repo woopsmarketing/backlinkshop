@@ -22,6 +22,7 @@ import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardTitle, BulletList } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { TableOfContents } from '@/components/content/TableOfContents'
 import { KeyTakeaways } from '@/components/content/KeyTakeaways'
 import { RelatedContent } from '@/components/content/RelatedContent'
@@ -29,6 +30,7 @@ import { RelatedServices } from '@/components/content/RelatedServices'
 import { RelatedArticles } from '@/components/content/RelatedArticles'
 
 import { PRICING, formatKrw } from '@/config/pricing'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH, resolveArticles } from '@/config/seo-graph'
 
 export const dynamic = 'force-static'
@@ -100,26 +102,32 @@ const SUMMARY_POINTS = [
 
 const QUALITY_CRITERIA = [
   {
+    icon: 'target',
     title: '주제 관련성',
     body: '링크를 건 페이지가 내 페이지와 같은 주제를 다루고 있는지 봅니다. 문맥이 전혀 다른 자리에서 걸린 링크는 참조로 해석될 여지가 적습니다.',
   },
   {
+    icon: 'map',
     title: '링크가 놓인 자리',
     body: '본문 문장 안에서 근거로 걸린 링크와, 푸터나 사이드바에 일괄로 나열된 링크는 성격이 다릅니다. 같은 도메인에서 나온 링크라도 자리에 따라 무게가 달라집니다.',
   },
   {
+    icon: 'pen',
     title: '앵커 텍스트',
     body: '가리키는 문서가 무엇에 대한 것인지 설명하는 표현인지 봅니다. 목표 키워드만 반복되면 사람이 실제로 인용할 때의 표현 분포에서 멀어집니다.',
   },
   {
+    icon: 'search',
     title: '링크를 준 페이지의 색인 상태',
     body: '그 페이지 자체가 검색 결과에 등장하지 않는다면, 거기 걸린 링크가 평가에 반영될 여지도 함께 줄어듭니다.',
   },
   {
+    icon: 'network',
     title: '그 사이트의 외부 링크 패턴',
     body: '한 페이지에서 서로 무관한 사이트로 링크가 대량으로 나가고 있다면, 링크 하나가 갖는 의미는 옅어집니다.',
   },
   {
+    icon: 'clock',
     title: '유지 여부',
     body: '일정 기간 뒤 사라지는 링크와 문서로 남는 링크는 다릅니다. 작업이 끝난 뒤에도 링크가 살아 있는지 직접 확인할 수 있어야 합니다.',
   },
@@ -257,22 +265,27 @@ const BACKLINK_DOES_NOT_FIX = [
 
 const STUCK_REASONS = [
   {
+    icon: 'compass',
     title: '페이지가 다른 질문에 답하고 있다',
     body: '검색한 사람이 비교를 원하는데 페이지가 소개만 하고 있다면, 참조 신호가 늘어도 결과가 바뀌기 어렵습니다.',
   },
   {
+    icon: 'alert',
     title: '평가 이전 단계에서 막혀 있다',
     body: '색인에서 제외되었거나 다른 주소가 대표 문서로 잡혀 있는 경우가 있습니다. 이때는 링크가 향할 자리 자체가 잘못되어 있습니다.',
   },
   {
+    icon: 'layers',
     title: '링크가 한쪽으로 몰려 있다',
     body: '같은 유형, 같은 앵커 텍스트로만 쌓이면 특정 지점부터 추가분이 이전만큼 작용하지 않을 수 있습니다.',
   },
   {
+    icon: 'trending',
     title: '경쟁 강도를 과소평가했다',
     body: '이미 상위에 있는 사이트들이 오래 쌓아온 참조를 갖고 있다면, 필요한 작업량 자체가 다릅니다.',
   },
   {
+    icon: 'clock',
     title: '아직 재평가가 이뤄지지 않았다',
     body: '링크가 걸린 뒤 크롤링과 재평가가 반영되기까지는 시간이 필요합니다. 얼마나 걸릴지는 사이트마다 달라 기간을 단정하지 않습니다.',
   },
@@ -280,18 +293,22 @@ const STUCK_REASONS = [
 
 const BEFORE_BUYING = [
   {
+    icon: 'search',
     title: '지금 필요한 것이 링크가 맞는지',
     body: '노출 자체가 없는 상태와 노출은 되는데 위로 못 가는 상태는 원인이 다릅니다. 어느 쪽인지 먼저 구분합니다.',
   },
   {
+    icon: 'file',
     title: '어디에 무엇이 걸리는지 받아볼 수 있는지',
     body: '작업 URL과 앵커 텍스트를 확인할 수 있어야 나중에 직접 검증할 수 있습니다. 확인할 수 없는 작업은 평가할 수도 없습니다.',
   },
   {
+    icon: 'target',
     title: '목표 페이지와 키워드가 정해져 있는지',
     body: '홈으로 올릴지 상세 페이지로 올릴지에 따라 링크가 향해야 할 자리가 달라집니다. 이것이 정해지지 않으면 구성도 정해지지 않습니다.',
   },
   {
+    icon: 'chart',
     title: '무엇을 결과로 볼지 합의했는지',
     body: '순위인지, 노출 키워드 수인지, 문의 수인지 미리 정해두지 않으면 작업이 끝난 뒤 판단할 기준이 남지 않습니다.',
   },
@@ -299,14 +316,17 @@ const BEFORE_BUYING = [
 
 const LINK_DIRECTIONS = [
   {
+    icon: 'link',
     title: '백링크 (인바운드 링크)',
     body: '다른 사이트의 페이지에서 내 사이트로 들어오는 링크입니다. 이 페이지에서 계속 다루는 대상이 이것입니다.',
   },
   {
+    icon: 'sitemap',
     title: '내부링크',
     body: '내 사이트 안의 페이지에서 같은 사이트의 다른 페이지로 거는 링크입니다. 방향이 사이트 안에서 끝납니다.',
   },
   {
+    icon: 'share',
     title: '아웃바운드 링크',
     body: '내 사이트에서 다른 사이트로 나가는 링크입니다. 근거나 출처를 제시하는 자리에서 주로 씁니다.',
   },
@@ -354,7 +374,7 @@ export default function BacklinkPage() {
       <Breadcrumb trail={[{ href: '/backlink', label: '백링크란?' }]} />
 
       <Hero
-        eyebrow="BACKLINK GUIDE"
+        eyebrow="백링크 가이드"
         title={
           <>
             백링크란?
@@ -364,7 +384,7 @@ export default function BacklinkPage() {
         support="백링크는 다른 사이트가 내 페이지를 참조한 링크입니다. 다만 링크가 하나 늘었다고 순위가 그만큼 움직이지는 않습니다. 링크가 어떤 경로로 평가에 반영되는지, 어떤 링크가 의미를 갖는지를 순서대로 정리했습니다."
         actions={
           <>
-            <TelegramCTA source="backlink" position="hero" size="lg" />
+            <TelegramCTA source="backlink" position="hero" size="lg" label={ctaLabel('backlink')} />
             <Button href="/services" variant="secondary" size="lg">
               어떤 작업이 있는지 보기
             </Button>
@@ -375,7 +395,7 @@ export default function BacklinkPage() {
 
       <Section size="sm" subtle ariaLabelledBy="summary-title">
         <SectionHead
-          eyebrow="SUMMARY"
+          eyebrow="요약"
           id="summary-title"
           title="먼저 요약하면 이렇습니다."
           lead="아래 내용을 모두 읽기 어렵다면 이 다섯 문장만 기억해도 판단이 훨씬 쉬워집니다."
@@ -436,6 +456,7 @@ export default function BacklinkPage() {
         <div className="bl-grid bl-grid--3">
           {LINK_DIRECTIONS.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -514,6 +535,7 @@ export default function BacklinkPage() {
         <div className="bl-grid bl-grid--3">
           {QUALITY_CRITERIA.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -638,10 +660,12 @@ export default function BacklinkPage() {
         />
         <div className="bl-grid bl-grid--2">
           <Card feature>
+            <IconSurface name="check" />
             <CardTitle>백링크가 관여하는 영역</CardTitle>
             <BulletList items={BACKLINK_AFFECTS} />
           </Card>
           <Card>
+            <IconSurface name="alert" />
             <CardTitle>백링크가 대신해 주지 못하는 것</CardTitle>
             <BulletList items={BACKLINK_DOES_NOT_FIX} plain />
           </Card>
@@ -662,6 +686,7 @@ export default function BacklinkPage() {
         <div className="bl-grid bl-grid--3">
           {STUCK_REASONS.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -684,6 +709,7 @@ export default function BacklinkPage() {
         <div className="bl-grid bl-grid--2">
           {BEFORE_BUYING.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -772,6 +798,7 @@ export default function BacklinkPage() {
       <Section size="sm">
         <TelegramCTABlock
           source="backlink"
+          cta="backlink"
           position="mid"
           title="여기까지 읽고도 내 경우가 어디에 해당하는지 애매하다면"
           body="사이트 주소와 목표 키워드를 알려주시면, 지금 링크가 필요한 단계인지부터 같이 확인해 드립니다."
@@ -794,6 +821,7 @@ export default function BacklinkPage() {
 
       <FinalCTA
         source="backlink"
+        cta="backlink"
         title="지금 내 사이트에 링크가 필요한 단계인지 확인해 보세요."
         body="도메인과 목표 키워드만 알려주시면 어디가 막혀 있는지부터 같이 보겠습니다."
       />

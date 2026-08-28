@@ -3,7 +3,8 @@
 /**
  * TelegramCTA — 사이트의 Primary Conversion.
  *
- * - t.me URL 은 config/site.ts 한 곳에서만 관리한다.
+ * - t.me URL 은 config/site.ts 한 곳에서만 관리한다. 버튼 문구에는 채널 이름을 노출하지 않는다
+ *   (상담 채널이 바뀌어도 사이트 전체 문구를 고칠 필요가 없어야 한다).
  * - 클릭 시 GA4 이벤트를 발화한다. 이벤트 이름은 기존 'telegram_click' 을 유지해
  *   이미 연결된 Google Ads 전환이 끊기지 않게 한다 (lib/gtag.ts 참고).
  */
@@ -14,7 +15,6 @@ import { trackTelegramCtaClick } from '@/lib/gtag'
 import { buttonClass } from '@/components/ui/Button'
 
 export const DEFAULT_CTA_LABEL = '내 사이트 상황 상담하기'
-export const CTA_NOTE = 'Telegram으로 연결됩니다'
 
 type Props = {
   /** 문맥 (pbn-backlink, pricing, google-ranking ...) */
@@ -26,8 +26,6 @@ type Props = {
   variant?: 'button' | 'secondary' | 'link'
   size?: 'md' | 'lg'
   block?: boolean
-  /** 'Telegram으로 연결됩니다' 보조 표시 */
-  showNote?: boolean
 }
 
 export function TelegramCTA({
@@ -37,7 +35,6 @@ export function TelegramCTA({
   variant = 'button',
   size = 'md',
   block,
-  showNote,
 }: Props) {
   const pathname = usePathname()
 
@@ -63,7 +60,6 @@ export function TelegramCTA({
       >
         {label}
       </a>
-      {showNote ? <span className="bl-cta__note">{CTA_NOTE}</span> : null}
     </span>
   )
 }

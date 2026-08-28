@@ -51,6 +51,10 @@ export const PAGE_REGISTRY: Record<string, { label: string; description: string 
     label: '구글 상위노출',
     description: '순위가 오르지 않는 이유를 하나로 설명하지 않습니다.',
   },
+  '/about': {
+    label: '백링크샵 소개',
+    description: '8년 넘게 검색 결과가 변하는 과정을 직접 겪으며 만든 판단 기준입니다.',
+  },
   '/cases': {
     label: '성공사례',
     description: '어떤 조건에서 나온 결과인지 함께 공개합니다.',
@@ -93,12 +97,13 @@ export type ClusterKey =
   | 'googleRanking'
   | 'cases'
   | 'faq'
+  | 'about'
 
 export const SEO_GRAPH: Record<ClusterKey, Cluster> = {
   home: {
     pillar: '/backlink',
     moneyPage: '/services/pbn-backlink',
-    relatedPages: ['/pricing', '/backlink-agency', '/cases'],
+    relatedPages: ['/pricing', '/backlink-agency', '/cases', '/about'],
     relatedArticles: [
       'backlink-price-guide',
       'what-is-pbn-backlink',
@@ -166,13 +171,19 @@ export const SEO_GRAPH: Record<ClusterKey, Cluster> = {
   googleRanking: {
     pillar: '/backlink',
     moneyPage: '/services/pbn-backlink',
-    relatedPages: ['/cases', '/services/onpage-seo', '/services/content-seo'],
+    relatedPages: [
+      '/services/onpage-seo',
+      '/services/content-seo',
+      '/services/pbn-backlink',
+      '/cases',
+      '/about',
+    ],
     relatedArticles: ['high-quality-backlink-criteria', 'link-building-guide'],
   },
   cases: {
     pillar: '/backlink',
     moneyPage: '/services/pbn-backlink',
-    relatedPages: ['/pricing', '/backlink-agency'],
+    relatedPages: ['/pricing', '/backlink-agency', '/about'],
     relatedArticles: ['how-to-choose-backlink-agency'],
   },
   faq: {
@@ -180,6 +191,16 @@ export const SEO_GRAPH: Record<ClusterKey, Cluster> = {
     moneyPage: '/pricing',
     relatedPages: ['/backlink-agency', '/services/pbn-backlink', '/refund'],
     relatedArticles: ['what-is-pbn-backlink', 'backlink-price-guide'],
+  },
+  /**
+   * /about 은 키워드 페이지가 아니라 신뢰 페이지다.
+   * 그래서 pillar 를 /google-ranking 으로 두고, 경험 서술이 실제 판단으로 이어지는 곳으로 보낸다.
+   */
+  about: {
+    pillar: '/google-ranking',
+    moneyPage: '/services/pbn-backlink',
+    relatedPages: ['/cases', '/backlink', '/services/onpage-seo'],
+    relatedArticles: ['high-quality-backlink-criteria', 'what-is-pbn-backlink'],
   },
 }
 

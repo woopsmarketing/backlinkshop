@@ -8,18 +8,25 @@
   /* ---- Color ---- */
   --bg: #ffffff;
   --surface: #ffffff;
+  /* 카드처럼 배경 위로 올라오는 표면. 현재는 흰색이지만 의미가 달라 이름을 나눠 둔다. */
+  --surface-raised: #ffffff;
   --surface-subtle: #f8f9fb;
 
   --text-primary: #111111;
   --text-secondary: #5f636b;
   --text-muted: #8b9098;
 
-  --border: #e7e9ed;
-  --border-strong: #d7dbe1;
+  /* V2: 보더를 한 단계 진하게. 흰 배경에서 카드 경계가 보이지 않던 문제를 먼저 해결한다. */
+  --border: #d8dde6;
+  --border-strong: #c3cbd6;
 
   --brand: #3157e8;
   --brand-hover: #2447c9;
   --brand-soft: #eef2ff;
+  /* 그라디언트·강조 스트로크용 진한 브랜드 */
+  --brand-deep: #1f3bb3;
+  /* 브랜드 톤의 얇은 선 (다이어그램·구분선) */
+  --brand-line: rgba(49, 87, 232, 0.16);
 
   --success: #16845b;
 
@@ -42,7 +49,8 @@
   --lh-h2: 1.16;
   --lh-body: 1.75;
 
-  --tracking-eyebrow: 0.12em;
+  /* V2: eyebrow 가 한글(01 / 현재 상황)로 바뀌어 자간을 줄인다. 영문 대문자 기준 0.12em 은 한글을 늘어뜨린다. */
+  --tracking-eyebrow: 0.04em;
 
   /* ---- Layout ---- */
   --container: 1240px;
@@ -55,12 +63,16 @@
   --space-section-lg: clamp(5.5rem, 3rem + 8vw, 12rem);
 
   /* ---- Shape ---- */
-  --radius: 10px;
+  --radius: 12px;
   --radius-lg: 14px;
   --radius-pill: 999px;
 
-  --shadow-subtle: 0 1px 2px rgba(17, 17, 17, 0.04);
-  --shadow-hover: 0 6px 20px rgba(17, 17, 17, 0.07);
+  /* 카드 기본 그림자와 hover 시 떠오르는 그림자.
+     기존 이름(--shadow-subtle / --shadow-hover)은 다른 규칙이 이미 쓰고 있어 값만 맞춘다. */
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-lift: 0 12px 28px -14px rgba(16, 24, 40, 0.22), 0 2px 6px rgba(16, 24, 40, 0.04);
+  --shadow-subtle: var(--shadow-card);
+  --shadow-hover: var(--shadow-lift);
 
   /* ---- Motion ---- */
   --dur-fast: 180ms;

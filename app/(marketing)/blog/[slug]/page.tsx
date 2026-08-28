@@ -9,6 +9,8 @@
  *   dangerouslySetInnerHTML 로 그대로 렌더링한다. 외부 입력을 이 필드에 넣지 말 것.
  * - 날짜는 'YYYY-MM-DD' 문자열을 그대로 잘라 쓴다. new Date() 를 쓰면 타임존에 따라 하루가 밀린다.
  * - sections 가 비어 있어도(집필 중) 에러 없이 렌더링된다. TableOfContents 는 3개 미만이면 스스로 숨는다.
+ * - heroImage 는 글이 무엇을 설명하는지 먼저 알리는 다이어그램이다. 화면 상단이라 lazy 를 붙이지 않는다.
+ *   값이 없으면 이미지 영역 없이 렌더링된다.
  */
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -131,6 +133,20 @@ export default async function BlogPostPage({ params }: Props) {
             {formatKoreanDate(post.publishedAt)} 발행
             {revised ? ` · ${formatKoreanDate(post.updatedAt)} 수정` : ''}
           </p>
+
+          {post.heroImage ? (
+            <figure className="bl-article-hero">
+              {/* SVG 다이어그램이라 래스터 최적화가 필요 없다 (ArticleCard 주석 참고) */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={post.heroImage}
+                alt={post.imageAlt ?? ''}
+                width={800}
+                height={450}
+                decoding="async"
+              />
+            </figure>
+          ) : null}
 
           {post.keyTakeaways.length ? (
             <div style={{ marginTop: '2.5rem' }}>

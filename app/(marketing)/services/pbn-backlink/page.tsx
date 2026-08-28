@@ -25,6 +25,7 @@ import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardTitle, BulletList } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { KeyTakeaways } from '@/components/content/KeyTakeaways'
 import { RelatedContent } from '@/components/content/RelatedContent'
 import { RelatedArticles } from '@/components/content/RelatedArticles'
@@ -33,6 +34,7 @@ import { ServiceSchema } from '@/components/seo/ServiceSchema'
 import { getService } from '@/config/services'
 import { getPricingGroup, formatKrw, PRICE_FACTORS } from '@/config/pricing'
 import { getFaqByCategory } from '@/config/faq'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH, resolveArticles } from '@/config/seo-graph'
 
 export const dynamic = 'force-static'
@@ -111,26 +113,32 @@ const FIT_ROWS = [
 
 const QUALITY_CRITERIA = [
   {
+    icon: 'clock',
     title: '도메인의 이력',
     body: '지표가 좋아 보여도 과거에 스팸 목적으로 소모된 흔적이 있으면 사용하지 않습니다. 그 도메인이 원래 어떤 주제로 운영됐는지를 먼저 확인합니다.',
   },
   {
+    icon: 'file',
     title: '사이트별 고유 콘텐츠',
     body: '같은 문장을 복사해 여러 사이트를 채우면 네트워크 전체가 하나의 패턴으로 묶입니다. 사이트마다 다루는 주제와 문서를 따로 둡니다.',
   },
   {
+    icon: 'server',
     title: '호스팅과 IP 구성',
     body: '여러 사이트가 같은 서버, 같은 대역에 몰려 있으면 사이트 사이의 관계가 그대로 드러납니다. 호스팅 환경과 IP를 나눠 운영합니다.',
   },
   {
+    icon: 'link',
     title: '링크가 놓이는 문맥',
     body: '본문 흐름과 상관없는 자리에 링크만 끼워 넣지 않습니다. 문서의 주제와 링크 대상이 자연스럽게 이어지는 위치에 배치합니다.',
   },
   {
+    icon: 'share',
     title: '앵커 텍스트 분산',
     body: '목표 키워드만 반복해서 걸면 링크 프로필이 한쪽으로 기울어집니다. 브랜드명·URL·일반 표현을 섞어 비율을 먼저 설계합니다.',
   },
   {
+    icon: 'network',
     title: '내보내는 링크의 밀도',
     body: '한 사이트가 서로 무관한 사이트로 링크를 끝없이 내보내면 그 사이트의 신뢰도부터 떨어집니다. 아웃바운드 링크의 수와 주제 범위를 관리합니다.',
   },
@@ -138,14 +146,17 @@ const QUALITY_CRITERIA = [
 
 const DELIVERABLES = [
   {
+    icon: 'globe',
     title: '작업 URL 목록',
     body: '링크가 생성된 페이지 주소를 그대로 전달드립니다. 직접 열어보고 어떤 문서에 어떤 형태로 놓였는지 확인하실 수 있습니다.',
   },
   {
+    icon: 'pen',
     title: '앵커 텍스트 내역',
     body: '각 링크에 어떤 문구를 썼는지, 전체 비율이 어떻게 구성됐는지 함께 적습니다. 앵커가 한쪽으로 몰리지 않았는지 직접 확인하실 수 있습니다.',
   },
   {
+    icon: 'compass',
     title: '이후 방향 정리',
     body: '이번 작업으로 어떤 부분이 채워졌고 다음에 볼 영역은 어디인지 정리해 드립니다. 링크를 더 넣는 것이 답이 아닌 경우도 그대로 말씀드립니다.',
   },
@@ -153,18 +164,22 @@ const DELIVERABLES = [
 
 const RISK_CONTROLS = [
   {
+    icon: 'layers',
     title: '인프라를 나눕니다',
-    body: '호스팅 업체와 IP 대역을 나눠 사용합니다. 네트워크 전체가 하나의 발자국으로 묶이지 않게 하는 최소 조건이라고 보고 있습니다.',
+    body: '호스팅 업체와 IP 대역을 나눠 사용합니다. 여러 사이트가 같은 환경에 몰려 있을 때 생기는 기술적 중복 위험을 줄이는 최소 조건이라고 보고 있습니다.',
   },
   {
+    icon: 'pen',
     title: '사이트를 콘텐츠로 유지합니다',
     body: '링크만 걸린 껍데기 문서를 만들지 않습니다. 각 사이트가 자기 주제를 갖고 문서를 유지하도록 운영합니다.',
   },
   {
+    icon: 'share',
     title: '앵커와 속도를 분산합니다',
     body: '같은 문구를 한 번에 몰아 넣지 않습니다. 기간과 앵커를 나눠 진행해 링크가 급격히 한 방향으로 쏠리지 않게 합니다.',
   },
   {
+    icon: 'shield',
     title: '맞지 않으면 권하지 않습니다',
     body: '상담 과정에서 지금 단계에 PBN이 필요하지 않다고 판단되면 그대로 말씀드립니다. 판매만 생각한다면 굳이 하지 않을 이야기입니다.',
   },
@@ -190,7 +205,7 @@ export default function PbnBacklinkPage() {
       />
 
       <Hero
-        eyebrow="PBN BACKLINK"
+        eyebrow="PBN 백링크"
         title={
           <>
             <span className="bl-break">PBN 백링크,</span>
@@ -200,22 +215,16 @@ export default function PbnBacklinkPage() {
         support="PBN은 링크가 생기는 자리를 직접 운영하는 방식입니다. 그래서 같은 이름을 붙이더라도 네트워크를 어떻게 만들고 관리하느냐에 따라 결과가 전혀 달라집니다. 이 페이지에는 구성 방식과 판단 기준, 그리고 감수해야 하는 부분까지 함께 적었습니다."
         actions={
           <>
-            <TelegramCTA
-              source="pbn-backlink"
-              position="hero"
-              size="lg"
-              label="PBN 구성이 맞는지 상담하기"
-            />
+            <TelegramCTA source="pbn-backlink" position="hero" size="lg" label={ctaLabel('pbn')} />
             <Button href="/pricing" variant="secondary" size="lg">
               가격이 달라지는 이유 보기
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 사이트 주소와 목표 키워드만 있으면 됩니다"
       />
 
       <ProblemSection
-        eyebrow="01 / SITUATION"
+        eyebrow="01 / 현재 상황"
         title={
           <>
             <span className="bl-break">PBN을 찾아보는 분들은</span>
@@ -229,7 +238,7 @@ export default function PbnBacklinkPage() {
 
       <Section ariaLabelledBy="pbn-definition-title">
         <SectionHead
-          eyebrow="02 / DEFINITION"
+          eyebrow="02 / 정의와 구조"
           id="pbn-definition-title"
           title="PBN은 링크가 놓이는 자리를 직접 운영하는 방식입니다."
           lead="Private Blog Network의 줄임말입니다. 외부 사이트에 게재를 요청하는 방식과 달리, 링크가 걸릴 사이트 자체를 운영 주체가 직접 관리합니다."
@@ -262,7 +271,7 @@ export default function PbnBacklinkPage() {
 
       <Section subtle ariaLabelledBy="pbn-fit-title">
         <SectionHead
-          eyebrow="03 / FIT"
+          eyebrow="03 / 적합한 상황"
           id="pbn-fit-title"
           title="PBN은 모든 사이트에 권하지 않습니다."
           lead="이 문장을 서비스 페이지에 적는 것이 이상해 보일 수 있습니다. 그런데 맞지 않는 상태에서 진행하면 비용만 쓰고 원인은 그대로 남습니다. 아래 표는 상담에서 실제로 확인하는 항목입니다."
@@ -300,7 +309,7 @@ export default function PbnBacklinkPage() {
 
       <Section ariaLabelledBy="pbn-quality-title">
         <SectionHead
-          eyebrow="04 / QUALITY"
+          eyebrow="04 / 품질 기준"
           id="pbn-quality-title"
           title="품질은 개수가 아니라 이 항목들에서 갈립니다."
           lead="몇 개를 넣는지는 견적서에 적기 쉬운 숫자일 뿐입니다. 실제로 차이를 만드는 것은 링크 하나가 어떤 환경에 놓이는가입니다. 업체를 비교하실 때 그대로 질문해 보셔도 좋습니다."
@@ -308,6 +317,7 @@ export default function PbnBacklinkPage() {
         <div className="bl-grid bl-grid--3">
           {QUALITY_CRITERIA.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -323,7 +333,7 @@ export default function PbnBacklinkPage() {
 
       <Section subtle ariaLabelledBy="pbn-process-title">
         <SectionHead
-          eyebrow="05 / PROCESS"
+          eyebrow="05 / 진행 방식"
           id="pbn-process-title"
           title="합의 없이 링크부터 심지 않습니다."
           lead="주문을 받자마자 작업을 시작하지 않습니다. 무엇을 왜 하는지 먼저 맞추고, 그 범위 안에서만 진행합니다."
@@ -338,7 +348,7 @@ export default function PbnBacklinkPage() {
 
       <Section size="sm" ariaLabelledBy="pbn-deliverables-title">
         <SectionHead
-          eyebrow="06 / DELIVERABLES"
+          eyebrow="06 / 전달 내역"
           id="pbn-deliverables-title"
           title="무엇을 했는지 확인할 수 없는 상태로 작업을 끝내지 않습니다."
           lead="링크 작업은 눈에 잘 보이지 않아서, 끝난 뒤에 무엇이 남았는지가 특히 중요합니다."
@@ -346,6 +356,7 @@ export default function PbnBacklinkPage() {
         <div className="bl-grid bl-grid--3">
           {DELIVERABLES.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -362,7 +373,7 @@ export default function PbnBacklinkPage() {
 
       <Section subtle bordered ariaLabelledBy="pbn-risk-title">
         <SectionHead
-          eyebrow="07 / RISK"
+          eyebrow="07 / 위험과 한계"
           id="pbn-risk-title"
           title="위험이 없다고 말하지는 않겠습니다."
           lead="이 부분을 흐리게 넘기는 설명이 많아서, 먼저 분명히 적어 두겠습니다."
@@ -382,6 +393,7 @@ export default function PbnBacklinkPage() {
         <div className="bl-grid bl-grid--2" style={{ marginTop: '2.5rem' }}>
           {RISK_CONTROLS.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -406,7 +418,7 @@ export default function PbnBacklinkPage() {
 
       <Section ariaLabelledBy="pbn-pricing-title">
         <SectionHead
-          eyebrow="08 / PRICING"
+          eyebrow="08 / 가격"
           id="pbn-pricing-title"
           title="구성별 가격을 먼저 공개합니다."
           lead={`${pricing.label} 구성은 ${formatKrw(pricing.from)}에서 시작합니다. 다만 같은 구성이라도 사이트 상태와 키워드 경쟁도에 따라 필요한 작업량이 달라지므로, 최종 구성은 상황을 본 뒤에 안내드립니다.`}
@@ -430,19 +442,13 @@ export default function PbnBacklinkPage() {
       </Section>
 
       <Section size="sm">
-        <TelegramCTABlock
-          source="pbn-backlink"
-          position="mid"
-          title="지금 단계에 PBN이 필요한지부터 확인해 보세요."
-          body="사이트 주소와 목표 키워드를 알려주시면, 현재 상태에서 이 방식이 맞는지 아니면 먼저 정리할 것이 있는지 판단해 드립니다. 맞지 않으면 맞지 않는다고 말씀드립니다."
-          label="PBN 구성이 맞는지 상담하기"
-        />
+        <TelegramCTABlock source="pbn-backlink" cta="pbn" position="mid" />
       </Section>
 
       <FAQSection
         items={faq}
         id="faq-pbn"
-        eyebrow="09 / FAQ"
+        eyebrow="09 / 자주 묻는 질문"
         title="PBN에서 자주 받는 질문"
         moreHref="/faq"
         moreLabel="다른 질문도 보기"
@@ -458,6 +464,7 @@ export default function PbnBacklinkPage() {
 
       <FinalCTA
         source="pbn-backlink"
+        cta="pbn"
         title="PBN이 맞는 상황인지, 한 번 확인해 보시겠어요?"
         body="사이트 주소와 목표 키워드만 있으면 첫 판단은 가능합니다. 필요하지 않다고 보이면 그 이유를 함께 말씀드립니다."
         label="PBN 구성이 맞는지 상담하기"

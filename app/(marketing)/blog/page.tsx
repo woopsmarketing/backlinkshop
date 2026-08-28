@@ -6,9 +6,11 @@
  * - 글 데이터는 전부 content/blog 에서 온다. 이 파일에 글 제목·요약을 하드코딩하지 않는다.
  * - 카테고리별 색인 페이지는 만들지 않는다. 라벨은 읽는 순서를 잡는 표시로만 쓴다.
  *
- * 날짜 표기
- * - updatedAt 은 'YYYY-MM-DD' 문자열이다. new Date() 로 파싱하면 서버/클라이언트 타임존 차이로
- *   하루가 밀릴 수 있으므로 문자열을 그대로 잘라서 표기한다.
+ * 카드
+ * - 목록은 ArticleCard 하나로 통일한다. 카테고리·제목·요약만 쌓아 두면 문서 링크처럼 보여서
+ *   목록 전체가 스캔되지 않는다. 대표 다이어그램이 그 글이 무엇을 설명하는 글인지 먼저 알린다.
+ * - 날짜 표기도 ArticleCard 안에서 처리한다. updatedAt 은 'YYYY-MM-DD' 문자열이고,
+ *   new Date() 로 파싱하면 서버/클라이언트 타임존 차이로 하루가 밀린다.
  */
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -21,10 +23,12 @@ import { TelegramCTA } from '@/components/marketing/TelegramCTA'
 import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
-import { Card, CardBody, CardTitle, BulletList } from '@/components/ui/Card'
+import { Card, CardBody, CardTitle } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { ArticleCard } from '@/components/content/ArticleCard'
 import { RelatedServices } from '@/components/content/RelatedServices'
 
+import { ctaLabel } from '@/config/cta'
 import { BLOG_POSTS, getFeaturedPost, type BlogCategory } from '@/content/blog'
 
 export const dynamic = 'force-static'
@@ -40,13 +44,6 @@ export const metadata: Metadata = {
       '상담하지 않아도 스스로 판단할 수 있도록, 검색순위가 정해지는 방식과 링크를 고르는 기준을 글로 정리했습니다.',
     url: '/blog',
   },
-}
-
-/** 'YYYY-MM-DD' → '2026년 8월 27일'. 문자열만 다뤄 서버·클라이언트 렌더 결과를 일치시킨다. */
-function formatKoreanDate(iso: string): string {
-  const [year, month, day] = iso.split('-')
-  if (!year || !month || !day) return iso
-  return `${Number(year)}년 ${Number(month)}월 ${Number(day)}일`
 }
 
 const TOPIC_GUIDE: { category: BlogCategory; title: string; body: string }[] = [
@@ -75,14 +72,13 @@ const TOPIC_GUIDE: { category: BlogCategory; title: string; body: string }[] = [
 export default function BlogIndexPage() {
   const featured = getFeaturedPost()
   const posts = BLOG_POSTS.filter(post => post.slug !== featured.slug)
-  const featuredOutline = featured.sections.slice(0, 4).map(section => section.heading)
 
   return (
     <>
       <Breadcrumb trail={[{ href: '/blog', label: 'SEO 가이드' }]} />
 
       <Hero
-        eyebrow="SEO KNOWLEDGE"
+        eyebrow="SEO 가이드"
         title={
           <>
             <span className="bl-break">SEO를 이해하면</span>
@@ -92,18 +88,17 @@ export default function BlogIndexPage() {
         support="검색 결과가 어떤 순서로 정해지는지 알면, 지금 내 사이트에 필요한 작업과 아직 필요하지 않은 작업이 구분됩니다. 상담하지 않아도 스스로 판단할 수 있도록 기준을 글로 정리해 두었습니다."
         actions={
           <>
-            <TelegramCTA source="blog" position="hero" label="현재 SEO 상황 상담하기" size="lg" />
+            <TelegramCTA source="blog" position="hero" label={ctaLabel('blog')} size="lg" />
             <Button href="/services" variant="secondary" size="lg">
               SEO 서비스 살펴보기
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 읽다가 막히는 부분만 물어보셔도 됩니다"
       />
 
       <Section size="sm" ariaLabelledBy="featured-title">
         <SectionHead
-          eyebrow="01 / START HERE"
+          eyebrow="01 / 시작점"
           id="featured-title"
           title="처음이라면 이 글부터 읽어보세요."
           lead={
@@ -114,44 +109,12 @@ export default function BlogIndexPage() {
             </>
           }
         />
-        <div className="bl-featured">
-          <div>
-            <span className="bl-related__label">{featured.category}</span>
-            <h3 className="bl-h3" style={{ marginTop: '0.5rem' }}>
-              <Link href={`/blog/${featured.slug}`}>{featured.title}</Link>
-            </h3>
-            <p className="bl-lead" style={{ marginTop: '1rem' }}>
-              {featured.summary}
-            </p>
-            <p className="bl-muted" style={{ marginTop: '1rem' }}>
-              마지막 수정 {formatKoreanDate(featured.updatedAt)}
-            </p>
-            <p style={{ marginTop: '1.75rem' }}>
-              <Link href={`/blog/${featured.slug}`} className="bl-btn bl-btn--secondary">
-                이 글 읽기 &rarr;
-              </Link>
-            </p>
-          </div>
-          <div>
-            {featuredOutline.length ? (
-              <>
-                <span className="bl-related__label">이 글에서 다루는 것</span>
-                <div style={{ marginTop: '0.75rem' }}>
-                  <BulletList items={featuredOutline} />
-                </div>
-              </>
-            ) : (
-              <p className="bl-muted">
-                본문을 정리하는 중입니다. 준비되는 대로 이 자리에 다루는 내용을 함께 표시합니다.
-              </p>
-            )}
-          </div>
-        </div>
+        <ArticleCard post={featured} size="lg" />
       </Section>
 
       <Section subtle ariaLabelledBy="topics-title">
         <SectionHead
-          eyebrow="02 / TOPICS"
+          eyebrow="02 / 주제 구분"
           id="topics-title"
           title="글은 네 가지 라벨로 구분합니다."
           lead="라벨은 검색용 분류가 아니라 읽는 순서를 잡기 위한 표시입니다. 어떤 주제부터 봐야 할지 감이 오지 않을 때 참고하세요."
@@ -175,22 +138,15 @@ export default function BlogIndexPage() {
 
       <Section ariaLabelledBy="articles-title">
         <SectionHead
-          eyebrow="03 / ARTICLES"
+          eyebrow="03 / 글 목록"
           id="articles-title"
           title="최근에 정리한 글"
           lead="마지막으로 고친 날짜가 최근인 순서로 보여 드립니다. 검색 환경이 바뀌면 글도 고칩니다. 쓴 날짜만이 아니라 수정한 날짜를 함께 남겨 두는 이유입니다."
         />
         {posts.length ? (
-          <div className="bl-grid bl-grid--3">
+          <div className="bl-post-grid bl-post-grid--3">
             {posts.map(post => (
-              <Link key={post.slug} href={`/blog/${post.slug}`} className="bl-post-card">
-                <span className="bl-related__label">{post.category}</span>
-                <span className="bl-post-card__title">{post.title}</span>
-                <span className="bl-post-card__summary">{post.summary}</span>
-                <span className="bl-post-card__meta">
-                  마지막 수정 {formatKoreanDate(post.updatedAt)}
-                </span>
-              </Link>
+              <ArticleCard key={post.slug} post={post} />
             ))}
           </div>
         ) : (
@@ -213,7 +169,7 @@ export default function BlogIndexPage() {
 
       <Section subtle size="sm" ariaLabelledBy="next-step-title">
         <SectionHead
-          eyebrow="04 / NEXT STEP"
+          eyebrow="04 / 다음 단계"
           id="next-step-title"
           title="읽은 기준을 실제 작업으로 옮길 때"
           lead="글은 판단 기준까지만 다룹니다. 어떤 작업을 어떤 순서로 진행할지는 사이트마다 다르기 때문에, 조건을 나눠서 서비스 페이지에 정리해 두었습니다."
@@ -225,17 +181,12 @@ export default function BlogIndexPage() {
             position="mid"
             title="읽다가 내 사이트에는 어떻게 적용할지 막히셨나요?"
             body="글에 없는 상황이라면 사이트 주소와 목표 키워드를 알려 주세요. 지금 상태에서 무엇부터 봐야 하는지 함께 정리해 드립니다."
-            label="현재 SEO 상황 상담하기"
+            label={ctaLabel('blog')}
           />
         </div>
       </Section>
 
-      <FinalCTA
-        source="blog"
-        title="어떤 글부터 읽어야 할지 모르겠다면 물어보셔도 됩니다."
-        body="사이트 주소와 목표 키워드를 알려 주시면, 지금 상황에 맞는 글과 필요한 작업을 함께 짚어 드립니다."
-        label="현재 SEO 상황 상담하기"
-      />
+      <FinalCTA source="blog" cta="blog" />
     </>
   )
 }

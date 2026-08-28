@@ -15,6 +15,7 @@
  *  7. 사이트맵 URL 이 전부 색인 대상 라우트인가
  *  8. noindex 대상 페이지에 noindex 가 실제로 붙었는가
  *  9. 구조화 데이터가 유효한 JSON 인가, 금지 타입(Review/AggregateRating)이 없는가
+ * 10. 페이지가 참조하는 로컬 이미지가 실제로 존재하는가, alt 가 비어 있지 않은가
  */
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs'
@@ -238,7 +239,10 @@ for (const [route, html] of pages) {
   const hrefs = [...html.matchAll(/href="(\/[^"#?]*)"/g)].map(m => m[1])
   for (const href of new Set(hrefs)) {
     const clean = href.replace(/\/$/, '') || '/'
-    if (clean.startsWith('/_next') || clean.startsWith('/icon') || clean.endsWith('.png')) continue
+    // 정적 asset 은 페이지가 아니다 (React 가 붙이는 <link rel="preload" as="image"> 포함).
+    // 파일 존재 여부는 아래 9번 이미지 검사에서 따로 본다.
+    if (clean.startsWith('/_next') || clean.startsWith('/icon') || clean.startsWith('/images/')) continue
+    if (/\.(png|jpe?g|svg|webp|avif|ico|gif|txt|xml|json|css|js)$/i.test(clean)) continue
     if (!KNOWN.has(clean)) {
       fail(`${route} — 존재하지 않는 내부링크: ${href}`)
       brokenLinks += 1
@@ -321,6 +325,33 @@ for (const single of ['Organization', 'WebSite']) {
   }
 }
 if (schemaIssues === 0) pass(`구조화 데이터 이상 없음 (${[...seenSchemaTypes.keys()].join(', ')})`)
+
+// ================================================================ 9. 이미지
+// 블로그 다이어그램처럼 로컬 이미지를 직접 참조하는 곳이 늘었다.
+// 파일명을 잘못 적으면 빌드는 통과하고 화면에서만 깨지므로 여기서 잡는다.
+section('9. 이미지 참조')
+let imageIssues = 0
+const checkedImages = new Set()
+for (const [route, html] of pages) {
+  for (const [, src] of html.matchAll(/<img\b[^>]*?\ssrc="(\/[^"]+)"/g)) {
+    if (src.startsWith('/_next')) continue
+    if (!checkedImages.has(src)) {
+      checkedImages.add(src)
+      if (!existsSync(join(ROOT, 'public', src.replace(/^\//, '')))) {
+        fail(`${route} — 존재하지 않는 이미지: ${src}`)
+        imageIssues += 1
+      }
+    }
+  }
+  for (const [, attrs] of html.matchAll(/<img\b([^>]*?)>/g)) {
+    if (!/\ssrc="\/(?!_next)/.test(attrs)) continue
+    if (!/\salt="[^"]+"/.test(attrs)) {
+      fail(`${route} — alt 가 비어 있는 이미지: ${attrs.slice(0, 90)}`)
+      imageIssues += 1
+    }
+  }
+}
+if (imageIssues === 0) pass(`로컬 이미지 ${checkedImages.size}개 전부 존재 · alt 있음`)
 
 // ================================================================ 결과
 console.log(`\n${'='.repeat(60)}`)

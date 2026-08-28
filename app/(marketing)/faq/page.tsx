@@ -29,6 +29,7 @@ import { RelatedArticles } from '@/components/content/RelatedArticles'
 import { FaqSchema } from '@/components/seo/FaqSchema'
 
 import { FAQ_ITEMS, FAQ_CATEGORIES, getFaqByCategory, type FaqCategory } from '@/config/faq'
+import { ctaLabel } from '@/config/cta'
 import { PRICING, formatKrw } from '@/config/pricing'
 import { SEO_GRAPH, resolveArticles, pageLabel } from '@/config/seo-graph'
 
@@ -70,28 +71,28 @@ const CATEGORY_META: Record<
 > = {
   '백링크 기본': {
     slug: 'faq-basics',
-    eyebrow: '01 / BASICS',
+    eyebrow: '02 / 백링크 기본',
     heading: '백링크가 무엇을 바꾸고, 무엇은 바꾸지 못하는지',
     intro:
       '백링크를 처음 알아보는 단계에서는 "효과가 있느냐"가 가장 큰 질문입니다. 그런데 실제로 판단이 갈리는 지점은 효과의 유무가 아니라, 지금 이 사이트에서 링크가 정말 병목인지 아닌지입니다. 아래 세 질문은 그 구분을 먼저 하기 위한 것입니다.',
   },
   PBN: {
     slug: 'faq-pbn',
-    eyebrow: '02 / PBN',
+    eyebrow: '03 / PBN',
     heading: 'PBN을 두고 설명이 가장 많이 갈리는 부분',
     intro:
       'PBN은 소개하는 곳마다 쓰는 표현이 달라서 제안을 나란히 놓고 비교하기가 어렵습니다. 어떤 구조로 만들어지고 어느 지점에서 품질 차이가 생기는지를 알면, 받은 제안이 어느 쪽에 가까운지 스스로 가늠할 수 있습니다.',
   },
   '작업 과정': {
     slug: 'faq-workflow',
-    eyebrow: '03 / WORKFLOW',
+    eyebrow: '04 / 작업 과정',
     heading: '시작하기 전에 정해지는 것과, 끝나고 남는 것',
     intro:
       '외부에 작업을 맡길 때 가장 불안한 부분은 결과보다 과정입니다. 어디까지가 합의된 범위이고 작업이 끝난 뒤 무엇을 확인할 수 있는지가 미리 정해져 있으면, 진행 도중에 해석이 엇갈릴 일이 줄어듭니다.',
   },
   가격: {
     slug: 'faq-pricing',
-    eyebrow: '04 / PRICING',
+    eyebrow: '05 / 가격',
     heading: '같은 이름의 서비스인데 견적이 달라지는 이유',
     intro: (
       <>
@@ -104,14 +105,14 @@ const CATEGORY_META: Record<
   },
   '결과 · 기간': {
     slug: 'faq-results',
-    eyebrow: '05 / TIMELINE',
+    eyebrow: '06 / 결과와 기간',
     heading: '언제 확인하고, 무엇으로 확인하는지',
     intro:
       '기간에 대한 질문은 대개 "언제 오르나요"로 시작합니다. 다만 실무에서 더 도움이 되는 것은 상승 시점을 약속받는 일이 아니라, 어떤 지표를 어느 시점에 함께 볼지 작업 전에 정해 두는 일입니다.',
   },
   '환불 · 정책': {
     slug: 'faq-policy',
-    eyebrow: '06 / POLICY',
+    eyebrow: '07 / 환불과 정책',
     heading: '중간에 멈추게 되면 어떻게 되는지',
     intro: (
       <>
@@ -141,7 +142,7 @@ export default function FaqPage() {
       <Breadcrumb trail={[{ href: '/faq', label: '자주 묻는 질문' }]} />
 
       <Hero
-        eyebrow="FAQ"
+        eyebrow="자주 묻는 질문"
         title={
           <>
             <span className="bl-break">상담 전에 많이 묻는 질문을</span>정리했습니다.
@@ -150,18 +151,17 @@ export default function FaqPage() {
         support="메시지를 보내기 전에 확인해 두면 좋은 내용을 한 페이지에 모았습니다. 답변은 실제 상담에서 드리는 설명과 같은 기준으로 썼고, 확인할 수 없는 수치나 결과를 약속하는 문장은 넣지 않았습니다. 읽다가 우리 사이트에는 어떻게 적용되는지가 궁금해지면 그때 물어보셔도 됩니다."
         actions={
           <>
-            <TelegramCTA source="faq" position="hero" label="궁금한 점 바로 물어보기" size="lg" />
+            <TelegramCTA source="faq" position="hero" label={ctaLabel('faq')} size="lg" />
             <Button href="/services" variant="secondary" size="lg">
               서비스부터 살펴보기
             </Button>
           </>
         }
-        note="질문 하나만 보내셔도 됩니다 · 답변은 Telegram으로 드립니다"
       />
 
       <Section size="sm" subtle ariaLabelledBy="faq-map-title">
         <SectionHead
-          eyebrow="FAQ MAP"
+          eyebrow="01 / 질문 지도"
           id="faq-map-title"
           title="궁금한 쪽부터 보셔도 됩니다."
           lead="질문을 여섯 묶음으로 나눠 두었습니다. 백링크 자체를 처음 검토 중이라면 기본부터, 이미 다른 곳에서 견적을 받아보셨다면 가격과 작업 과정부터 보시는 편이 빠릅니다. 모든 답변은 접혀 있어도 페이지 안에 그대로 들어 있어, 브라우저 검색으로도 바로 찾을 수 있습니다."
@@ -199,6 +199,7 @@ export default function FaqPage() {
       <Section size="sm">
         <TelegramCTABlock
           source="faq"
+          cta="faq"
           position="mid"
           title="여기에 없는 질문이 남아 있다면"
           body="사이트 주소와 목표 키워드만 알려주시면 해당되는 부분만 골라서 답해 드립니다. 견적을 먼저 요청하지 않으셔도 됩니다."
@@ -208,7 +209,7 @@ export default function FaqPage() {
 
       <Section subtle ariaLabelledBy="faq-next-title">
         <SectionHead
-          eyebrow="NEXT"
+          eyebrow="08 / 다음 단계"
           id="faq-next-title"
           title="더 길게 읽고 판단하고 싶다면"
           lead="FAQ의 답변은 요약입니다. 판단 기준을 직접 세워 두고 싶다면 아래 문서에서 같은 내용을 근거까지 펼쳐 설명해 두었습니다."
@@ -223,6 +224,7 @@ export default function FaqPage() {
 
       <FinalCTA
         source="faq"
+        cta="faq"
         title="읽어보셔도 판단이 서지 않는다면"
         body="질문이 깔끔하게 정리되지 않아도 괜찮습니다. 사이트 주소와 지금 걸리는 부분만 알려주시면 어디부터 봐야 할지 같이 정리하겠습니다."
         label="내 상황부터 이야기하기"

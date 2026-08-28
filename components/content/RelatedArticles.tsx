@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import type { BlogPost } from '@/content/blog'
+import { ArticleCard } from './ArticleCard'
 
 /**
  * 관련 글 — 실제로 존재하는 글만 받는다 (config/seo-graph.ts 의 resolveArticles 사용).
@@ -16,13 +16,9 @@ export function RelatedArticles({
   return (
     <section className="bl-related" aria-label={heading}>
       <h2 className="bl-related__heading">{heading}</h2>
-      <div className={`bl-related__list bl-related__list--${posts.length >= 3 ? 3 : 2}`}>
+      <div className={`bl-post-grid bl-post-grid--${posts.length >= 3 ? 3 : 2}`}>
         {posts.map(post => (
-          <Link key={post.slug} href={`/blog/${post.slug}`} className="bl-related__item">
-            <span className="bl-related__label">{post.category}</span>
-            <span className="bl-related__title">{post.title}</span>
-            <span className="bl-related__desc">{post.summary}</span>
-          </Link>
+          <ArticleCard key={post.slug} post={post} />
         ))}
       </div>
     </section>

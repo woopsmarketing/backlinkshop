@@ -1,0 +1,55 @@
+<svg viewBox="0 0 800 520" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>홈에서 허브 페이지를 거쳐 상세 페이지로 내려가고 관련 상세끼리 연결되는 내부링크 구조</title>
+  <rect width="800" height="520" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="40" font-size="20" font-weight="600" fill="#111111">사이트 내부링크 구조</text>
+    <text x="48" y="64" font-size="14" fill="#5f636b">허브가 상세를 모으고, 관련 있는 상세끼리 옆으로 연결합니다</text>
+
+    <g fill="none" stroke="#c3cbd6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M400,166 L400,196 M168,196 L632,196 M168,196 L168,224 M400,196 L400,224 M632,196 L632,224"/>
+      <path d="M168,284 L168,334 M110,334 L226,334 M110,334 L110,384 M226,334 L226,384"/>
+      <path d="M400,284 L400,334 M342,334 L458,334 M342,334 L342,384 M458,334 L458,384"/>
+      <path d="M632,284 L632,334 M574,334 L690,334 M574,334 L574,384 M690,334 L690,384"/>
+    </g>
+
+    <g fill="none" stroke="#3157e8" stroke-opacity="0.45" stroke-width="1.5">
+      <path d="M110,432 C110,464 226,464 226,432"/>
+      <path d="M342,432 C342,464 458,464 458,432"/>
+      <path d="M574,432 C574,464 690,464 690,432"/>
+      <path d="M226,432 C226,488 342,488 342,432"/>
+      <path d="M458,432 C458,488 574,488 574,432"/>
+    </g>
+
+    <rect x="340" y="110" width="120" height="56" rx="12" fill="#eef2ff" stroke="#3157e8" stroke-width="2"/>
+    <text x="400" y="145" font-size="20" font-weight="600" fill="#1f3bb3" text-anchor="middle">홈</text>
+
+    <text x="48" y="214" font-size="13" fill="#8b9098">허브</text>
+    <g>
+      <rect x="78" y="224" width="180" height="60" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="168" y="259" font-size="16" fill="#111111" text-anchor="middle">카테고리 A</text>
+      <rect x="310" y="224" width="180" height="60" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="400" y="259" font-size="16" fill="#111111" text-anchor="middle">카테고리 B</text>
+      <rect x="542" y="224" width="180" height="60" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="632" y="259" font-size="16" fill="#111111" text-anchor="middle">카테고리 C</text>
+    </g>
+
+    <text x="48" y="374" font-size="13" fill="#8b9098">상세</text>
+    <g>
+      <rect x="60" y="384" width="100" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="110" y="413" font-size="14" fill="#111111" text-anchor="middle">상세 A1</text>
+      <rect x="176" y="384" width="100" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="226" y="413" font-size="14" fill="#111111" text-anchor="middle">상세 A2</text>
+      <rect x="292" y="384" width="100" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="342" y="413" font-size="14" fill="#111111" text-anchor="middle">상세 B1</text>
+      <rect x="408" y="384" width="100" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="458" y="413" font-size="14" fill="#111111" text-anchor="middle">상세 B2</text>
+      <rect x="524" y="384" width="100" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="574" y="413" font-size="14" fill="#111111" text-anchor="middle">상세 C1</text>
+      <rect x="640" y="384" width="100" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="690" y="413" font-size="14" fill="#111111" text-anchor="middle">상세 C2</text>
+    </g>
+
+    <line x1="48" y1="499" x2="72" y2="499" stroke="#3157e8" stroke-opacity="0.45" stroke-width="1.5"/>
+    <text x="84" y="504" font-size="13" fill="#5f636b">관련 있는 상세 페이지끼리의 가로 연결</text>
+  </g>
+</svg>

@@ -15,50 +15,54 @@ export type PublicRoute = {
   priority: number
 }
 
-/** 리뉴얼 배포일. 신규 페이지의 최초 lastModified. */
+/** 1차 리뉴얼 배포일. 그 뒤로 바뀌지 않은 페이지의 lastModified. */
 export const LAUNCH_DATE = '2026-08-27'
+
+/** 2차 리뉴얼(UI·콘텐츠·신뢰 개편) 배포일. 이번에 실제로 내용이 바뀐 페이지에만 쓴다. */
+export const V2_DATE = '2026-08-29'
 
 export const PUBLIC_ROUTES: PublicRoute[] = [
   // Tier A — 가장 많은 내부링크를 받는 페이지
-  { path: '/', lastModified: LAUNCH_DATE, changeFrequency: 'weekly', priority: 1 },
-  { path: '/backlink', lastModified: LAUNCH_DATE, changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/', lastModified: V2_DATE, changeFrequency: 'weekly', priority: 1 },
+  { path: '/backlink', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.9 },
   {
     path: '/backlink-agency',
-    lastModified: LAUNCH_DATE,
+    lastModified: V2_DATE,
     changeFrequency: 'monthly',
     priority: 0.9,
   },
-  { path: '/pricing', lastModified: LAUNCH_DATE, changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/pricing', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.9 },
   {
     path: '/services/pbn-backlink',
-    lastModified: LAUNCH_DATE,
+    lastModified: V2_DATE,
     changeFrequency: 'monthly',
     priority: 0.9,
   },
-  { path: '/google-ranking', lastModified: LAUNCH_DATE, changeFrequency: 'monthly', priority: 0.9 },
+  { path: '/google-ranking', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.9 },
 
   // Tier B
-  { path: '/services', lastModified: LAUNCH_DATE, changeFrequency: 'monthly', priority: 0.8 },
-  { path: '/cases', lastModified: LAUNCH_DATE, changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/faq', lastModified: LAUNCH_DATE, changeFrequency: 'monthly', priority: 0.7 },
-  { path: '/blog', lastModified: LAUNCH_DATE, changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/services', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/cases', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/faq', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/about', lastModified: V2_DATE, changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/blog', lastModified: V2_DATE, changeFrequency: 'weekly', priority: 0.8 },
 
   // Tier C
   {
     path: '/services/plan-backlink',
-    lastModified: LAUNCH_DATE,
+    lastModified: V2_DATE,
     changeFrequency: 'monthly',
     priority: 0.7,
   },
   {
     path: '/services/onpage-seo',
-    lastModified: LAUNCH_DATE,
+    lastModified: V2_DATE,
     changeFrequency: 'monthly',
     priority: 0.7,
   },
   {
     path: '/services/content-seo',
-    lastModified: LAUNCH_DATE,
+    lastModified: V2_DATE,
     changeFrequency: 'monthly',
     priority: 0.7,
   },

@@ -1,0 +1,57 @@
+<svg viewBox="0 0 800 400" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>외부 링크가 홈페이지로 들어와 내부 링크를 따라 하위 페이지로 이어지는 경로</title>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1.5 L9,5 L0,8.5 Z" fill="#3157e8"/>
+    </marker>
+  </defs>
+  <rect width="800" height="400" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="34" font-size="20" font-weight="600" fill="#111111">밖에서 받은 신호가 흐르는 경로</text>
+    <text x="48" y="56" font-size="14" fill="#5f636b">외부 링크는 홈으로 들어와 내부 링크를 따라 이동합니다</text>
+
+    <text x="48" y="88" font-size="13" fill="#8b9098">외부에서 오는 링크</text>
+    <text x="560" y="88" font-size="13" fill="#8b9098">내부 페이지</text>
+
+    <g fill="none" stroke="#b7c4f7" stroke-width="1.5" marker-end="url(#ar)">
+      <path d="M180,136 C214,136 216,196 250,196"/>
+      <path d="M180,196 L250,196"/>
+      <path d="M180,256 C214,256 216,196 250,196"/>
+      <path d="M400,196 C462,196 470,126 560,126"/>
+      <path d="M400,196 L560,196"/>
+      <path d="M400,196 C462,196 470,266 560,266"/>
+    </g>
+
+    <path d="M400,232 C470,290 496,320 552,332" fill="none" stroke="#d8dde6" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <circle cx="481" cy="299" r="12" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+    <path d="M475,293 L487,305 M487,293 L475,305" stroke="#8b9098" stroke-width="1.6" stroke-linecap="round"/>
+
+    <g>
+      <rect x="48" y="112" width="132" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="114" y="141" font-size="14" fill="#111111" text-anchor="middle">외부 링크</text>
+      <rect x="48" y="172" width="132" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="114" y="201" font-size="14" fill="#111111" text-anchor="middle">외부 링크</text>
+      <rect x="48" y="232" width="132" height="48" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="114" y="261" font-size="14" fill="#111111" text-anchor="middle">외부 링크</text>
+    </g>
+
+    <rect x="250" y="148" width="150" height="96" rx="12" fill="#eef2ff" stroke="#3157e8" stroke-width="2"/>
+    <text x="325" y="190" font-size="18" font-weight="600" fill="#1f3bb3" text-anchor="middle">홈페이지</text>
+    <text x="325" y="214" font-size="13" fill="#5f636b" text-anchor="middle">신호가 모이는 곳</text>
+
+    <g>
+      <rect x="560" y="100" width="160" height="52" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="640" y="131" font-size="14" fill="#111111" text-anchor="middle">하위 페이지</text>
+      <rect x="560" y="170" width="160" height="52" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="640" y="201" font-size="14" fill="#111111" text-anchor="middle">하위 페이지</text>
+      <rect x="560" y="240" width="160" height="52" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="640" y="271" font-size="14" fill="#111111" text-anchor="middle">하위 페이지</text>
+    </g>
+
+    <rect x="560" y="306" width="160" height="52" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="640" y="337" font-size="14" fill="#8b9098" text-anchor="middle">하위 페이지</text>
+    <text x="640" y="380" font-size="13" fill="#8b9098" text-anchor="middle">내부 경로 없음</text>
+
+    <text x="48" y="380" font-size="13" fill="#8b9098">내부 경로가 없는 페이지는 신호를 받지 못합니다.</text>
+  </g>
+</svg>

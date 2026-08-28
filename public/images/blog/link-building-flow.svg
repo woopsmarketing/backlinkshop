@@ -1,0 +1,54 @@
+<svg viewBox="0 0 800 450" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>목표 키워드 정의부터 효과 측정까지 이어지는 링크빌딩 다섯 단계 흐름</title>
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1.5 L9,5 L0,8.5 Z" fill="#3157e8"/>
+    </marker>
+  </defs>
+  <rect width="800" height="450" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="46" font-size="20" font-weight="600" fill="#111111">링크빌딩 전략 흐름</text>
+    <text x="48" y="70" font-size="14" fill="#5f636b">각 단계의 결과가 다음 단계의 입력이 됩니다</text>
+
+    <g fill="none" stroke="#b7c4f7" stroke-width="1.5" marker-end="url(#ar)">
+      <path d="M172,171 L190,171"/>
+      <path d="M318,171 L336,171"/>
+      <path d="M464,171 L482,171"/>
+      <path d="M610,171 L628,171"/>
+    </g>
+
+    <g>
+      <rect x="48" y="116" width="120" height="110" rx="12" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="108" y="150" font-size="13" font-weight="600" fill="#3157e8" text-anchor="middle">01</text>
+      <text x="108" y="182" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">목표 키워드</text>
+      <text x="108" y="204" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">정의</text>
+      <text x="108" y="252" font-size="13" fill="#8b9098" text-anchor="middle">범위</text>
+
+      <rect x="194" y="116" width="120" height="110" rx="12" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="254" y="150" font-size="13" font-weight="600" fill="#3157e8" text-anchor="middle">02</text>
+      <text x="254" y="182" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">현재 링크</text>
+      <text x="254" y="204" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">프로필 확인</text>
+      <text x="254" y="252" font-size="13" fill="#8b9098" text-anchor="middle">진단</text>
+
+      <rect x="340" y="116" width="120" height="110" rx="12" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="400" y="150" font-size="13" font-weight="600" fill="#3157e8" text-anchor="middle">03</text>
+      <text x="400" y="182" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">필요한 유형</text>
+      <text x="400" y="204" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">결정</text>
+      <text x="400" y="252" font-size="13" fill="#8b9098" text-anchor="middle">설계</text>
+
+      <rect x="486" y="116" width="120" height="110" rx="12" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="546" y="150" font-size="13" font-weight="600" fill="#3157e8" text-anchor="middle">04</text>
+      <text x="546" y="193" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">단계적 구축</text>
+      <text x="546" y="252" font-size="13" fill="#8b9098" text-anchor="middle">실행</text>
+
+      <rect x="632" y="116" width="120" height="110" rx="12" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="692" y="150" font-size="13" font-weight="600" fill="#3157e8" text-anchor="middle">05</text>
+      <text x="692" y="193" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">효과 측정</text>
+      <text x="692" y="252" font-size="13" fill="#8b9098" text-anchor="middle">확인</text>
+    </g>
+
+    <rect x="48" y="300" width="704" height="104" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+    <text x="400" y="344" font-size="15" fill="#111111" text-anchor="middle">링크는 한 번에 늘리는 것이 아니라 순서대로 쌓습니다</text>
+    <text x="400" y="370" font-size="13" fill="#5f636b" text-anchor="middle">측정 결과는 다시 1단계 키워드 정의로 돌아갑니다</text>
+  </g>
+</svg>

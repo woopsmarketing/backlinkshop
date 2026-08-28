@@ -11,10 +11,13 @@ export const post: BlogPost = {
     '고품질 백링크는 도메인 점수 한 줄로 판별되지 않습니다. 링크가 놓인 페이지가 어떤 문서인지, 그 페이지가 어디에서 연결되는지, 링크가 본문 안에 있는지, 앵커가 자연스러운지까지 봐야 판단이 섭니다. 이 글은 그 7가지 축을 실무에서 직접 확인하는 방법과, 이미 받은 링크를 점검하는 순서를 정리한 기준표입니다.',
   category: 'BACKLINK',
   publishedAt: '2026-08-27',
-  updatedAt: '2026-08-27',
+  updatedAt: '2026-08-29',
   cluster: 'backlink',
   moneyPage: '/services/pbn-backlink',
   supportingPage: '/pricing',
+  thumbnail: '/images/blog/backlink-quality-signals.svg',
+  heroImage: '/images/blog/backlink-quality-signals.svg',
+  imageAlt: '품질 신호와 주의 신호를 나란히 비교한 백링크 판단 기준 다이어그램',
   featured: true,
   keyTakeaways: [
     '도메인 점수는 SEO 도구 회사가 만든 추정치이며 구글이 쓰는 값이 아닙니다. 후보를 훑는 필터로는 쓰되 결론으로 쓰지 마세요.',
@@ -48,6 +51,7 @@ export const post: BlogPost = {
 <li><strong>왜 추천했는가.</strong> 문장 흐름상 참조할 이유가 있어서 걸린 링크인가, 아니면 어디에 걸어도 상관없는 자리에 끼워 넣은 링크인가.</li>
 </ol>
 <p>여기서 중요한 결론이 하나 나옵니다. <strong>품질은 링크 자체의 고정된 속성이 아니라, 링크와 내 페이지 사이의 관계</strong>라는 점입니다. 인테리어 시공 업체에 좋은 링크가 법률사무소에는 아무 의미가 없을 수 있습니다. 반대로 점수가 낮은 작은 사이트라도 같은 지역, 같은 분야를 오래 다뤄 왔다면 그 링크는 제 몫을 합니다.</p>
+<figure class="blog-figure"><img src="/images/blog/link-juice-flow.svg" alt="외부 문서에서 출발한 링크의 평가가 목표 페이지에 도달하고 내부링크를 따라 하위 페이지로 이어지는 경로를 나타낸 다이어그램" width="800" height="400" loading="lazy" decoding="async" /><figcaption>링크는 도착한 페이지에서 끝나지 않습니다. 어느 페이지로 받을지가 그다음 경로까지 정합니다.</figcaption></figure>
 <p>그래서 좋은 링크 목록을 남에게 받아 그대로 쓰는 방식은 잘 작동하지 않습니다. 내 사이트가 무엇을 다루는지, 지금 어떤 링크를 이미 받고 있는지에 따라 같은 후보의 값어치가 달라지기 때문입니다. <a href="/backlink">백링크가 사이트 권위에 작용하는 구조</a>를 이해하고 나면, 아래 7가지 축이 왜 따로따로 필요한지도 자연스럽게 이어집니다.</p>`,
     },
     {

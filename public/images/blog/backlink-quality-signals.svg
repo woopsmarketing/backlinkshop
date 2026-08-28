@@ -1,0 +1,51 @@
+<svg viewBox="0 0 800 450" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>좋은 백링크의 품질 신호와 주의해야 할 신호를 두 열로 비교한 표</title>
+  <rect width="800" height="450" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="46" font-size="20" font-weight="600" fill="#111111">좋은 백링크를 판단하는 신호</text>
+    <text x="48" y="70" font-size="14" fill="#5f636b">하나의 신호로 결정하지 않고, 여러 신호를 함께 봅니다</text>
+
+    <line x1="400" y1="100" x2="400" y2="414" stroke="#d8dde6" stroke-width="1.25"/>
+
+    <text x="48" y="126" font-size="16" font-weight="600" fill="#16845b">품질 신호</text>
+    <text x="424" y="126" font-size="16" font-weight="600" fill="#b4530a">주의 신호</text>
+
+    <g>
+      <rect x="48" y="148" width="328" height="54" rx="10" fill="#eef2ff"/>
+      <path d="M68,175 L72.5,179.5 L80,171" fill="none" stroke="#16845b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="98" y="180" font-size="15" fill="#111111">주제 관련성</text>
+
+      <rect x="48" y="216" width="328" height="54" rx="10" fill="#eef2ff"/>
+      <path d="M68,243 L72.5,247.5 L80,239" fill="none" stroke="#16845b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="98" y="248" font-size="15" fill="#111111">실제 트래픽</text>
+
+      <rect x="48" y="284" width="328" height="54" rx="10" fill="#eef2ff"/>
+      <path d="M68,311 L72.5,315.5 L80,307" fill="none" stroke="#16845b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="98" y="316" font-size="15" fill="#111111">자연스러운 앵커</text>
+
+      <rect x="48" y="352" width="328" height="54" rx="10" fill="#eef2ff"/>
+      <path d="M68,379 L72.5,383.5 L80,375" fill="none" stroke="#16845b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="98" y="384" font-size="15" fill="#111111">문맥 안 링크</text>
+    </g>
+
+    <g>
+      <rect x="424" y="148" width="328" height="54" rx="10" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <path d="M445,170 L455,180 M455,170 L445,180" stroke="#b4530a" stroke-width="2" stroke-linecap="round"/>
+      <text x="474" y="180" font-size="15" fill="#5f636b">주제 무관</text>
+
+      <rect x="424" y="216" width="328" height="54" rx="10" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <path d="M445,238 L455,248 M455,238 L445,248" stroke="#b4530a" stroke-width="2" stroke-linecap="round"/>
+      <text x="474" y="248" font-size="15" fill="#5f636b">링크만 있는 페이지</text>
+
+      <rect x="424" y="284" width="328" height="54" rx="10" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <path d="M445,306 L455,316 M455,306 L445,316" stroke="#b4530a" stroke-width="2" stroke-linecap="round"/>
+      <text x="474" y="316" font-size="15" fill="#5f636b">동일 앵커 반복</text>
+
+      <rect x="424" y="352" width="328" height="54" rx="10" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <path d="M445,374 L455,384 M455,374 L445,384" stroke="#b4530a" stroke-width="2" stroke-linecap="round"/>
+      <text x="474" y="384" font-size="15" fill="#5f636b">대량 동시 생성</text>
+    </g>
+
+    <text x="400" y="436" font-size="13" fill="#8b9098" text-anchor="middle">왼쪽이 많을수록 안정적이고, 오른쪽이 많을수록 다시 손봐야 할 가능성이 큽니다</text>
+  </g>
+</svg>

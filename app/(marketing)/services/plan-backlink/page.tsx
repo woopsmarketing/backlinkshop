@@ -22,12 +22,14 @@ import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
 import { Card, CardTitle, CardBody, BulletList } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { RelatedContent } from '@/components/content/RelatedContent'
 import { RelatedServices } from '@/components/content/RelatedServices'
 import { ServiceSchema } from '@/components/seo/ServiceSchema'
 
 import { SERVICES, getService } from '@/config/services'
 import { getPricingGroup } from '@/config/pricing'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH } from '@/config/seo-graph'
 
 export const dynamic = 'force-static'
@@ -54,18 +56,22 @@ const PLAN_QUESTIONS = [
 
 const WHEN_COMBINATION = [
   {
+    icon: 'link',
     title: '외부 참조 이력이 거의 없는 사이트',
     body: '아직 어디에서도 언급된 적이 없는 상태에서 한 가지 경로로만 링크를 빠르게 쌓으면, 링크가 늘어난 모양이 지나치게 단조로워집니다. 시작 단계일수록 성격이 다른 경로에서 조금씩 들어오는 형태가 설명하기 쉽습니다.',
   },
   {
+    icon: 'layers',
     title: '같은 유형만 반복해 온 사이트',
     body: '이전에 받은 링크가 특정 유형이나 특정 앵커 텍스트에 몰려 있다면, 같은 방향으로 더 쌓는다고 상황이 바뀌지 않을 수 있습니다. 이미 채워진 쪽이 아니라 비어 있는 쪽을 채우는 편이 낫습니다.',
   },
   {
+    icon: 'target',
     title: '올려야 할 키워드가 여러 개인 사이트',
     body: '대표 키워드 하나에 모든 작업을 집중하면 나머지 페이지는 그대로 남습니다. 목표가 여러 개라면 어느 페이지에 얼마만큼 보낼지 배분을 먼저 정해야 합니다.',
   },
   {
+    icon: 'chart',
     title: '예산을 나눠 단계적으로 진행하려는 경우',
     body: '한 번에 큰 금액을 쓰지 않고 작게 시작한 뒤 반응을 보며 넓히는 진행이 가능합니다. 이때 처음 잡아둔 구성이 이후 확장의 기준이 되므로, 첫 구성을 대충 만들지 않습니다.',
   },
@@ -146,7 +152,7 @@ export default function PlanBacklinkPage() {
       />
 
       <Hero
-        eyebrow="PLAN BACKLINK"
+        eyebrow="플랜 백링크"
         title={
           <>
             <span className="bl-break">어떤 백링크를 선택해야 할지 모르겠다면,</span>
@@ -159,7 +165,7 @@ export default function PlanBacklinkPage() {
             <TelegramCTA
               source="plan-backlink"
               position="hero"
-              label="어떤 조합이 맞는지 상담하기"
+              label={ctaLabel('plan')}
               size="lg"
             />
             <Button href="/pricing" variant="secondary" size="lg">
@@ -167,11 +173,10 @@ export default function PlanBacklinkPage() {
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 지금 어떤 링크가 있는지 모르셔도 괜찮습니다"
       />
 
       <ProblemSection
-        eyebrow="01 / SITUATION"
+        eyebrow="01 / 현재 상황"
         title={
           <>
             <span className="bl-break">상품 목록을 아무리 봐도</span>무엇을 골라야 할지 정해지지
@@ -185,7 +190,7 @@ export default function PlanBacklinkPage() {
 
       <Section ariaLabelledBy="when-title">
         <SectionHead
-          eyebrow="02 / WHEN"
+          eyebrow="02 / 필요한 상황"
           id="when-title"
           title="조합이 필요한 상황은 따로 있습니다."
           lead="모든 사이트에 조합형 구성이 맞는 것은 아닙니다. 아래 네 가지 중 하나에 해당한다면 단일 유형보다 조합을 먼저 검토할 이유가 있습니다."
@@ -193,6 +198,7 @@ export default function PlanBacklinkPage() {
         <div className="bl-grid bl-grid--2">
           {WHEN_COMBINATION.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -208,7 +214,7 @@ export default function PlanBacklinkPage() {
 
       <Section subtle ariaLabelledBy="criteria-title">
         <SectionHead
-          eyebrow="03 / CRITERIA"
+          eyebrow="03 / 판단 기준"
           id="criteria-title"
           title="구성을 짜기 전에 사이트를 먼저 봅니다."
           lead="같은 예산이라도 사이트 상태에 따라 구성이 달라집니다. 다음 다섯 가지를 확인한 뒤에야 어떤 유형을 얼마나 넣을지 정할 수 있습니다."
@@ -228,7 +234,7 @@ export default function PlanBacklinkPage() {
 
       <Section size="lg" narrow ariaLabelledBy="design-title">
         <SectionHead
-          eyebrow="04 / DESIGN"
+          eyebrow="04 / 설계 방식"
           id="design-title"
           title="조합을 설계하는 방식"
           lead="플랜 백링크에서 실제로 하는 일은 링크를 많이 만드는 것이 아니라, 링크가 생기는 방식이 한쪽으로 쏠리지 않게 나누는 것입니다. 어떤 기준으로 나누는지 그대로 적습니다."
@@ -295,17 +301,19 @@ export default function PlanBacklinkPage() {
 
       <Section subtle ariaLabelledBy="included-title">
         <SectionHead
-          eyebrow="05 / INCLUDED"
+          eyebrow="05 / 포함 범위"
           id="included-title"
           title="무엇이 포함되고, 무엇을 먼저 여쭤보는지"
           lead="구성이 사람마다 달라지는 작업일수록 범위를 미리 적어두는 편이 낫습니다."
         />
         <div className="bl-grid bl-grid--2">
           <Card feature>
+            <IconSurface name="check" />
             <CardTitle>구성에 포함되는 것</CardTitle>
             {pricing ? <BulletList items={pricing.includes} /> : null}
           </Card>
           <Card>
+            <IconSurface name="search" />
             <CardTitle>시작 전에 확인하는 것</CardTitle>
             <BulletList items={BEFORE_START} />
           </Card>
@@ -318,7 +326,7 @@ export default function PlanBacklinkPage() {
 
       <Section ariaLabelledBy="process-title">
         <SectionHead
-          eyebrow="06 / PROCESS"
+          eyebrow="06 / 진행 방식"
           id="process-title"
           title="구성부터 확정하고 시작합니다."
           lead="무엇을 왜 넣었는지 합의한 다음에 작업을 시작합니다. 진행 중에 구성을 바꿔야 할 이유가 생기면 그것도 먼저 말씀드립니다."
@@ -328,7 +336,7 @@ export default function PlanBacklinkPage() {
 
       <Section subtle ariaLabelledBy="pricing-title">
         <SectionHead
-          eyebrow="07 / PRICING"
+          eyebrow="07 / 가격"
           id="pricing-title"
           title="플랜 백링크 가격"
           lead="구성 규모에 따라 라인업이 나뉩니다. 어느 라인업이 맞는지는 목표 키워드 수와 현재 링크 상태를 보고 정합니다."
@@ -341,13 +349,7 @@ export default function PlanBacklinkPage() {
       </Section>
 
       <Section size="sm">
-        <TelegramCTABlock
-          source="plan-backlink"
-          position="mid"
-          title="지금 구성이 맞는지만 확인해도 됩니다."
-          body="사이트 주소와 올리고 싶은 키워드를 알려주시면, 조합형이 맞는지 아니면 다른 작업이 먼저인지 판단해 드립니다. 맞지 않는다고 보이면 그렇게 말씀드립니다."
-          label="내 사이트 구성 물어보기"
-        />
+        <TelegramCTABlock source="plan-backlink" cta="plan" position="mid" />
       </Section>
 
       <Section size="sm" bordered>
@@ -359,6 +361,7 @@ export default function PlanBacklinkPage() {
 
       <FinalCTA
         source="plan-backlink"
+        cta="plan"
         title="어떤 조합이 맞는지부터 정리해 드립니다."
         body="사이트 주소와 목표 키워드, 지금까지 해본 작업만 알려주시면 됩니다. 필요하지 않은 구성은 권하지 않습니다."
         label="조합 상담하기"

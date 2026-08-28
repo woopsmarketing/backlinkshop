@@ -157,3 +157,34 @@
   background: var(--surface-subtle);
   font-size: var(--fs-sm);
 }
+
+/* 본문 다이어그램 — 글이 설명하는 구조를 그림으로 한 번 더 보여준다.
+   .blog-breakout 안(본문 폭을 넘기는 자리)에서도 그대로 동작한다. */
+.blog-content .blog-figure {
+  margin-block: 2rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-subtle);
+}
+
+.blog-content .blog-figure img,
+.blog-content .blog-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.blog-content .blog-figure figcaption {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+/* .blog-breakout 이 바깥 여백을 이미 잡고 있으므로 안쪽 그림은 여백을 중복해서 갖지 않는다 */
+.blog-content .blog-breakout > .blog-figure {
+  margin-block: 0;
+}

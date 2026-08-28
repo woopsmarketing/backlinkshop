@@ -11,10 +11,14 @@ export const post: BlogPost = {
     '백링크에는 정찰제가 없습니다. 같은 이름의 상품이라도 링크가 놓이는 자리와 만드는 방식이 다르면 완전히 다른 작업이기 때문입니다. 이 글은 견적 금액을 만들어내는 변수와, 가격표를 비교하기 전에 먼저 물어야 할 질문을 정리합니다.',
   category: 'BACKLINK',
   publishedAt: '2026-08-27',
-  updatedAt: '2026-08-27',
+  updatedAt: '2026-08-29',
   cluster: 'pricing',
   moneyPage: '/pricing',
   supportingPage: '/backlink-agency',
+  thumbnail: '/images/blog/backlink-price-factors.svg',
+  heroImage: '/images/blog/backlink-price-factors.svg',
+  imageAlt:
+    '백링크 가격이 도메인 품질·링크 유형·수량·앵커 구성·유지 기간에 따라 결정되는 구조를 나타낸 다이어그램',
   keyTakeaways: [
     '백링크 가격은 개수에 붙는 것이 아니라, 어떤 상태의 사이트를 어느 키워드에서 어디까지 다루느냐에 붙습니다.',
     '유형별 단가 차이는 대부분 원가 구조의 차이입니다. 도메인을 직접 운영해 유지하는 비용과, 자동으로 대량 생성하는 방식은 애초에 다른 일입니다.',
@@ -143,6 +147,7 @@ export const post: BlogPost = {
 <li><strong>링크는 조합부터 시작합니다.</strong> 한 가지 유형을 대량으로 넣기 전에 균형 잡힌 구성을 만들어 두는 편이 이후 확장이 쉽습니다. <a href="/services/plan-backlink">여러 유형을 섞어 설계하는 방식</a>이 이 단계에 맞습니다.</li>
 <li><strong>강도는 마지막에 올립니다.</strong> 경쟁 상황이 실제로 확인된 다음에 더 강한 신호를 검토합니다.</li>
 </ol>
+<figure class="blog-figure"><img src="/images/blog/price-decision-flow.svg" alt="목표 페이지를 하나로 좁히고 페이지 상태와 콘텐츠를 점검한 뒤 링크 조합을 만들고 마지막에 강도를 올리는 예산 집행 5단계 흐름도" width="800" height="400" loading="lazy" decoding="async" /><figcaption>순서를 지키면 결과가 나오지 않았을 때도 어느 단계에서 막혔는지 말할 수 있습니다.</figcaption></figure>
 <div class="blog-note"><p>예산이 적을수록 <strong>넓게 쓰기보다 한 곳에 모으는 편</strong>이 유리합니다. 결과가 나오든 안 나오든, 무엇 때문이었는지 말할 수 있어야 다음 예산을 어디에 쓸지 정할 수 있습니다.</p></div>
 <p>어떤 작업이 지금 내 상황에 해당하는지 한눈에 보고 싶다면 <a href="/services">상황별로 작업을 고르는 허브</a>에서 시작하는 방법도 있습니다.</p>`,
     },

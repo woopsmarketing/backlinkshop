@@ -23,12 +23,14 @@ import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardMeta, CardTitle, BulletList } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { RelatedContent } from '@/components/content/RelatedContent'
 import { RelatedServices } from '@/components/content/RelatedServices'
 import { ServiceSchema } from '@/components/seo/ServiceSchema'
 
-import { getService } from '@/config/services'
+import { getService, ONPAGE_SCOPE } from '@/config/services'
 import { getPricingGroup, formatKrw } from '@/config/pricing'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH } from '@/config/seo-graph'
 
 export const dynamic = 'force-static'
@@ -53,69 +55,83 @@ const ONPAGE_QUESTIONS = [
   '무엇을 고쳐야 하는지 알려주는 사람 없이 링크만 계속 추가하고 계신가요?',
 ]
 
-const CHECK_AREAS = [
-  {
-    label: 'Search intent',
-    title: '검색의도',
-    body: '목표 키워드를 실제로 검색했을 때 상단에 자리 잡은 문서들이 어떤 성격인지 먼저 봅니다. 비교와 정리를 원하는 검색인지, 바로 구매할 곳을 찾는 검색인지에 따라 필요한 페이지의 형태가 다릅니다. 지금 페이지가 그 성격과 같은 종류의 답을 주고 있는지 대조합니다.',
-    symptom:
-      '어긋나면: 유입은 조금 있는데 머무는 시간이 짧고, 특정 키워드에서만 계속 뒤쪽 페이지에 머뭅니다.',
+/**
+ * 점검 영역의 목록·설명은 config/services.ts 의 ONPAGE_SCOPE 가 원본이다.
+ * 이 페이지는 거기에 아이콘과 "어긋나면" 증상만 얹는다.
+ * 키를 ONPAGE_SCOPE 의 title 로 좁혀 두었기 때문에, config 가 바뀌면 타입 에러로 드러난다.
+ */
+type ScopeTitle = (typeof ONPAGE_SCOPE)[number]['title']
+
+const SCOPE_DETAIL: Record<ScopeTitle, { icon: string; symptom: string }> = {
+  '사이트 속도 · Core Web Vitals': {
+    icon: 'gauge',
+    symptom: '어긋나면: 모바일 유입에서 특히 이탈이 크고, 내용이 비슷한 경쟁 페이지에 밀립니다.',
   },
-  {
-    label: 'Title',
-    title: '타이틀',
-    body: '검색 결과 화면에 실제로 노출되는 제목과 설명이 페이지 내용을 제대로 대변하는지 확인합니다. 여러 페이지가 비슷한 제목을 공유하고 있지는 않은지, 길이 때문에 중요한 부분이 잘려 나가지는 않는지, 클릭할 이유가 제목 안에 담겨 있는지를 함께 봅니다.',
-    symptom: '어긋나면: 노출 수는 늘어나는데 클릭률이 따라 오르지 않습니다.',
-  },
-  {
-    label: 'Heading',
-    title: '헤딩 구조',
-    body: '제목 태그가 문서의 실제 계층을 따라가는지 봅니다. 대표 제목이 하나로 정리되어 있는지, 하위 제목이 글자 크기를 키우려는 용도로 쓰이지는 않았는지, 소제목만 훑어도 이 문서가 무엇을 다루는지 파악되는지를 확인합니다.',
+  '페이지 구조 · 헤딩': {
+    icon: 'file',
     symptom:
       '어긋나면: 분량은 긴데 검색엔진이 문서를 요약하지 못해, 본문 일부가 발췌되어 노출되는 기회를 놓칩니다.',
   },
-  {
-    label: 'Internal link',
-    title: '내부링크',
-    body: '올리고 싶은 페이지까지 사이트 안에서 몇 번 만에 도달하는지, 그 링크에 붙은 문구가 목적지의 주제를 설명하고 있는지 봅니다. 어디에서도 연결되지 않은 채 떠 있는 페이지가 있는지도 함께 찾습니다.',
+  '사이트 구조 · IA': {
+    icon: 'sitemap',
+    symptom:
+      '어긋나면: 새로 올린 페이지가 늦게 수집되고, 정작 중요하지 않은 주소들이 대신 수집됩니다.',
+  },
+  '내부링크 설계 · 크롤 경로': {
+    icon: 'link',
     symptom:
       '어긋나면: 외부에서 들어온 신호가 홈에만 고이고 정작 순위를 올리려는 상세 페이지까지 흐르지 않습니다.',
   },
-  {
-    label: 'Structure',
-    title: '콘텐츠 구조',
-    body: '검색한 사람이 찾던 답이 화면 위쪽에서 바로 나오는지, 문단과 목록·표의 배치가 읽는 순서를 방해하지 않는지 봅니다. 같은 주제를 여러 페이지가 나눠 갖고 서로 경쟁하고 있지는 않은지도 확인합니다.',
-    symptom: '어긋나면: 비슷한 페이지들이 번갈아 노출되면서 어느 쪽도 자리를 잡지 못합니다.',
-  },
-  {
-    label: 'Indexability',
-    title: '색인 가능성',
-    body: '검색엔진이 이 페이지를 가져갈 수 있는 상태인지 확인합니다. 수집을 막는 설정이 남아 있는지, 대표 URL 지정이 다른 주소를 가리키고 있지는 않은지, 주소 변경 이후 연결이 끊긴 곳은 없는지, 사이트맵에 실제 페이지가 들어 있는지를 봅니다.',
+  '색인 상태 (Indexability)': {
+    icon: 'globe',
     symptom:
       '어긋나면: 아무리 링크를 붙여도 검색 결과에 페이지 자체가 등장하지 않습니다. 여기가 막혀 있으면 다른 작업의 효과를 확인할 수조차 없습니다.',
   },
-  {
-    label: 'Page quality',
-    title: '페이지 품질',
-    body: '모바일 화면에서 본문이 실제로 읽히는지, 중요한 내용이 뜨기까지 기다려야 하는지, 팝업이나 배너가 첫 화면을 가리지는 않는지 봅니다. 누가 쓴 글이고 어떤 근거를 들었는지가 드러나는지도 확인 대상입니다.',
+  'Canonical · 리다이렉트': {
+    icon: 'share',
+    symptom: '어긋나면: 같은 내용이 여러 주소로 나뉘어, 어느 쪽도 평가를 온전히 받지 못합니다.',
+  },
+  'Sitemap · robots': {
+    icon: 'map',
+    symptom:
+      '어긋나면: 새로 올린 페이지가 수집되지 않거나, 반대로 막아 두려던 주소가 검색 결과에 남습니다.',
+  },
+  '메타데이터 · 구조화 데이터': {
+    icon: 'pen',
+    symptom: '어긋나면: 노출 수는 늘어나는데 클릭률이 따라 오르지 않습니다.',
+  },
+  '콘텐츠 구조': {
+    icon: 'layers',
+    symptom: '어긋나면: 비슷한 페이지들이 번갈아 노출되면서 어느 쪽도 자리를 잡지 못합니다.',
+  },
+  '기술적 중복 · 품질 위험': {
+    icon: 'alert',
+    symptom: '어긋나면: 올리려던 페이지 대신 중복된 다른 주소가 검색 결과에 잡힙니다.',
+  },
+  '모바일 사용성': {
+    icon: 'users',
     symptom: '어긋나면: 잠깐 올라갔던 순위가 유지되지 않고 다시 내려앉는 패턴이 반복됩니다.',
   },
-]
+}
 
 const DELIVERABLES = [
   {
+    icon: 'search',
     title: '지금 어디가 막혀 있는지',
     body: '위 영역 중 실제로 문제가 되는 곳과, 확인해 보니 이미 괜찮았던 곳을 나눠서 적습니다. 문제가 없는 영역을 굳이 손대라고 하지 않습니다.',
   },
   {
+    icon: 'trending',
     title: '고칠 순서',
     body: '먼저 손대야 효과를 확인할 수 있는 것과, 여유가 생기면 정리해도 되는 것을 나눠 둡니다. 순서 없이 나열된 목록은 실행으로 이어지기 어렵습니다.',
   },
   {
+    icon: 'wrench',
     title: '누가 고칠 수 있는지',
     body: '관리자 화면에서 바로 바꿀 수 있는 것과 개발 작업이 필요한 것을 구분해 적습니다. 담당자에게 그대로 전달할 수 있는 형태로 정리합니다.',
   },
   {
+    icon: 'clock',
     title: '링크 작업으로 넘어갈 시점',
     body: '페이지 쪽 정리가 끝난 뒤에 어떤 링크 작업이 어울릴지, 아니면 지금 상태로도 링크를 병행할 수 있을지에 대한 판단을 함께 남깁니다.',
   },
@@ -152,7 +168,7 @@ export default function OnpageSeoPage() {
       />
 
       <Hero
-        eyebrow="ON-PAGE SEO"
+        eyebrow="온페이지 SEO"
         title={
           <>
             <span className="bl-break">백링크를 추가하기 전에,</span>
@@ -162,22 +178,16 @@ export default function OnpageSeoPage() {
         support="외부에서 아무리 신호를 보내도, 그 신호를 받을 쪽이 정리되어 있지 않으면 결과로 이어지기 어렵습니다. 온페이지 SEO 점검은 링크를 더 붙이기 전에 페이지 자체가 평가받을 상태인지부터 확인하는 작업입니다."
         actions={
           <>
-            <TelegramCTA
-              source="onpage-seo"
-              position="hero"
-              size="lg"
-              label="지금 점검이 필요한 상태인지 상담하기"
-            />
+            <TelegramCTA source="onpage-seo" position="hero" size="lg" label={ctaLabel('onpage')} />
             <Button href="/google-ranking" variant="secondary" size="lg">
               순위가 오르지 않는 이유 보기
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 사이트 주소와 목표 키워드만 있으면 됩니다"
       />
 
       <ProblemSection
-        eyebrow="01 / SITUATION"
+        eyebrow="01 / 현재 상황"
         title={
           <>
             <span className="bl-break">링크를 늘렸는데도</span>순위가 그대로인가요?
@@ -190,13 +200,14 @@ export default function OnpageSeoPage() {
 
       <Section ariaLabelledBy="why-first-title">
         <SectionHead
-          eyebrow="02 / WHY ON-PAGE FIRST"
+          eyebrow="02 / 순서의 이유"
           id="why-first-title"
           title="왜 링크보다 페이지를 먼저 보나요?"
           lead="백링크는 이 페이지를 참고할 만하다는 외부의 의견입니다. 그 의견이 도착했을 때 검색엔진이 페이지를 읽고, 무엇에 대한 문서인지 판단하고, 검색 결과에 담을 수 있어야 의견이 값을 갖습니다."
         />
         <div className="bl-grid bl-grid--3">
           <Card>
+            <IconSurface name="target" />
             <CardTitle>받을 쪽이 준비되어야 합니다</CardTitle>
             <CardBody>
               수집이 막혀 있거나 대표 주소가 다른 곳을 가리키고 있으면, 링크가 향한 페이지는 애초에
@@ -205,6 +216,7 @@ export default function OnpageSeoPage() {
             </CardBody>
           </Card>
           <Card>
+            <IconSurface name="compass" />
             <CardTitle>무엇에 대한 문서인지 분명해야 합니다</CardTitle>
             <CardBody>
               제목과 소제목, 본문의 순서가 흐릿하면 어떤 검색어에 이 문서를 놓을지 판단하기
@@ -212,6 +224,7 @@ export default function OnpageSeoPage() {
             </CardBody>
           </Card>
           <Card>
+            <IconSurface name="shield" />
             <CardTitle>고친 효과가 오래 남습니다</CardTitle>
             <CardBody>
               구조를 정리해 두면 이후에 추가하는 콘텐츠와 링크가 같은 기반 위에 쌓입니다. 반대로
@@ -228,18 +241,18 @@ export default function OnpageSeoPage() {
 
       <Section subtle ariaLabelledBy="check-areas-title">
         <SectionHead
-          eyebrow="03 / CHECK AREAS"
+          eyebrow="03 / 점검 영역"
           id="check-areas-title"
           title="어떤 영역을 보는지 먼저 밝힙니다."
           lead="점검을 몇 개 항목으로 했다고 말하는 대신, 어떤 영역을 어떤 기준으로 보는지를 공개합니다. 사이트마다 문제가 몰려 있는 영역이 다르기 때문에 실제로 들여다보는 깊이도 달라집니다."
         />
         <div className="bl-grid bl-grid--3">
-          {CHECK_AREAS.map(area => (
+          {ONPAGE_SCOPE.map(area => (
             <Card key={area.title}>
-              <span className="bl-related__label">{area.label}</span>
+              <IconSurface name={SCOPE_DETAIL[area.title].icon} />
               <CardTitle>{area.title}</CardTitle>
               <CardBody>{area.body}</CardBody>
-              <CardMeta>{area.symptom}</CardMeta>
+              <CardMeta>{SCOPE_DETAIL[area.title].symptom}</CardMeta>
             </Card>
           ))}
         </div>
@@ -254,7 +267,7 @@ export default function OnpageSeoPage() {
 
       <Section ariaLabelledBy="deliverables-title">
         <SectionHead
-          eyebrow="04 / DELIVERABLES"
+          eyebrow="04 / 전달 내역"
           id="deliverables-title"
           title="점검이 끝나면 무엇을 받게 되나요?"
           lead="화면 캡처를 모아 놓은 문서가 아니라, 순서대로 실행할 수 있는 형태로 전달합니다."
@@ -262,6 +275,7 @@ export default function OnpageSeoPage() {
         <div className="bl-grid bl-grid--2">
           {DELIVERABLES.map(item => (
             <Card key={item.title}>
+              <IconSurface name={item.icon} />
               <CardTitle>{item.title}</CardTitle>
               <CardBody>{item.body}</CardBody>
             </Card>
@@ -276,17 +290,19 @@ export default function OnpageSeoPage() {
 
       <Section subtle ariaLabelledBy="fit-title">
         <SectionHead
-          eyebrow="05 / GOOD FIT"
+          eyebrow="05 / 적합한 상황"
           id="fit-title"
           title="이런 사이트에 적합합니다."
           lead="아래에 가까울수록 점검으로 얻는 것이 많습니다."
         />
         <div className="bl-grid bl-grid--2">
           <Card feature>
+            <IconSurface name="check" />
             <CardTitle>적합한 경우</CardTitle>
             <BulletList items={GOOD_FIT} />
           </Card>
           <Card>
+            <IconSurface name="alert" />
             <CardTitle>먼저 다른 작업이 필요한 경우</CardTitle>
             <BulletList items={OTHER_FIT} />
             <CardMeta>
@@ -298,7 +314,7 @@ export default function OnpageSeoPage() {
 
       <Section ariaLabelledBy="pricing-title">
         <SectionHead
-          eyebrow="06 / PRICING"
+          eyebrow="06 / 가격"
           id="pricing-title"
           title="점검 비용과 범위를 미리 확인하세요."
           lead="점검은 단일 구성으로 진행합니다. 사이트 규모가 크거나 여러 목표 키워드를 함께 봐야 하는 경우에는 범위를 먼저 합의한 뒤 시작합니다."
@@ -333,18 +349,12 @@ export default function OnpageSeoPage() {
       </Section>
 
       <Section size="sm" subtle>
-        <TelegramCTABlock
-          source="onpage-seo"
-          position="mid"
-          title="지금 우리 사이트는 어느 쪽부터 봐야 할까요?"
-          body="사이트 주소와 올리고 싶은 키워드를 알려주시면, 점검이 먼저인지 링크가 먼저인지부터 이야기하겠습니다. 점검이 필요 없는 상태로 보이면 그렇게 말씀드립니다."
-          label="어느 쪽부터 볼지 상담하기"
-        />
+        <TelegramCTABlock source="onpage-seo" cta="onpage" position="mid" />
       </Section>
 
       <Section ariaLabelledBy="related-title">
         <SectionHead
-          eyebrow="07 / NEXT"
+          eyebrow="07 / 다음 단계"
           id="related-title"
           title="점검 다음에 이어지는 것들."
           lead="페이지 쪽을 정리하고 나면 대개 콘텐츠를 보강하거나 외부 신호를 쌓는 단계로 넘어갑니다."
@@ -360,6 +370,7 @@ export default function OnpageSeoPage() {
 
       <FinalCTA
         source="onpage-seo"
+        cta="onpage"
         title="사이트 주소만 알려주셔도 됩니다."
         body="현재 페이지가 어떤 상태인지 먼저 보고, 점검이 필요한지 아니면 다른 작업이 먼저인지 말씀드리겠습니다."
         label="현재 페이지 상태 상담하기"

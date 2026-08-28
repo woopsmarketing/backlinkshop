@@ -1,0 +1,59 @@
+<svg viewBox="0 0 800 400" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>링크 작업 유형을 강도가 낮은 쪽부터 높은 쪽까지 배치한 축과 위험 안내</title>
+  <rect width="800" height="400" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="36" font-size="20" font-weight="600" fill="#111111">링크 작업의 강도와 위험</text>
+    <text x="48" y="58" font-size="14" fill="#5f636b">강도가 올라갈수록 통제하기 어려워집니다</text>
+
+    <g>
+      <rect x="53" y="100" width="164" height="68" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="135" y="128" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">자연 유입 링크</text>
+      <text x="135" y="150" font-size="13" fill="#5f636b" text-anchor="middle">직접 통제 불가</text>
+
+      <rect x="230" y="100" width="164" height="68" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="312" y="128" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">콘텐츠 기고 링크</text>
+      <text x="312" y="150" font-size="13" fill="#5f636b" text-anchor="middle">관계와 시간 필요</text>
+
+      <rect x="407" y="100" width="164" height="68" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="489" y="128" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">네트워크 링크</text>
+      <text x="489" y="150" font-size="13" fill="#5f636b" text-anchor="middle">출처가 겹칠 수 있음</text>
+
+      <rect x="584" y="100" width="164" height="68" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+      <text x="666" y="128" font-size="15" font-weight="600" fill="#111111" text-anchor="middle">대량 자동 링크</text>
+      <text x="666" y="150" font-size="13" fill="#5f636b" text-anchor="middle">패턴이 드러나기 쉬움</text>
+    </g>
+
+    <g stroke="#d8dde6" stroke-width="1.25">
+      <line x1="135" y1="168" x2="135" y2="199"/>
+      <line x1="312" y1="168" x2="312" y2="199"/>
+      <line x1="489" y1="168" x2="489" y2="199"/>
+      <line x1="666" y1="168" x2="666" y2="199"/>
+    </g>
+
+    <line x1="48" y1="210" x2="752" y2="210" stroke="#c3cbd6" stroke-width="2" stroke-linecap="round"/>
+
+    <g fill="#ffffff" stroke="#3157e8" stroke-width="2">
+      <circle cx="135" cy="210" r="9"/>
+      <circle cx="312" cy="210" r="9"/>
+      <circle cx="489" cy="210" r="9"/>
+      <circle cx="666" cy="210" r="9"/>
+    </g>
+    <g fill="#3157e8">
+      <circle cx="135" cy="210" r="2"/>
+      <circle cx="312" cy="210" r="3.5"/>
+      <circle cx="489" cy="210" r="5"/>
+      <circle cx="666" cy="210" r="6.5"/>
+    </g>
+
+    <text x="48" y="242" font-size="14" fill="#5f636b">낮음</text>
+    <text x="400" y="242" font-size="13" fill="#8b9098" text-anchor="middle">작업 강도</text>
+    <text x="752" y="242" font-size="14" fill="#5f636b" text-anchor="end">높음</text>
+
+    <rect x="48" y="296" width="704" height="56" rx="12" fill="#f7f9fc" stroke="#d8dde6" stroke-width="1.25"/>
+    <path d="M78,310 L88.5,331 L67.5,331 Z" fill="none" stroke="#b4530a" stroke-width="1.5" stroke-linejoin="round"/>
+    <path d="M78,318 L78,325" stroke="#b4530a" stroke-width="1.6" stroke-linecap="round"/>
+    <circle cx="78" cy="328.5" r="1.2" fill="#b4530a"/>
+    <text x="104" y="317" font-size="14" fill="#111111">위험이 0인 링크 작업은 없습니다.</text>
+    <text x="104" y="338" font-size="13" fill="#5f636b">왼쪽 끝도 ‘안전’이 아니라 ‘낮음’입니다. 강도가 높을수록 되돌리기 어렵습니다.</text>
+  </g>
+</svg>

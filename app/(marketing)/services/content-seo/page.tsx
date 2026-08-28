@@ -23,12 +23,14 @@ import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardTitle } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { RelatedArticles } from '@/components/content/RelatedArticles'
 import { RelatedContent } from '@/components/content/RelatedContent'
 import { ServiceSchema } from '@/components/seo/ServiceSchema'
 
 import { getService } from '@/config/services'
 import { getPricingGroup, formatKrw } from '@/config/pricing'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH, resolveArticles } from '@/config/seo-graph'
 
 export const dynamic = 'force-static'
@@ -73,32 +75,38 @@ const MISCONCEPTIONS = [
 
 const ELEMENTS = [
   {
-    label: '01 / INTENT',
+    label: '01',
+    icon: 'search',
     title: '검색의도',
     body: '이 키워드를 입력한 사람이 무엇을 끝내고 싶은지부터 정의합니다. 개념을 이해하려는 검색과 업체를 비교하려는 검색은 필요한 문서가 다릅니다.',
   },
   {
-    label: '02 / STRUCTURE',
+    label: '02',
+    icon: 'layers',
     title: '콘텐츠 구조',
     body: '답을 먼저 주는지, 배경 설명부터 시작하는지 확인합니다. 스크롤 순서가 읽는 사람이 판단하는 순서와 어긋나면 내용이 좋아도 전달되지 않습니다.',
   },
   {
-    label: '03 / HEADINGS',
+    label: '03',
+    icon: 'sitemap',
     title: '헤딩',
     body: '헤딩만 훑어도 문서의 논리가 보이는지 봅니다. 장식용 문구 대신 독자가 실제로 떠올리는 질문을 헤딩으로 세웁니다.',
   },
   {
-    label: '04 / COVERAGE',
+    label: '04',
+    icon: 'target',
     title: '주제 커버리지',
     body: '하나의 주제를 다룰 때 함께 따라오는 하위 질문이 빠져 있지 않은지 점검합니다. 비용, 조건, 한계, 대안처럼 검색자가 이어서 묻는 부분입니다.',
   },
   {
-    label: '05 / LINKS',
+    label: '05',
+    icon: 'link',
     title: '내부링크',
     body: '읽고 난 뒤 궁금해질 내용을 어디로 연결할지 설계합니다. 앵커 텍스트가 도착 페이지를 설명하면 사람도 검색엔진도 문맥을 같이 이해합니다.',
   },
   {
-    label: '06 / FLOW',
+    label: '06',
+    icon: 'trending',
     title: '전환 흐름',
     body: '문서를 다 읽은 사람이 다음에 무엇을 할 수 있는지 남깁니다. 문의 지점을 문맥이 맞는 위치에 두는 것도 문서 구조의 일부입니다.',
   },
@@ -174,7 +182,7 @@ export default function ContentSeoPage() {
       />
 
       <Hero
-        eyebrow="CONTENT SEO"
+        eyebrow="콘텐츠 SEO"
         title={
           <>
             <span className="bl-break">검색엔진이 아니라,</span>
@@ -187,7 +195,7 @@ export default function ContentSeoPage() {
             <TelegramCTA
               source="content-seo"
               position="hero"
-              label="콘텐츠 방향 상담하기"
+              label={ctaLabel('content')}
               size="lg"
             />
             <Button href="/services/onpage-seo" variant="secondary" size="lg">
@@ -195,11 +203,10 @@ export default function ContentSeoPage() {
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 목표 키워드와 해당 페이지 주소만 있으면 됩니다"
       />
 
       <ProblemSection
-        eyebrow="01 / SITUATION"
+        eyebrow="01 / 현재 상황"
         title={
           <>
             <span className="bl-break">글은 쌓이는데,</span>
@@ -213,7 +220,7 @@ export default function ContentSeoPage() {
 
       <Section ariaLabelledBy="reframe-title">
         <SectionHead
-          eyebrow="02 / REFRAME"
+          eyebrow="02 / 흔한 오해"
           id="reframe-title"
           title="콘텐츠 SEO는 키워드를 반복하는 작업이 아닙니다."
           lead="검색엔진에게 키워드를 알리는 일과, 검색한 사람에게 답을 주는 일은 오랫동안 다른 작업처럼 취급돼 왔습니다. 지금은 두 가지가 사실상 같은 방향을 봅니다. 문서가 질문에 답하고 있으면 그 사실이 신호로 남고, 답하지 못하면 표현을 아무리 바꿔도 남길 신호가 없습니다."
@@ -238,7 +245,7 @@ export default function ContentSeoPage() {
 
       <Section subtle ariaLabelledBy="elements-title">
         <SectionHead
-          eyebrow="03 / SCOPE"
+          eyebrow="03 / 작업 범위"
           id="elements-title"
           title="문서에서 실제로 다루는 여섯 가지"
           lead="맞춤법이나 문체를 고치는 작업이 아닙니다. 검색 결과에서 선택될 수 있는 문서가 되도록 아래 여섯 가지를 순서대로 정리합니다."
@@ -246,6 +253,7 @@ export default function ContentSeoPage() {
         <div className="bl-grid bl-grid--3">
           {ELEMENTS.map(element => (
             <Card key={element.title}>
+              <IconSurface name={element.icon} />
               <span className="bl-related__label">{element.label}</span>
               <CardTitle>{element.title}</CardTitle>
               <CardBody>{element.body}</CardBody>
@@ -256,7 +264,7 @@ export default function ContentSeoPage() {
 
       <Section ariaLabelledBy="structure-title">
         <SectionHead
-          eyebrow="04 / STRUCTURE"
+          eyebrow="04 / 구조 비교"
           id="structure-title"
           title={
             <>
@@ -289,7 +297,7 @@ export default function ContentSeoPage() {
 
       <Section subtle ariaLabelledBy="process-title">
         <SectionHead
-          eyebrow="05 / PROCESS"
+          eyebrow="05 / 진행 방식"
           id="process-title"
           title="진행 순서"
           lead="새 글을 바로 쓰지 않습니다. 지금 있는 문서가 어떤 질문에 답하고 있는지 확인한 뒤, 고칠 곳과 새로 써야 할 곳을 나눕니다."
@@ -299,7 +307,7 @@ export default function ContentSeoPage() {
 
       <Section ariaLabelledBy="pricing-title">
         <SectionHead
-          eyebrow="06 / PRICING"
+          eyebrow="06 / 가격"
           id="pricing-title"
           title="비용과 포함 범위"
           lead={
@@ -328,18 +336,12 @@ export default function ContentSeoPage() {
       </Section>
 
       <Section size="sm">
-        <TelegramCTABlock
-          source="content-seo"
-          position="mid"
-          title="지금 페이지가 어떤 검색어의 답인지 애매하신가요?"
-          body="목표 키워드와 페이지 주소를 보내 주시면, 검색의도와 문서 구조가 어긋나 있는지부터 확인해 드립니다."
-          label="콘텐츠 구조 상담하기"
-        />
+        <TelegramCTABlock source="content-seo" cta="content" position="mid" />
       </Section>
 
       <Section subtle ariaLabelledBy="more-title">
         <SectionHead
-          eyebrow="07 / NEXT"
+          eyebrow="07 / 다음 단계"
           id="more-title"
           title="판단에 도움이 되는 내용"
           lead="상담 전에 먼저 읽어보셔도 됩니다. 콘텐츠와 링크 중 어느 쪽이 지금 필요한지 스스로 가늠하는 데 도움이 됩니다."
@@ -352,6 +354,7 @@ export default function ContentSeoPage() {
 
       <FinalCTA
         source="content-seo"
+        cta="content"
         title="어떤 검색어의 답을 만들고 싶으신가요?"
         body="목표 키워드와 대상 페이지를 알려 주시면 지금 문서에서 무엇이 비어 있는지 보고 말씀드리겠습니다."
         label="콘텐츠 방향 상담하기"

@@ -21,17 +21,19 @@ import { TelegramCTABlock } from '@/components/marketing/TelegramCTABlock'
 import { FinalCTA } from '@/components/marketing/FinalCTA'
 import { Button } from '@/components/ui/Button'
 import { Card, CardBody, CardMeta, CardTitle, BulletList } from '@/components/ui/Card'
+import { IconSurface } from '@/components/ui/Icon'
 import { RelatedContent } from '@/components/content/RelatedContent'
 import { RelatedServices } from '@/components/content/RelatedServices'
 import { RelatedArticles } from '@/components/content/RelatedArticles'
 
 import { PRICING, formatKrw } from '@/config/pricing'
+import { getService } from '@/config/services'
+import { ctaLabel } from '@/config/cta'
 import { SEO_GRAPH, resolveArticles } from '@/config/seo-graph'
 import { PUBLISHED_CASES, CASE_DISCLOSURE_RULES } from '@/config/cases'
 
 export const dynamic = 'force-static'
 
-const CTA_LABEL = '현재 SEO 상황 상담하기'
 const CTA_SOURCE = 'backlink-agency'
 
 export const metadata: Metadata = {
@@ -57,6 +59,8 @@ const AGENCY_QUESTIONS = [
 type Criterion = {
   no: string
   name: string
+  /** components/ui/Icon.tsx 의 IconName */
+  icon: string
   /** 무엇을 보는지 */
   watch: string
   /** 어떻게 확인하는지 */
@@ -69,6 +73,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 01',
     name: '관련성',
+    icon: 'target',
     watch:
       '링크가 걸리는 자리의 주제가 내 사이트가 다루는 주제와 이어지는지를 봅니다. 업종이 똑같아야 한다는 뜻은 아니고, 그 글을 읽던 사람이 내 페이지로 넘어오는 흐름이 설명되는지가 기준입니다.',
     how: '진행할 링크가 어떤 성격의 사이트에 실리는지 상담 단계에서 말로 설명받아 보세요. 설명이 "다양한 분야"에서 멈춘다면 어떤 분야인지, 내 업종과 어디서 만나는지 한 번 더 물어보면 됩니다.',
@@ -77,6 +82,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 02',
     name: '페이지 품질',
+    icon: 'file',
     watch:
       '링크가 실리는 페이지 자체가 사람이 읽을 수 있는 문서인지를 봅니다. 도메인 지표 하나보다, 그 한 페이지가 어떤 모습인지가 실제로 전달되는 신호에 가깝습니다.',
     how: '이미 게시된 URL을 한두 개만 열어보면 대부분 판단됩니다. 본문이 있는지, 문장이 사람이 쓴 것처럼 읽히는지, 같은 페이지에 외부 링크가 몇 개나 함께 걸려 있는지를 보세요.',
@@ -85,6 +91,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 03',
     name: '앵커 구성',
+    icon: 'pen',
     watch:
       '어떤 문구로 링크를 걸지, 그 비율을 누가 어떤 근거로 정하는지를 봅니다. 목표 키워드, 브랜드명, 사이트 주소, 일반 문구가 섞이는 방식이 링크 프로필의 인상을 만듭니다.',
     how: '작업 전에 앵커 텍스트 구성안을 문장으로 받아볼 수 있는지 확인하세요. 완료 후 리포트에 실제 사용된 문구가 그대로 적히는지도 함께 물어보면 계획과 결과를 대조할 수 있습니다.',
@@ -93,6 +100,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 04',
     name: '유지 방식',
+    icon: 'clock',
     watch:
       '만들어진 링크가 얼마 동안, 어떤 조건으로 남아 있는지를 봅니다. 백링크 작업의 값은 게시되는 순간이 아니라 남아 있는 기간 동안 발생합니다.',
     how: '유지 기간이 정해져 있는지, 링크가 내려갔을 때 어떻게 처리하는지, 그 확인을 누가 하는지를 결제 전에 문장으로 확인하세요. 구두 설명보다 상담 기록이나 안내 문서에 남는 형태가 낫습니다.',
@@ -101,6 +109,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 05',
     name: '작업 과정',
+    icon: 'sitemap',
     watch:
       '착수부터 완료까지 어떤 순서로 무엇을 하는지가 미리 설명되는지를 봅니다. 순서가 있다는 것은 중간에 방향을 바꿀 지점이 있다는 뜻입니다.',
     how: '사이트 상태 확인, 구성 제안, 작업, 리포트로 이어지는 단계와 각 단계에 걸리는 기간을 물어보세요. 시작 전에 무엇을 알려주어야 하는지까지 안내된다면 과정이 실제로 정리되어 있다는 신호입니다.',
@@ -109,6 +118,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 06',
     name: '리포팅',
+    icon: 'chart',
     watch:
       '작업이 끝난 뒤 무엇을 손에 남기는지를 봅니다. 순위 그래프는 결과의 요약일 뿐이고, 백링크 대행에서 검증해야 할 대상은 실제로 무엇이 만들어졌는가입니다.',
     how: '리포트 형식을 미리 요청해 작업 URL, 앵커 텍스트, 게시 시점이 각각 적혀 있는지 확인하세요. 받은 뒤에는 목록의 주소를 몇 개 열어 실제 게시 상태와 대조해 보면 됩니다.',
@@ -117,6 +127,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 07',
     name: '가격',
+    icon: 'gauge',
     watch:
       '금액이 무엇의 대가인지 설명되는지를 봅니다. 견적을 비교하려면 먼저 두 견적이 같은 것을 가리키고 있어야 합니다.',
     how: '같은 금액 안에 링크 수, 작업 기간, 리포트 범위가 각각 적혀 있는지 확인하세요. 공개된 시작가와 실제 견적이 달라지는 조건이 무엇인지도 함께 물어보면 금액의 구조가 보입니다.',
@@ -125,6 +136,7 @@ const CRITERIA: Criterion[] = [
   {
     no: '기준 08',
     name: '정책',
+    icon: 'shield',
     watch:
       '환불, 재작업, 중단에 대한 기준이 문서로 존재하는지를 봅니다. 잘 진행될 때가 아니라 어긋났을 때 무엇을 근거로 이야기할지의 문제입니다.',
     how: '결제 전에 환불 규정과 취소 기준이 페이지나 문서로 공개되어 있는지 확인하세요. 언제 개정되었는지까지 적혀 있다면 실제로 관리되는 문서라고 볼 수 있습니다.',
@@ -190,6 +202,14 @@ const OUR_APPROACH: { criterion: string; how: string; verify: ReactNode }[] = [
   },
 ]
 
+/** CASE_DISCLOSURE_RULES(config)에 아이콘 필드가 없어 표시용 매핑만 여기서 붙인다. */
+const DISCLOSURE_ICONS: Record<string, string> = {
+  '중간 순위를 지어내지 않습니다': 'shield',
+  '결과와 조건을 함께 공개합니다': 'file',
+  '트래픽·매출 수치는 쓰지 않습니다': 'alert',
+  '평균값으로 뭉뚱그리지 않습니다': 'chart',
+}
+
 export default function BacklinkAgencyPage() {
   const cluster = SEO_GRAPH.agency
   const articles = resolveArticles(cluster.relatedArticles)
@@ -200,7 +220,7 @@ export default function BacklinkAgencyPage() {
       <Breadcrumb trail={[{ href: '/backlink-agency', label: '백링크 업체 판단 기준' }]} />
 
       <Hero
-        eyebrow="HOW TO EVALUATE"
+        eyebrow="백링크 업체 판단 기준"
         title={
           <>
             <span className="bl-break">백링크 업체,</span>
@@ -210,17 +230,16 @@ export default function BacklinkAgencyPage() {
         support="견적서를 나란히 놓고 금액만 비교하면 무엇을 사는 것인지 알기 어렵습니다. 링크가 어디에 생기고, 어떤 문구로 걸리고, 끝난 뒤 무엇이 손에 남는지가 정해져야 그때부터 가격이 비교 가능한 숫자가 됩니다."
         actions={
           <>
-            <TelegramCTA source={CTA_SOURCE} position="hero" size="lg" label={CTA_LABEL} />
+            <TelegramCTA source={CTA_SOURCE} position="hero" size="lg" label={ctaLabel('agency')} />
             <Button href="/pricing" variant="secondary" size="lg">
               가격이 달라지는 조건 보기
             </Button>
           </>
         }
-        note="Telegram으로 연결됩니다 · 사이트 주소와 목표 키워드만 알려주시면 됩니다"
       />
 
       <ProblemSection
-        eyebrow="01 / SITUATION"
+        eyebrow="01 / 현재 상황"
         title={
           <>
             <span className="bl-break">백링크 작업을 맡겨본 뒤,</span>
@@ -234,7 +253,7 @@ export default function BacklinkAgencyPage() {
 
       <Section size="lg" ariaLabelledBy="criteria-title">
         <SectionHead
-          eyebrow="02 / CRITERIA"
+          eyebrow="02 / 판단 기준"
           id="criteria-title"
           title="백링크 대행을 맡기기 전에 맞춰야 할 여덟 가지"
           lead="업체를 평가하는 기준이 아니라, 작업의 조건을 확정하는 질문 목록으로 읽어 주세요. 여덟 가지 모두에 답이 정해지면 견적은 그다음에 비교하면 됩니다. 어느 항목도 상대를 시험하기 위한 것이 아니라, 끝난 뒤 서로 다른 이야기를 하지 않기 위한 것입니다."
@@ -242,6 +261,7 @@ export default function BacklinkAgencyPage() {
         <div className="bl-grid bl-grid--2">
           {CRITERIA.map(item => (
             <Card key={item.name}>
+              <IconSurface name={item.icon} />
               <span className="bl-related__label">{item.no}</span>
               <CardTitle>{item.name}</CardTitle>
               <CardBody>
@@ -271,7 +291,7 @@ export default function BacklinkAgencyPage() {
 
       <Section subtle ariaLabelledBy="approach-title">
         <SectionHead
-          eyebrow="03 / OUR APPROACH"
+          eyebrow="03 / 백링크샵의 방식"
           id="approach-title"
           title="백링크샵은 이렇게 판단합니다"
           lead="같은 여덟 가지 기준을 저희에게도 그대로 적용합니다. 자랑할 만한 숫자를 앞세우는 대신, 확인하실 수 있는 것만 적었습니다. 사이트 상태를 보고 지금 링크 작업이 맞지 않는다고 판단되면 그렇게 말씀드리고 권하지 않습니다."
@@ -295,16 +315,16 @@ export default function BacklinkAgencyPage() {
       <Section size="sm">
         <TelegramCTABlock
           source={CTA_SOURCE}
+          cta="agency"
           position="mid"
           title="지금 상태에서 어떤 항목부터 확인해야 할지 함께 정리해 드립니다."
           body="도메인 주소와 올리고 싶은 키워드만 알려주시면 됩니다. 상담이 곧 결제로 이어지지 않아도 괜찮습니다."
-          label={CTA_LABEL}
         />
       </Section>
 
       <Section ariaLabelledBy="cases-title">
         <SectionHead
-          eyebrow="04 / CASES"
+          eyebrow="04 / 사례 공개 기준"
           id="cases-title"
           title="사례를 어떻게 공개하는지도 판단 재료입니다"
           lead="성과 사례는 업체를 고를 때 가장 먼저 보게 되는 자료이면서, 검증하기 가장 어려운 자료이기도 합니다. 그래서 저희는 무엇을 공개할지보다 어떤 조건을 갖춘 사례만 공개할지를 먼저 정했습니다."
@@ -312,6 +332,7 @@ export default function BacklinkAgencyPage() {
         <div className="bl-grid bl-grid--2">
           {CASE_DISCLOSURE_RULES.map(rule => (
             <Card key={rule.title}>
+              <IconSurface name={DISCLOSURE_ICONS[rule.title] ?? 'spark'} />
               <CardTitle>{rule.title}</CardTitle>
               <CardBody>{rule.body}</CardBody>
             </Card>
@@ -340,7 +361,7 @@ export default function BacklinkAgencyPage() {
 
       <Section subtle ariaLabelledBy="pricing-title">
         <SectionHead
-          eyebrow="05 / PRICING"
+          eyebrow="05 / 시작가"
           id="pricing-title"
           title="시작가는 먼저 공개합니다"
           lead="상담을 해야만 금액을 알 수 있는 구조를 만들지 않았습니다. 아래는 각 작업의 시작가와 그 금액에 포함되는 항목입니다. 실제 견적은 키워드 경쟁도와 사이트 상태에 따라 달라지며, 무엇 때문에 달라지는지도 가격 안내에 함께 적어 두었습니다."
@@ -348,6 +369,7 @@ export default function BacklinkAgencyPage() {
         <div className="bl-grid bl-grid--2">
           {PRICING.map(group => (
             <Card key={group.service}>
+              <IconSurface name={getService(group.service)?.icon ?? 'spark'} />
               <CardTitle>{group.label}</CardTitle>
               <div className="bl-price">
                 <span className="bl-price__value">{formatKrw(group.from)}</span>
@@ -367,7 +389,7 @@ export default function BacklinkAgencyPage() {
 
       <Section ariaLabelledBy="next-title">
         <SectionHead
-          eyebrow="06 / NEXT"
+          eyebrow="06 / 다음 단계"
           id="next-title"
           title="기준을 정했다면, 다음은 무엇이 필요한지 고르는 일입니다"
           lead="여덟 가지 기준은 어떤 작업을 맡기든 똑같이 적용됩니다. 다만 지금 필요한 작업이 무엇인지는 사이트마다 다릅니다."
@@ -385,9 +407,9 @@ export default function BacklinkAgencyPage() {
 
       <FinalCTA
         source={CTA_SOURCE}
+        cta="agency"
         title="지금 맡기려는 백링크 작업이 적절한지부터 봐 드립니다."
         body="사이트 주소와 목표 키워드를 알려주시면 현재 상태에서 어떤 기준이 특히 중요한지 정리해 드립니다. 맞지 않는 작업이라면 권하지 않습니다."
-        label={CTA_LABEL}
       />
     </>
   )

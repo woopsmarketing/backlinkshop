@@ -67,13 +67,18 @@
 }
 
 /* ---------- Typography ---------- */
+/* 섹션 라벨. V2 에서 한글(01 / 현재 상황)로 바뀌었다.
+   - 자간은 --tracking-eyebrow 에서 줄였다 (영문 대문자용 0.12em 은 한글을 늘어뜨린다).
+   - 앞의 두 자리 숫자가 흔들리지 않도록 tabular-nums 를 쓴다.
+   - 색은 회색 대신 브랜드로 올려서 섹션 시작점이 눈에 걸리게 한다. */
 .bl-eyebrow {
   display: block;
   font-size: var(--fs-xs);
   font-weight: 600;
   letter-spacing: var(--tracking-eyebrow);
+  font-variant-numeric: tabular-nums;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--brand);
   margin-bottom: 1rem;
 }
 
@@ -203,7 +208,15 @@
 .bl-hero__grid > *,
 .bl-featured > *,
 .bl-related__list > *,
-.bl-cta > * {
+.bl-cta > *,
+.bl-qgrid > *,
+.bl-strategy > *,
+.bl-consult > *,
+.bl-timeline > *,
+.bl-journey > *,
+.bl-post-grid > *,
+.bl-case-card > *,
+.bl-insight > * {
   min-width: 0;
 }
 

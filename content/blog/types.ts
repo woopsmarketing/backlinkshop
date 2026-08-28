@@ -36,6 +36,18 @@ export type BlogPost = {
   moneyPage?: string
   /** 문맥이 맞을 때만 연결하는 보조 랜딩 */
   supportingPage?: string
+  /**
+   * 대표 이미지 (SVG 다이어그램).
+   * - thumbnail: /blog 목록 카드 · 관련 글 카드
+   * - heroImage: 글 본문 상단
+   * 같은 파일을 둘 다에 써도 되지만, 나중에 비율이 다른 이미지를 쓸 수 있게 필드를 나눠 둔다.
+   * 값이 없으면 이미지 없이 렌더링된다 (레이아웃이 깨지지 않는다).
+   */
+  thumbnail?: string
+  heroImage?: string
+  /** 이미지가 무엇을 설명하는지. 장식용이 아니므로 반드시 내용을 적는다. */
+  imageAlt?: string
+
   /** Key Takeaways */
   keyTakeaways: string[]
   sections: BlogSection[]

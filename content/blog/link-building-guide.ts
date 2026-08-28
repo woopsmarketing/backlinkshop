@@ -11,10 +11,13 @@ export const post: BlogPost = {
     '링크빌딩은 링크 하나를 확보하는 행위가 아니라, 어떤 페이지가 어떤 문맥에서 링크를 받게 할지 정하고 실행하는 과정입니다. 이 글은 시작 전에 정리해야 할 네 가지, 링크를 얻는 네 가지 경로의 비용·시간·통제력 비교, 앵커 텍스트 계획, 우선순위를 정하는 순서를 다룹니다. 구매할 상품을 고르기 전에 읽어야 할 내용입니다.',
   category: 'SEO',
   publishedAt: '2026-08-27',
-  updatedAt: '2026-08-27',
+  updatedAt: '2026-08-29',
   cluster: 'backlink',
   moneyPage: '/services/plan-backlink',
   supportingPage: '/services/content-seo',
+  thumbnail: '/images/blog/link-building-flow.svg',
+  heroImage: '/images/blog/link-building-flow.svg',
+  imageAlt: '목표 키워드 정의부터 효과 측정까지 링크빌딩 5단계 흐름도',
   keyTakeaways: [
     '링크빌딩은 상위 개념이고 백링크 구매는 그 안의 한 경로입니다. 구매부터 시작하면 그 링크가 어디로 향해야 하는지가 계획에서 빠집니다.',
     '시작 전에 목표 키워드, 목표 페이지, 현재 링크 프로필, 감당 가능한 리스크 수준 네 가지를 문서로 정리하면 이후 판단이 훨씬 단순해집니다.',
@@ -169,6 +172,7 @@ export const post: BlogPost = {
 <li><strong>홈</strong> — 브랜드형 링크가 자연히 모이는 곳이라 별도로 밀어붙이지 않아도 되는 경우가 많습니다.</li>
 <li><strong>아직 없는 페이지</strong> — 목표 키워드에 맞는 페이지가 아예 없다면 링크가 아니라 제작이 먼저입니다.</li>
 </ol>
+<figure class="blog-figure"><img src="/images/blog/internal-link-structure.svg" alt="홈과 주제별 가이드 문서, 그 아래 상세·전환 페이지가 내부링크로 연결되어 외부 링크로 받은 힘이 아래 계층으로 전달되는 사이트 구조도" width="800" height="520" loading="lazy" decoding="async" /><figcaption>외부 링크를 잘 받는 페이지와 순위를 원하는 페이지가 다를 때, 둘을 잇는 것이 내부링크입니다.</figcaption></figure>
 <p>여기에 한 가지 원칙을 더합니다. <strong>한 번에 한 주제씩</strong> 진행합니다. 세 개 주제에 링크를 동시에 나눠 붙이면 무엇이 효과가 있었는지 구분되지 않습니다. 한 주제를 정해 목표 페이지와 그 페이지를 뒷받침하는 문서까지 묶어서 진행하면, 결과가 나왔을 때 원인을 특정할 수 있습니다.</p>
 <p>여러 유형을 어떤 비율로 섞을지가 판단이 안 될 때는, 개별 상품을 고르기 전에 조합 자체를 먼저 설계하는 접근이 있습니다. <a href="/services/plan-backlink">플랜 방식의 링크 구성</a>이 그 자리를 맡습니다.</p>`,
     },

@@ -41,6 +41,7 @@ export const FOOTER_NAV: { heading: string; links: NavLink[] }[] = [
   {
     heading: '자료',
     links: [
+      { href: '/about', label: '백링크샵 소개' },
       { href: '/cases', label: '성공사례' },
       { href: '/blog', label: 'SEO 블로그' },
       { href: '/faq', label: 'FAQ' },

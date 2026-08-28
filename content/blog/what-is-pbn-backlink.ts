@@ -11,10 +11,13 @@ export const post: BlogPost = {
     'PBN은 한 주체가 여러 사이트를 운영하면서 목표 사이트로 링크를 내보내는 구조입니다. 링크를 통제할 수 있다는 점이 장점이자 그대로 위험 요인이 되며, 구글이 권장하는 방식도 아닙니다. 이 글은 PBN을 팔기 위한 글이 아니라, 제안을 받았을 때 무엇을 확인해야 하는지 판단하기 위한 글입니다.',
   category: 'PBN',
   publishedAt: '2026-08-27',
-  updatedAt: '2026-08-27',
+  updatedAt: '2026-08-29',
   cluster: 'pbnBacklink',
   moneyPage: '/services/pbn-backlink',
   supportingPage: '/backlink',
+  thumbnail: '/images/blog/pbn-architecture.svg',
+  heroImage: '/images/blog/pbn-architecture.svg',
+  imageAlt: '여러 네트워크 사이트가 하나의 목표 사이트로 링크를 보내는 PBN 구조 개념도',
   keyTakeaways: [
     'PBN(Private Blog Network)은 한 운영 주체가 여러 사이트를 소유·관리하며 목표 사이트로 링크를 내보내는 구조입니다. 링크를 직접 통제할 수 있다는 점이 핵심이고, 동시에 그 점 때문에 조작으로 판단될 여지가 생깁니다.',
     '구글은 PBN을 권장하지 않습니다. 순위를 목적으로 만들어진 링크는 구글의 링크 스팸 정책이 다루는 범위에 들어갈 수 있고, 링크가 무시되거나 사이트에 수동 조치가 적용되는 결과가 모두 가능합니다.',
@@ -108,6 +111,7 @@ export const post: BlogPost = {
 <li><strong>브랜드 리스크</strong> — 같은 네트워크에서 어떤 업종의 어떤 사이트로 링크가 나가는지를 발주자가 통제하기 어렵습니다. 경쟁사나 원치 않는 업종과 같은 페이지에 나란히 놓일 수 있습니다.</li>
 <li><strong>정리 비용</strong> — 문제가 생겼을 때 링크를 제거하고 부인(disavow) 파일을 정리하는 작업이 필요하며, 이 과정에는 어떤 링크가 어디에 걸렸는지에 대한 기록이 남아 있어야 합니다.</li>
 </ul>
+<figure class="blog-figure"><img src="/images/blog/pbn-risk-spectrum.svg" alt="PBN 운영 방식에 따라 위험도가 낮은 쪽에서 높은 쪽으로 이어지는 스펙트럼과 각 구간에서 나타나는 특징을 표시한 다이어그램" width="800" height="400" loading="lazy" decoding="async" /><figcaption>위험이 0인 구간은 없습니다. 지금 어느 지점에서 작업하는지 알고 시작하는 것이 차이를 만듭니다.</figcaption></figure>
 <h3>리스크를 줄이는 방향</h3>
 <p>없앨 수는 없고, 줄일 수는 있습니다. 실무에서 의미 있는 것들만 추리면 다음과 같습니다.</p>
 <ol>

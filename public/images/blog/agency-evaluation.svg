@@ -1,0 +1,51 @@
+<svg viewBox="0 0 800 450" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>백링크 업체를 판단할 때 확인해야 하는 여섯 가지 항목 체크리스트</title>
+  <rect width="800" height="450" fill="#ffffff"/>
+  <g font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif">
+    <text x="48" y="42" font-size="20" font-weight="600" fill="#111111">백링크 업체를 판단하는 체크리스트</text>
+    <text x="48" y="66" font-size="14" fill="#5f636b">여섯 항목을 물어보고 답을 받을 수 있는지 확인합니다</text>
+
+    <text x="48" y="98" font-size="13" fill="#8b9098">확인할 항목</text>
+    <text x="732" y="98" font-size="13" fill="#8b9098" text-anchor="end">확인 가능해야 하는 내용</text>
+
+    <g>
+      <rect x="48" y="108" width="704" height="42" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <circle cx="76" cy="129" r="12" fill="#eef2ff"/>
+      <path d="M70,129 L74.5,133.5 L82,125" fill="none" stroke="#3157e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="102" y="134" font-size="15" fill="#111111">작업 URL 공개</text>
+      <text x="732" y="134" font-size="14" fill="#5f636b" text-anchor="end">링크가 걸린 주소 목록</text>
+
+      <rect x="48" y="158" width="704" height="42" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <circle cx="76" cy="179" r="12" fill="#eef2ff"/>
+      <path d="M70,179 L74.5,183.5 L82,175" fill="none" stroke="#3157e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="102" y="184" font-size="15" fill="#111111">링크 유형 설명</text>
+      <text x="732" y="184" font-size="14" fill="#5f636b" text-anchor="end">유형별 비중과 이유</text>
+
+      <rect x="48" y="208" width="704" height="42" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <circle cx="76" cy="229" r="12" fill="#eef2ff"/>
+      <path d="M70,229 L74.5,233.5 L82,225" fill="none" stroke="#3157e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="102" y="234" font-size="15" fill="#111111">앵커 분산 계획</text>
+      <text x="732" y="234" font-size="14" fill="#5f636b" text-anchor="end">앵커 텍스트 구성안</text>
+
+      <rect x="48" y="258" width="704" height="42" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <circle cx="76" cy="279" r="12" fill="#eef2ff"/>
+      <path d="M70,279 L74.5,283.5 L82,275" fill="none" stroke="#3157e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="102" y="284" font-size="15" fill="#111111">기간과 범위</text>
+      <text x="732" y="284" font-size="14" fill="#5f636b" text-anchor="end">작업 일정과 수량</text>
+
+      <rect x="48" y="308" width="704" height="42" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <circle cx="76" cy="329" r="12" fill="#eef2ff"/>
+      <path d="M70,329 L74.5,333.5 L82,325" fill="none" stroke="#3157e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="102" y="334" font-size="15" fill="#111111">리스크 고지</text>
+      <text x="732" y="334" font-size="14" fill="#5f636b" text-anchor="end">가능한 위험과 대응</text>
+
+      <rect x="48" y="358" width="704" height="42" rx="10" fill="#ffffff" stroke="#d8dde6" stroke-width="1.25"/>
+      <circle cx="76" cy="379" r="12" fill="#eef2ff"/>
+      <path d="M70,379 L74.5,383.5 L82,375" fill="none" stroke="#3157e8" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="102" y="384" font-size="15" fill="#111111">사후 리포트</text>
+      <text x="732" y="384" font-size="14" fill="#5f636b" text-anchor="end">작업 후 결과 문서</text>
+    </g>
+
+    <text x="48" y="430" font-size="13" fill="#8b9098">여섯 항목 중 하나라도 확인 불가라면, 그 부분은 근거가 없는 것입니다.</text>
+  </g>
+</svg>
