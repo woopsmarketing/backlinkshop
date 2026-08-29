@@ -102,7 +102,7 @@ export default function EmailTestPage() {
                 <li>• 정식 오픈 안내 및 감사 인사</li>
                 <li>• MVP 테스트 중 불편 사항 사과</li>
                 <li>• 백링크 작업을 위한 정보 요청 (사이트 주소, 키워드)</li>
-                <li>• 24시간 텔레그램 문의 버튼 (t.me/goat82)</li>
+                <li>• 24시간 텔레그램 문의 버튼 (oopsad.com/tg)</li>
                 <li>• 주문내역 바로가기 / 백링크샵 바로가기 버튼</li>
               </ul>
             </div>

@@ -123,7 +123,8 @@ export const LpAnalysisFailedEmail: React.FC<LpAnalysisFailedEmailProps> = ({
             직접 해결이 어려우시다면
           </p>
           <a
-            href="https://t.me/goat82"
+            href="https://oopsad.com/tg"
+            rel="nofollow noopener noreferrer"
             style={{
               display: 'inline-block',
               background: '#0088cc',

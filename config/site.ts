@@ -16,8 +16,10 @@ export const SITE_NAME_EN = 'BacklinkShop'
  * 출처: 기존 리포지토리 전역에서 사용 중인 상담 링크 (app/page.tsx, app/pricing, app/services,
  * app/faq, app/cases, app/dashboard, app/lp/seo/LPFloatingCTA).
  * 주의: /analyze 플로우의 봇 딥링크(t.me/backlinkshop_seo_bot)와 다른 채널이므로 혼용하지 않는다.
+ * 2026-08-29: t.me 직링크에서 자사 리다이렉트 도메인(oopsad.com/tg)으로 교체했다.
+ * 이 URL을 렌더링하는 모든 <a>에는 rel="nofollow noopener noreferrer" 를 적용한다.
  */
-export const TELEGRAM_URL = 'https://t.me/goat82'
+export const TELEGRAM_URL = 'https://oopsad.com/tg'
 
 /** /analyze 결과 페이지에서 쓰는 봇 딥링크 (기존 동작 보존용, 마케팅 CTA에는 사용하지 않음) */
 export const TELEGRAM_BOT_URL = 'https://t.me/backlinkshop_seo_bot'

@@ -380,7 +380,7 @@ metadata = {
 
 - 보조 카피: "구글 상위노출에 필요한 모든 서비스를 제공합니다"
 - 버튼: **1:1 전문가 상담 신청** (텔레그램 아이콘, `bg-emerald-500`)
-- 링크: `https://t.me/goat82` (새 탭)
+- 링크: `https://oopsad.com/tg` (새 탭, `rel="nofollow noopener noreferrer"`)
 
 ### 제출 로직 (LPHeroForm.tsx:20-81)
 

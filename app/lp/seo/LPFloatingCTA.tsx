@@ -26,9 +26,9 @@ export function LPFloatingCTA() {
   return (
     <div className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 px-3">
       <a
-        href="https://t.me/goat82"
+        href="https://oopsad.com/tg"
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow noopener noreferrer"
         className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400/40 backdrop-blur transition-all hover:scale-[1.03] hover:bg-emerald-600"
       >
         <svg

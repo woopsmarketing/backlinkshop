@@ -122,7 +122,7 @@ export function PolicyDocumentPage({ doc }: { doc: PolicyDoc }) {
                     </li>
                     <li>
                       1:1 상담{' '}
-                      <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer">
+                      <a href={TELEGRAM_URL} target="_blank" rel="nofollow noopener noreferrer">
                         Telegram
                       </a>
                     </li>

@@ -64,7 +64,7 @@ export default function TopNav({ userEmail, isAdmin, title, balance }: TopNavPro
           <a
             href={TELEGRAM_URL}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noopener noreferrer"
             className="px-3 py-1 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             문의하기
@@ -97,7 +97,7 @@ export default function TopNav({ userEmail, isAdmin, title, balance }: TopNavPro
           <a
             href={TELEGRAM_URL}
             target="_blank"
-            rel="noopener noreferrer"
+            rel="nofollow noopener noreferrer"
             className="w-full py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 text-center"
           >
             문의하기

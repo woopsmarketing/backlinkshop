@@ -23,7 +23,7 @@ const { createClient } = require('@supabase/supabase-js')
 const CAMPAIGN = {
   brand: '백링크샵',
   discountPercent: 50,
-  telegramUrl: 'https://t.me/goat82',
+  telegramUrl: 'https://oopsad.com/tg',
   telegramId: '@goat82',
   kmongUrl: 'https://kmong.com/gig/385229',
   replyEmail: 'vnfm0580@gmail.com',
@@ -104,7 +104,7 @@ function heroHtml(variant, keyword, site) {
     <span style="display:inline-block;background:${acc};color:#ffffff;font-size:12px;font-weight:700;padding:4px 11px;border-radius:999px;margin-bottom:13px;">첫 구매 ${c.discountPercent}% 할인</span>
     <p style="margin:0 0 12px 0;font-size:22px;line-height:1.4;font-weight:800;color:#1a1a1a;">${headline}</p>
     <p style="margin:0 0 18px 0;color:#555;font-size:14.5px;line-height:1.6;">막혔던 키워드도, 새로 개발한 솔루션으로 다시 올립니다.</p>
-    <a href="${c.telegramUrl}" style="display:inline-block;background:${acc};color:#ffffff;padding:13px 30px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">💬 텔레그램으로 1분 상담</a>
+    <a href="${c.telegramUrl}" rel="nofollow noopener noreferrer" style="display:inline-block;background:${acc};color:#ffffff;padding:13px 30px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">💬 텔레그램으로 1분 상담</a>
   </div>`
 }
 
@@ -188,7 +188,7 @@ function buildHtml({ variant = 'generic', keyword = '', site = '', lpUrl = '', u
   <!-- 신청 방법 (단일 CTA 블록 — 중복 제거) -->
   <div style="border-top:1px solid #eee;padding-top:20px;margin-top:8px;">
     <p style="margin:0 0 10px 0;font-weight:700;font-size:16px;">📩 신청은 간단합니다</p>
-    <p style="margin:0 0 14px 0;color:#444;">사이트 주소와 키워드만 <a href="${c.telegramUrl}" style="color:#0088cc;font-weight:700;text-decoration:none;">텔레그램 ${c.telegramId}</a> 로 보내주시면 바로 도와드립니다.</p>
+    <p style="margin:0 0 14px 0;color:#444;">사이트 주소와 키워드만 <a href="${c.telegramUrl}" rel="nofollow noopener noreferrer" style="color:#0088cc;font-weight:700;text-decoration:none;">텔레그램 ${c.telegramId}</a> 로 보내주시면 바로 도와드립니다.</p>
     <p style="margin:0 0 8px 0;">
       <a href="${c.kmongUrl}" style="display:inline-block;background:#ff5b36;color:#fff;padding:12px 26px;border-radius:8px;text-decoration:none;font-weight:700;">🛒 크몽에서 신청하기</a>
       <span style="color:#888;font-size:13px;margin-left:8px;">텔레그램이 없으실 때</span>

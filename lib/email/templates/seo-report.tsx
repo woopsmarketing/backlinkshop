@@ -986,7 +986,8 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               전문가가 보고서를 함께 분석하고 맞춤 전략을 무료로 안내해드립니다
             </p>
             <a
-              href="https://t.me/goat82"
+              href="https://oopsad.com/tg"
+              rel="nofollow noopener noreferrer"
               style={{
                 display: 'inline-block',
                 background: '#facc15',
@@ -1219,7 +1220,8 @@ export const SeoReportEmail: React.FC<SeoReportEmailProps> = ({
               전문가가 직접 분석 결과를 설명하고, 내 사이트에 맞는 최적의 전략을 제안해드립니다
             </p>
             <a
-              href="https://t.me/goat82"
+              href="https://oopsad.com/tg"
+              rel="nofollow noopener noreferrer"
               style={{
                 display: 'inline-block',
                 background: '#facc15',

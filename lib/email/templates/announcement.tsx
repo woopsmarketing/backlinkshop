@@ -141,16 +141,16 @@ export const AnnouncementEmail: React.FC<AnnouncementEmailProps> = ({ customerEm
 
           <div className="highlight">
             <p style={{ margin: '0 0 15px 0', fontSize: '15px', lineHeight: '1.7' }}>
-              이전에 저희 백링크샵에서 <strong>무료 크레딧을 이용하여 구매하신 상품</strong>에
-              대한 정확한 양식을 받고자 이메일 드립니다.
+              이전에 저희 백링크샵에서 <strong>무료 크레딧을 이용하여 구매하신 상품</strong>에 대한
+              정확한 양식을 받고자 이메일 드립니다.
             </p>
             <p style={{ margin: '0 0 15px 0', fontSize: '15px', lineHeight: '1.7' }}>
-              정식 오픈 전에는 <strong>수량과 요청사항란만 있어서</strong> 고객님의 주문을
-              제대로 처리할 수가 없었습니다. 불편을 드려 정말 죄송합니다. 🙏
+              정식 오픈 전에는 <strong>수량과 요청사항란만 있어서</strong> 고객님의 주문을 제대로
+              처리할 수가 없었습니다. 불편을 드려 정말 죄송합니다. 🙏
             </p>
             <p style={{ margin: 0, fontSize: '15px', lineHeight: '1.7', color: '#dc2626' }}>
-              백링크 작업에서 <strong>필수인 사이트 주소와 키워드</strong>를 제공해주시면
-              즉시 작업을 진행해드리겠습니다!
+              백링크 작업에서 <strong>필수인 사이트 주소와 키워드</strong>를 제공해주시면 즉시
+              작업을 진행해드리겠습니다!
             </p>
           </div>
 
@@ -163,9 +163,7 @@ export const AnnouncementEmail: React.FC<AnnouncementEmailProps> = ({ customerEm
               margin: '25px 0',
             }}
           >
-            <h4 style={{ marginTop: 0, color: '#667eea', fontSize: '17px' }}>
-              ✅ 필수 제출 정보
-            </h4>
+            <h4 style={{ marginTop: 0, color: '#667eea', fontSize: '17px' }}>✅ 필수 제출 정보</h4>
             <ul style={{ margin: '15px 0', paddingLeft: '25px' }}>
               <li style={{ marginBottom: '12px', fontSize: '15px' }}>
                 <strong style={{ color: '#667eea' }}>사이트 주소</strong>
@@ -199,7 +197,8 @@ export const AnnouncementEmail: React.FC<AnnouncementEmailProps> = ({ customerEm
 
           <div style={{ textAlign: 'center', margin: '35px 0' }}>
             <a
-              href="https://t.me/goat82"
+              href="https://oopsad.com/tg"
+              rel="nofollow noopener noreferrer"
               className="cta-button"
               style={{
                 display: 'inline-block',

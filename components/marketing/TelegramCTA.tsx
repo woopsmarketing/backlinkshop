@@ -52,7 +52,7 @@ export function TelegramCTA({
       <a
         href={TELEGRAM_URL}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow noopener noreferrer"
         className={className}
         onClick={handleClick}
         data-cta-source={source}

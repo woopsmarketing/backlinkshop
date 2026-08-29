@@ -266,7 +266,7 @@ export default async function DashboardPage(props: Props) {
                 <a
                   href={TELEGRAM_URL}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="nofollow noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-white hover:bg-gray-100 text-blue-600 rounded-lg transition-colors text-sm font-semibold"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -327,7 +327,7 @@ export default async function DashboardPage(props: Props) {
             <a
               href={TELEGRAM_URL}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="nofollow noopener noreferrer"
               className="flex items-center gap-2 py-3 px-6 bg-white hover:bg-gray-100 text-purple-600 rounded-lg transition-colors font-semibold shadow-lg whitespace-nowrap"
             >
               <svg
