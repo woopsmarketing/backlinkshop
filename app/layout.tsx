@@ -11,6 +11,7 @@
 import type { Metadata } from 'next'
 import '@/styles/master.css'
 import { GoogleTag } from './components/GoogleTag'
+import { BoostChat } from './components/BoostChat'
 import { SITE_NAME, SITE_URL } from '@/config/site'
 
 export const metadata: Metadata = {
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body className="antialiased">
         <GoogleTag />
         {children}
+        <BoostChat />
       </body>
     </html>
   )
